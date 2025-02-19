@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 public class WebSecurityConfig {
 
-    private final AuthenticationFilter authenticationFilter;
+    // private final AuthenticationFilter authenticationFilter;
     private final AuthenticationProvider authenticationProvider;
     private final String[] WHITE_LITS = {"/",
             "/static/**",
