@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -18,11 +19,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CustomerModel extends UserModel {
+public class DiscountCampaignModel extends AbstractEntity<Long> {
+    private String description;
+    private Date startDate;
+    private Date endDate;
+    private boolean active;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
-    private Set<AddressModel> listAddress;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
-    private Set<CouponModel> listCoupon;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "discountCampaignModel", cascade = CascadeType.ALL)
+    Set<DiscountDetailModel> listDiscountDetail;
 }

@@ -1,8 +1,8 @@
 package com.apinayami.demo.model;
 
+import com.apinayami.demo.model.Product.PhoneModel;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,13 +16,10 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ShippingModel extends AbstractEntity<Long> {
-    @ManyToOne()
-    @JoinColumn(name = "shipping_address_id")
-    private AddressModel shippingAddress;
-    private double shippingFee;
+public class ConfigurationPhoneModel extends ConfigurationModel {
+    private String frontCamera;
+    private String backCamera;
 
-    @OneToOne()
-    @JoinColumn(name = "bill_id")
-    private BillModel billModel;
+    @OneToOne(mappedBy = "configurationPhoneModel", fetch = FetchType.LAZY)
+    private PhoneModel phoneModel;
 }

@@ -1,8 +1,7 @@
 package com.apinayami.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.apinayami.demo.util.Enum.ETypeCoupon;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,14 +14,14 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AddressModel extends AbstractEntity<Long> {
+public class CouponModel extends AbstractEntity<Long> {
     @ManyToOne()
     @JoinColumn(name = "customer_id")
     private CustomerModel customerModel;
-    private String shippingContactNumber;
-    private String detail;
-    private String province;
-    private String village;
-    private String district;
+    private String content;
+    private Double value;
+    @Enumerated(EnumType.STRING)
+    private ETypeCoupon type;
+    private Double constraintMoney;
     private boolean active;
 }

@@ -32,4 +32,5 @@ public abstract class AbstractEntity<T extends Serializable> implements Serializ
     @Column(name = "updated_at")
     @UpdateTimestamp
     protected Date updatedAt;
+
 }

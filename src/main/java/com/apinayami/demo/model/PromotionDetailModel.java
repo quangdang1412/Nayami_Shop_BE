@@ -16,13 +16,13 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ShippingModel extends AbstractEntity<Long> {
-    @ManyToOne()
-    @JoinColumn(name = "shipping_address_id")
-    private AddressModel shippingAddress;
-    private double shippingFee;
+public class PromotionDetailModel extends AbstractEntity<Long> {
+    @OneToOne
+    @JoinColumn(name = "image_id")
+    private ImageModel imageModel;
 
-    @OneToOne()
-    @JoinColumn(name = "bill_id")
-    private BillModel billModel;
+    @ManyToOne
+    @JoinColumn(name = "promotion_id")
+    private PromotionModel promotionModel;
+    private String position;
 }

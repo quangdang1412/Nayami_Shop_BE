@@ -1,5 +1,6 @@
 package com.apinayami.demo.model;
 
+import com.apinayami.demo.model.Product.BaseProduct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -16,13 +17,13 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ShippingModel extends AbstractEntity<Long> {
-    @ManyToOne()
-    @JoinColumn(name = "shipping_address_id")
-    private AddressModel shippingAddress;
-    private double shippingFee;
+public class ImageModel extends AbstractEntity<Long> {
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private BaseProduct productModel;
+    @OneToOne
+    @JoinColumn(name = "promotion_detail_id")
+    private PromotionDetailModel promotionDetailModel;
+    private String url;
 
-    @OneToOne()
-    @JoinColumn(name = "bill_id")
-    private BillModel billModel;
 }

@@ -1,8 +1,10 @@
 package com.apinayami.demo.model;
 
+import com.apinayami.demo.util.Enum.EPaymentCurrency;
+import com.apinayami.demo.util.Enum.EPaymentMethod;
+import com.apinayami.demo.util.Enum.EPaymentStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,13 +18,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ShippingModel extends AbstractEntity<Long> {
-    @ManyToOne()
-    @JoinColumn(name = "shipping_address_id")
-    private AddressModel shippingAddress;
-    private double shippingFee;
-
-    @OneToOne()
+public class PaymentModel extends AbstractEntity<Long> {
+    private EPaymentStatus paymentStatus;
+    private EPaymentCurrency currency;
+    private EPaymentMethod paymentMethod;
+    @OneToOne
     @JoinColumn(name = "bill_id")
     private BillModel billModel;
 }

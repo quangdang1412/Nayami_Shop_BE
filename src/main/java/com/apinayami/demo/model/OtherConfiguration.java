@@ -3,7 +3,6 @@ package com.apinayami.demo.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,13 +15,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ShippingModel extends AbstractEntity<Long> {
-    @ManyToOne()
-    @JoinColumn(name = "shipping_address_id")
-    private AddressModel shippingAddress;
-    private double shippingFee;
+public class OtherConfiguration extends AbstractEntity<Long> {
+    private String name;
+    private String description;
 
-    @OneToOne()
-    @JoinColumn(name = "bill_id")
-    private BillModel billModel;
+    @ManyToOne
+    @JoinColumn(name = "configuration_id")
+    private ConfigurationModel configurationModel;
 }
