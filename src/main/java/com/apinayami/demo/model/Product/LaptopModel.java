@@ -17,6 +17,6 @@ import lombok.experimental.SuperBuilder;
 public class LaptopModel extends BaseProduct {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "configuration_id", nullable = false)
+    @JoinColumn(name = "configuration_id", nullable = true) //test
     private ConfigurationLaptopModel configurationLaptopModel;
 }

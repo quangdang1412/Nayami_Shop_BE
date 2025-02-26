@@ -1,6 +1,11 @@
 package com.apinayami.demo.model.Product;
 
-import com.apinayami.demo.model.*;
+import com.apinayami.demo.model.BrandModel;
+import com.apinayami.demo.model.CategoryModel;
+import com.apinayami.demo.model.CommentModel;
+import com.apinayami.demo.model.ImageModel;
+import com.apinayami.demo.util.Enum.EProductStatus;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,15 +18,16 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.util.Date;
 import java.util.List;
 
-@MappedSuperclass
 @Getter
 @Setter
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BaseProduct {
+public class BaseProduct {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     protected Long id;
 
@@ -32,31 +38,33 @@ public abstract class BaseProduct {
     @Column(name = "updated_at")
     @UpdateTimestamp
     protected Date updatedAt;
-    private String productName;
-    private String description;
-    private boolean displayStatus;
-    private Integer quantity;
-    private Integer ratingAvg;
-    private Double orginalPrice;
-    private Double unitPrice;
+    protected String description;
+    protected String productName;
 
+    protected boolean displayStatus;
+    protected EProductStatus productStatus;
+    protected Integer quantity;
+    protected Integer ratingAvg;
+    protected Double orginalPrice;
+    protected Double unitPrice;
+
+
+    //references
     @ManyToOne
     @JoinColumn(name = "brand_id")
-    private BrandModel brandModel;
+    protected BrandModel brandModel;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private CategoryModel categoryModel;
+    protected CategoryModel categoryModel;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productModel", cascade = CascadeType.ALL)
-    private List<ImageModel> listImage;
+    @Nullable // test
+    protected List<ImageModel> listImage;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productModel", cascade = CascadeType.ALL)
-    private List<CommentModel> listComment;
+    @Nullable // test
+    protected List<CommentModel> listComment;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productModel", cascade = CascadeType.ALL)
-    private List<LineItemModel> listLineItem;
-
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productModel", cascade = CascadeType.ALL)
-//    private List<CommentModel> listComment;
 }
+

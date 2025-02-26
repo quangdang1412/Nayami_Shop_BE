@@ -20,9 +20,9 @@ public class LineItemModel extends AbstractEntity<Long> {
     private Integer quantity;
     private Double unitPrice;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private BaseProduct productModel;
+//    @ManyToOne
+//    @JoinColumn(name = "product_id")
+//    private BaseProduct productModel;
 
     @ManyToOne
     @JoinColumn(name = "bill_id")
