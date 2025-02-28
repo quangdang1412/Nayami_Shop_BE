@@ -1,0 +1,35 @@
+server:
+  port: 8081
+  
+spring:
+  config:
+    activate:
+      on-profile: dev
+  application:
+    name: nayami_shop
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  h2:
+    console:
+      enabled: false
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
+openapi:
+  service:
+    api-docs: api-service
+    title: ${API_TITLE:DEV-TEST-API}
+    version: 1.0.0

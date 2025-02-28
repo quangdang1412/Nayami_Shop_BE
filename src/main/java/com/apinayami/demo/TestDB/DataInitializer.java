@@ -4,22 +4,21 @@ import com.apinayami.demo.model.AddressModel;
 import com.apinayami.demo.model.CustomerModel;
 import com.apinayami.demo.model.ShippingModel;
 import com.apinayami.demo.model.TestModel;
-import com.apinayami.demo.repository.AddressRepository;
-import com.apinayami.demo.repository.CustomerRepository;
-import com.apinayami.demo.repository.ShippingRepository;
+import com.apinayami.demo.repository.IAddressRepository;
+import com.apinayami.demo.repository.ICustomerRepository;
+import com.apinayami.demo.repository.IShippingRepository;
 import com.apinayami.demo.util.Enum.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+//@Configuration
 @RequiredArgsConstructor
 public class DataInitializer {
 
-    private final CustomerRepository customerRepository;
-    private final AddressRepository addressRepository;
-    private final ShippingRepository shippingRepository;
+    private final ICustomerRepository customerRepository;
+    private final IAddressRepository addressRepository;
+    private final IShippingRepository shippingRepository;
 
     @Bean
     public CommandLineRunner initData() {

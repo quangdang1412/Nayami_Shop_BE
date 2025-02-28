@@ -1,9 +1,9 @@
 package com.apinayami.demo.repository;
 
-import com.apinayami.demo.model.ShippingModel;
+import com.apinayami.demo.model.CategoryModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ShippingRepository extends JpaRepository<ShippingModel, Long> {
+public interface ICategoryRepository extends JpaRepository<CategoryModel, Long> {
 }
