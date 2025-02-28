@@ -1,6 +1,5 @@
 package com.apinayami.demo.model;
 
-import com.apinayami.demo.model.Product.BaseProduct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -22,7 +21,7 @@ public class LineItemModel extends AbstractEntity<Long> {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    private BaseProduct productModel;
+    private ProductModel productModel;
 
     @ManyToOne
     @JoinColumn(name = "bill_id")

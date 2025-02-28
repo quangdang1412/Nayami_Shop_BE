@@ -1,6 +1,5 @@
 package com.apinayami.demo.model;
 
-import com.apinayami.demo.model.Product.BaseProduct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,9 +20,10 @@ public class CommentModel extends AbstractEntity<Long> {
     private Integer rating;
     @ManyToOne
     @JoinColumn(name = "product_id")
-    private BaseProduct productModel;
+    private ProductModel productModel;
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private CustomerModel customerModel;
+
 
 }

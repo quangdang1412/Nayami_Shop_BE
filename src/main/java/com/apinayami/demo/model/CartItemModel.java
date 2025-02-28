@@ -15,11 +15,15 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ImageModel extends AbstractEntity<Long> {
+public class CartItemModel extends AbstractEntity<Long> {
+    private Integer quantity;
+    private Double unitPrice;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductModel productModel;
 
-    private String url;
-
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private CustomerModel customerModel;
 }

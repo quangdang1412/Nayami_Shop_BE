@@ -1,48 +1,39 @@
-package com.apinayami.demo.model.Product;
+package com.apinayami.demo.model;
 
-import com.apinayami.demo.model.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
 import java.util.List;
 
-@MappedSuperclass
-@Getter
-@Setter
+@Entity
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BaseProduct {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    protected Long id;
+public class ProductModel extends AbstractEntity<Long> {
 
-    @Column(name = "created_at", updatable = false)
-    @CreationTimestamp
-    protected Date createdAt;
-
-    @Column(name = "updated_at")
-    @UpdateTimestamp
-    protected Date updatedAt;
     private String productName;
     private String description;
     private boolean displayStatus;
     private Integer quantity;
     private Integer ratingAvg;
-    private Double orginalPrice;
+    private Double originalPrice;
     private Double unitPrice;
 
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private BrandModel brandModel;
+
+    @ManyToOne
+    @JoinColumn(name = "discount_id")
+    private DiscountDetailModel discountDetailModel;
+
+    @ManyToOne
+    @JoinColumn(name = "configuration_id")
+    private ConfigurationModel configurationModel;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -57,6 +48,5 @@ public abstract class BaseProduct {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productModel", cascade = CascadeType.ALL)
     private List<LineItemModel> listLineItem;
 
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productModel", cascade = CascadeType.ALL)
-//    private List<CommentModel> listComment;
+
 }

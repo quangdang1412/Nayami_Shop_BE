@@ -3,7 +3,6 @@ package com.apinayami.demo.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,7 +21,4 @@ public class ShippingModel extends AbstractEntity<Long> {
     private AddressModel shippingAddress;
     private double shippingFee;
 
-    @OneToOne()
-    @JoinColumn(name = "bill_id")
-    private BillModel billModel;
 }

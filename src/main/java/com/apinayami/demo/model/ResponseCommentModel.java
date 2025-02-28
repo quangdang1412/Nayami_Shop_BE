@@ -3,6 +3,7 @@ package com.apinayami.demo.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +21,8 @@ public class ResponseCommentModel extends AbstractEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "staff_id")
     private StaffModel staffModel;
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "comment_id")
     private CommentModel commentModel;
+
 }

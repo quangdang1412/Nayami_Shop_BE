@@ -25,4 +25,7 @@ public class CustomerModel extends UserModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
     private Set<CouponModel> listCoupon;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
+    private Set<CartItemModel> listCartItem;
 }
