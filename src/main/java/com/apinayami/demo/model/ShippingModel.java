@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class ShippingModel extends AbstractEntity<Long> {
     @ManyToOne()
-    @JoinColumn(name = "shipping_address_id")
+    @JoinColumn(name = "address_id")
     private AddressModel shippingAddress;
     private double shippingFee;
 

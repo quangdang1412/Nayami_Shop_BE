@@ -10,5 +10,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 
 @EqualsAndHashCode(callSuper = true)
-public class StaffModel extends AbstractEntity<Long> {
+public class StaffModel extends UserModel {
 }
