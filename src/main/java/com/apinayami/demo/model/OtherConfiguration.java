@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class OtherConfiguration extends AbstractEntity<Long> {
     private String name;
-    private String description;
+    private String value;
 
     @ManyToOne
     @JoinColumn(name = "configuration_id")

@@ -17,11 +17,12 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class DiscountDetailModel extends AbstractEntity<Long> {
 
+    private Double percentage;
+
+    //reference
     @ManyToOne()
     @JoinColumn(name = "discount_campaign_id")
     private DiscountCampaignModel discountCampaignModel;
-    private Double percentage;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "discountDetailModel", cascade = CascadeType.ALL)
     Set<ProductModel> listProduct;
 }

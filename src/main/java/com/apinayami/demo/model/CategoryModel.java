@@ -1,9 +1,6 @@
 package com.apinayami.demo.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,9 +18,10 @@ import java.util.Set;
 public class CategoryModel extends AbstractEntity<Long> {
     private String categoryName;
 
+    //reference
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "categoryModel", cascade = CascadeType.ALL)
     Set<ProductModel> listProduct;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "categoryModel", cascade = CascadeType.ALL)
-    Set<ConfigurationModel> listConfiguration;
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "categoryModel", cascade = CascadeType.ALL)
+    ConfigurationModel configuration;
 }

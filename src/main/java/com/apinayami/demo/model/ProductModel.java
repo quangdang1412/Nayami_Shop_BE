@@ -1,5 +1,6 @@
 package com.apinayami.demo.model;
 
+import com.apinayami.demo.util.Enum.EProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class ProductModel extends AbstractEntity<Long> {
     private Integer ratingAvg;
     private Double originalPrice;
     private Double unitPrice;
+    private EProductStatus productStatus;
 
     @ManyToOne
     @JoinColumn(name = "brand_id")

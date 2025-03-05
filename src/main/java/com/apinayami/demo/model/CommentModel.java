@@ -18,12 +18,14 @@ import lombok.experimental.SuperBuilder;
 public class CommentModel extends AbstractEntity<Long> {
     private String description;
     private Integer rating;
+
+    //reference
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductModel productModel;
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    private CustomerModel customerModel;
+    private UserModel customerModel;
 
 
 }

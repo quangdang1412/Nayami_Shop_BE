@@ -16,10 +16,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ImageModel extends AbstractEntity<Long> {
+    private String url;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductModel productModel;
-
-    private String url;
-
 }

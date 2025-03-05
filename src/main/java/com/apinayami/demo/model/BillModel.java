@@ -17,22 +17,27 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class BillModel extends AbstractEntity<Long> {
+
+    private Double totalPrice;
+    private Double discount;
+    private EPaymentMethod paymentMethod;
+    //reference
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    private CustomerModel customerModel;
-    private EPaymentMethod paymentMethod;
+    private UserModel customerModel;
+
     @OneToOne
     @JoinColumn(name = "shipping_id")
     private ShippingModel shippingModel;
+
     @OneToOne
     @JoinColumn(name = "payment_id")
     private PaymentModel paymentModel;
-    private Double totalPrice;
-    private Double discount;
+
     @ManyToOne
     @JoinColumn(name = "coupon_id")
     private CouponModel couponModel;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "billModel", cascade = CascadeType.ALL)
-    private List<LineItemModel> listLineItem;
+    private List<LineItemModel> items;
 }

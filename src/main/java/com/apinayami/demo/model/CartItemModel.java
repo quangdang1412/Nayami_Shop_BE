@@ -25,5 +25,5 @@ public class CartItemModel extends AbstractEntity<Long> {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    private CustomerModel customerModel;
+    private UserModel customerModel;
 }

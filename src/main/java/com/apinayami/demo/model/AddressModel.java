@@ -16,13 +16,15 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AddressModel extends AbstractEntity<Long> {
-    @ManyToOne()
-    @JoinColumn(name = "customer_id")
-    private CustomerModel customerModel;
     private String shippingContactNumber;
     private String detail;
     private String province;
-    private String village;
+    private String ward;
     private String district;
     private boolean active;
+
+    //reference
+    @ManyToOne()
+    @JoinColumn(name = "customer_id")
+    private UserModel customerModel;
 }

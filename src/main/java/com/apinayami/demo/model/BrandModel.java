@@ -21,6 +21,7 @@ import java.util.Set;
 public class BrandModel extends AbstractEntity<Long> {
     private String brandName;
 
+    //reference
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "brandModel", cascade = CascadeType.ALL)
     Set<ProductModel> listProduct;
 }

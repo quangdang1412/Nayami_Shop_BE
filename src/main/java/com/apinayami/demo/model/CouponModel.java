@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 public class CouponModel extends AbstractEntity<Long> {
     @ManyToOne()
     @JoinColumn(name = "customer_id")
-    private CustomerModel customerModel;
+    private UserModel customerModel;
     private String content;
     private Double value;
     @Enumerated(EnumType.STRING)

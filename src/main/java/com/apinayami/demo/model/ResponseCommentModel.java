@@ -20,7 +20,7 @@ public class ResponseCommentModel extends AbstractEntity<Long> {
     private String description;
     @ManyToOne
     @JoinColumn(name = "staff_id")
-    private StaffModel staffModel;
+    private UserModel staffModel;
     @OneToOne
     @JoinColumn(name = "comment_id")
     private CommentModel commentModel;
