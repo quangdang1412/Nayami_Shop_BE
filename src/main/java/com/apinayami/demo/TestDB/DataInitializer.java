@@ -18,14 +18,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataInitializer {
 
-    private final UserRepository userRepository;
-    private final AddressRepository addressRepository;
-    private final ShippingRepository shippingRepository;
-    private final CategoryRepository categoryRepository;
-    private final ProductRepository productRepository;
-    private final BrandRepository brandRepository;
-    private final OtherConfigurationRepository otherConfigurationRepository;
-    private final ConfigurationRepository configurationRepository;
+    private final IUserRepository userRepository;
+    private final ICategoryRepository categoryRepository;
+    private final IProductRepository productRepository;
+    private final IBrandRepository brandRepository;
+    private final IOtherConfigurationRepository otherConfigurationRepository;
+    private final IConfigurationRepository configurationRepository;
 
     @Bean
     public CommandLineRunner initData() {
@@ -86,10 +84,6 @@ public class DataInitializer {
              * sau do set configuration cho product
              * add product
              */
-
-
-
-
             System.out.println("✅ Dữ liệu mẫu đã được tạo!");
         };
     }

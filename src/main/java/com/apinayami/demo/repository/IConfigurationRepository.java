@@ -1,9 +1,10 @@
 package com.apinayami.demo.repository;
 
-import com.apinayami.demo.model.ProductModel;
+import com.apinayami.demo.model.ConfigurationModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+
 @Repository
-public interface ProductRepository extends JpaRepository<ProductModel,Long> {
+public interface IConfigurationRepository extends JpaRepository<ConfigurationModel,Long> {
 }
