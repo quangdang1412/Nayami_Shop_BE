@@ -17,8 +17,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true, exclude = {"categoryModel", "otherConfigurationList"})
 public class ConfigurationModel extends AbstractEntity<Long> {
 
-    // reference
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryModel categoryModel;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "configurationModel", cascade = CascadeType.ALL)

@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ConfigurationDTO {
+    private long id;
     private long category;
     private List<OtherConfigurationDTO> listOtherConfigDTO;
 }

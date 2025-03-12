@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ProductDTO implements Serializable {
+    @NotNull
+    private long id;
     @NotBlank(message = "Name must be not blank")
     @NotNull
     private String name;

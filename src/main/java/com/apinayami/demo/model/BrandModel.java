@@ -17,7 +17,7 @@ import java.util.Set;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"listProduct"})
 public class BrandModel extends AbstractEntity<Long> {
     private String brandName;
 

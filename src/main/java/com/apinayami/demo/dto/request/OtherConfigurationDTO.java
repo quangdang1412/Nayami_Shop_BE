@@ -10,6 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 public class OtherConfigurationDTO implements Serializable {
+    private long id;
     private String name;
     private String value;
 }
