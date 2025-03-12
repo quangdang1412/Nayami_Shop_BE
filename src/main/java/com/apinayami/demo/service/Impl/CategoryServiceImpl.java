@@ -8,6 +8,8 @@ import com.apinayami.demo.repository.ICategoryRepository;
 import com.apinayami.demo.service.ICategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,8 @@ public class CategoryServiceImpl implements ICategoryService {
 
     private final ICategoryRepository categoryRepository;
 
+    private final CategoryMapper categoryMapper;
+
     @Override
     public CategoryModel findById(long id) {
         return categoryRepository.findById(id).isPresent() ? categoryRepository.findById(id).get() : null;
@@ -27,7 +31,8 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public List<CategoryDTO> getAll() {
-        return categoryRepository.findAll().stream().map(CategoryMapper.INSTANCE::toCategoryDTO).collect(Collectors.toList());
+        return categoryRepository.findAll().stream().map(categoryMapper::toCategoryDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -58,11 +63,11 @@ public class CategoryServiceImpl implements ICategoryService {
     public String delete(CategoryModel a) {
         try {
             categoryRepository.delete(a);
-            return "Cập nhật thành công " + a.getCategoryName();
+            return "Xoá thành công " + a.getCategoryName();
 
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
-            throw new CustomException("Lỗi cập nhật");
+            throw new CustomException("Lỗi khi xoá");
         }
     }
 }

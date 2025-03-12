@@ -9,7 +9,6 @@ import com.apinayami.demo.dto.request.BrandDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.BrandMapper;
 import com.apinayami.demo.model.BrandModel;
-import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.repository.IBrandRepository;
 import com.apinayami.demo.service.IBrandService;
 
