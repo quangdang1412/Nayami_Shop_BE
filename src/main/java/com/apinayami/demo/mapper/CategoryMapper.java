@@ -5,10 +5,11 @@ import com.apinayami.demo.model.CategoryModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CategoryMapper {
     CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
     CategoryModel toCategoryModel(CategoryDTO dto);
+
     CategoryDTO toCategoryDTO(CategoryModel model);
 }
