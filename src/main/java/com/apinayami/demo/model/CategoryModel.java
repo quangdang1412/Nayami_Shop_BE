@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -14,14 +15,15 @@ import java.util.Set;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = { "listProduct", "configuration" })
 public class CategoryModel extends AbstractEntity<Long> {
     private String categoryName;
 
-    //reference
+    // reference
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "categoryModel", cascade = CascadeType.ALL)
     Set<ProductModel> listProduct;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "categoryModel", cascade = CascadeType.ALL)
     ConfigurationModel configuration;
+
 }
