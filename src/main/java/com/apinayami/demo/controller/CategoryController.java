@@ -9,6 +9,7 @@ import com.apinayami.demo.service.ICategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,17 +26,20 @@ public class CategoryController {
     public List<CategoryDTO> getAllCategories() {
         return categoryService.getAll();
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<CategoryModel> getCategoryById(@PathVariable Long id) {
-        CategoryModel category = categoryService.findById(id);
+        CategoryModel category = categoryService.findCategoryById(id);
         return category != null ? ResponseEntity.ok(category) : ResponseEntity.notFound().build();
     }
+
     @SuppressWarnings("unchecked")
     @PostMapping
     public ResponseData<String> addCategory(@RequestBody @Valid CategoryModel category) {
         try {
             categoryService.create(category);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + category.getCategoryName());
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success",
+                    "Thêm thành công " + category.getCategoryName());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
@@ -49,7 +53,8 @@ public class CategoryController {
             CategoryModel updated_category = categoryService.findCategoryById(id);
             updated_category.setCategoryName(category.getCategoryName());
             categoryService.update(updated_category);
-            return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + category.getCategoryName());
+            return new ResponseData<>(HttpStatus.OK.value(), "Success",
+                    "Cập nhật thành công " + category.getCategoryName());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
@@ -68,6 +73,5 @@ public class CategoryController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
         }
     }
-
 
 }
