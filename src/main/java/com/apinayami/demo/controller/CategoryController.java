@@ -8,7 +8,6 @@ import com.apinayami.demo.service.ICategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +30,7 @@ public class CategoryController {
         try {
             categoryService.create(category);
             return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + category.getCategoryName());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
         }
@@ -41,12 +39,11 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseData<String> updateCategory(@PathVariable long id, @RequestBody @Valid CategoryModel category) {
         try {
-            CategoryModel updated_category = categoryService.findById(id);
+            CategoryModel updated_category = categoryService.findCategoryById(id);
             updated_category.setCategoryName(category.getCategoryName());
             categoryService.update(updated_category);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + category.getCategoryName());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
         }
@@ -55,14 +52,14 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ResponseData<String> deleteCategory(@PathVariable long id) {
         try {
-            CategoryModel updated_category = categoryService.findById(id);
+            CategoryModel updated_category = categoryService.findCategoryById(id);
             categoryService.delete(updated_category);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Xóa thành công ");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
         }
     }
+
 
 }

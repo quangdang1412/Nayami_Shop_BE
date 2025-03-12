@@ -1,14 +1,14 @@
 package com.apinayami.demo.TestDB;
 
-import com.apinayami.demo.model.*;
+import com.apinayami.demo.model.BrandModel;
+import com.apinayami.demo.model.CategoryModel;
 import com.apinayami.demo.repository.*;
-import com.apinayami.demo.util.Enum.EProductStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,10 +30,10 @@ public class DataInitializer {
 //                return;
 //            }
 
-//            // ✅ Tạo Brand
-//            BrandModel brandApple = BrandModel.builder().brandName("Apple").build();
-//            BrandModel brandSamsung = BrandModel.builder().brandName("Samsung").build();
-//            brandRepository.saveAll(Arrays.asList(brandApple, brandSamsung));
+            // ✅ Tạo Brand
+            BrandModel brandApple = BrandModel.builder().brandName("Apple").build();
+            BrandModel brandSamsung = BrandModel.builder().brandName("Samsung").build();
+            brandRepository.saveAll(Arrays.asList(brandApple, brandSamsung));
 
             // ✅ Tạo Category
             CategoryModel categoryPhone = CategoryModel.builder().categoryName("Phone").build();

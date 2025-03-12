@@ -8,6 +8,7 @@ import java.util.List;
 public interface ICategoryService extends IBaseCRUD<CategoryModel> {
 
     List<CategoryDTO> getAll();
-    CategoryModel findById(long id);
+
+    CategoryModel findCategoryById(long id);
 
 }

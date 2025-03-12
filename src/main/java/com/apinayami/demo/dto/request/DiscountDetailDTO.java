@@ -5,11 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDTO {
-    private long id;
-    private String categoryName;
+public class DiscountDetailDTO implements Serializable {
+
+    private double percentage;
+
+    private List<String> productID;
 }
