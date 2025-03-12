@@ -106,7 +106,7 @@ public class WebSecurityConfig {
                                 "/swagger-ui.html",
                                 "/webjars/**")
                         .permitAll() // Bỏ xác thực cho Swagger
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .csrf(csrf -> csrf.disable()) // Tắt CSRF nếu cần
                 .formLogin().disable(); // Không hiển thị trang login mặc định
 

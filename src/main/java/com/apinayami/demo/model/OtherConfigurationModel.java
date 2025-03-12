@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class OtherConfiguration extends AbstractEntity<Long> {
+public class OtherConfigurationModel extends AbstractEntity<Long> {
     private String name;
     private String value;
 

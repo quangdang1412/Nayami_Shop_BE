@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements ICategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public CategoryModel findById(long id) {
+    public CategoryModel findCategoryById(long id) {
         return categoryRepository.findById(id).isPresent() ? categoryRepository.findById(id).get() : null;
     }
 

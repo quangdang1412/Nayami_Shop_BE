@@ -17,6 +17,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = "email"),
+                @UniqueConstraint(columnNames = "phoneNumber") })
 public class UserModel extends AbstractEntity<Long> {
     protected String userName;
     protected String password;
