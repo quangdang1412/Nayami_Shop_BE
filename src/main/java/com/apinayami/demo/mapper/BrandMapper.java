@@ -2,12 +2,7 @@ package com.apinayami.demo.mapper;
 
 import com.apinayami.demo.dto.request.BrandDTO;
 import com.apinayami.demo.model.BrandModel;
-import com.apinayami.demo.model.ProductModel;
-
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class BrandMapper {
@@ -17,16 +12,9 @@ public class BrandMapper {
             return null;
         }
 
-        List<String> productNames = brand.getListProduct() != null
-                ? brand.getListProduct().stream()
-                        .map(ProductModel::getProductName)
-                        .collect(Collectors.toList())
-                : List.of();
-
         return BrandDTO.builder()
                 .id(brand.getId())
                 .name(brand.getBrandName())
-                .productNames(productNames)
                 .build();
     }
 

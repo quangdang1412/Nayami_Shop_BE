@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiscountDetailDTO implements Serializable {
+    private long id;
 
     private double percentage;
 

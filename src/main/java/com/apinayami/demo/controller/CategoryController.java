@@ -3,7 +3,7 @@ package com.apinayami.demo.controller;
 import com.apinayami.demo.dto.request.CategoryDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
-import com.apinayami.demo.model.BrandModel;
+import com.apinayami.demo.mapper.CategoryMapper;
 import com.apinayami.demo.model.CategoryModel;
 import com.apinayami.demo.service.ICategoryService;
 import jakarta.validation.Valid;
@@ -21,6 +21,7 @@ import java.util.List;
 @Validated
 public class CategoryController {
     private final ICategoryService categoryService;
+    private final CategoryMapper categoryMapper;
 
     @GetMapping
     public List<CategoryDTO> getAllCategories() {
@@ -29,7 +30,7 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryModel> getCategoryById(@PathVariable Long id) {
-        CategoryModel category = categoryService.findCategoryById(id);
+        CategoryModel category = categoryService.findById(id);
         return category != null ? ResponseEntity.ok(category) : ResponseEntity.notFound().build();
     }
 
