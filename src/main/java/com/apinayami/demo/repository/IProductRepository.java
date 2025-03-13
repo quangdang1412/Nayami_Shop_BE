@@ -1,11 +1,8 @@
 package com.apinayami.demo.repository;
 
 import com.apinayami.demo.model.ProductModel;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,11 +16,11 @@ public interface IProductRepository extends JpaRepository<ProductModel, Long> {
 
     List<ProductModel> getProductModelsByBrandModelId(long id);
 
-    @Query("SELECT p FROM ProductModel p WHERE p.displayStatus = true AND (:categoryID IS NULL OR lower(p.categoryModel.id) LIKE lower(:categoryID)) AND (:brandID IS NULL OR lower(p.brandModel.id) LIKE lower(:brandID)) AND (:searchQuery IS NULL OR lower(p.productName) LIKE lower(:searchQuery))")
-    Page<ProductModel> getProductForPage(
-            @Param("categoryID") String categoryID,
-            @Param("brandID") String brandID,
-            @Param("searchQuery") String searchQuery,
-            Pageable pageable
-    );
+//    @Query("SELECT p FROM ProductModel p WHERE p.displayStatus = true AND (:categoryID IS NULL OR lower(p.categoryModel.id) LIKE lower(:categoryID)) AND (:brandID IS NULL OR lower(p.brandModel.id) LIKE lower(:brandID)) AND (:searchQuery IS NULL OR lower(p.productName) LIKE lower(:searchQuery))")
+//    Page<ProductModel> getProductForPage(
+//            @Param("categoryID") String categoryID,
+//            @Param("brandID") String brandID,
+//            @Param("searchQuery") String searchQuery,
+//            Pageable pageable
+//    );
 }

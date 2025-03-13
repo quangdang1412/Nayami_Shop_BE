@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IImageRepository extends JpaRepository<ImageModel, String> {
-    ImageModel findByUrl(String url);
+    ImageModel findByUrlAndProductModelId(String url, long id);
 }

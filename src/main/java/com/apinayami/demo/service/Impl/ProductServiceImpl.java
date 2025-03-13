@@ -5,6 +5,9 @@ import com.apinayami.demo.dto.request.OtherConfigurationDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
+import com.apinayami.demo.mapper.BrandMapper;
+import com.apinayami.demo.mapper.CategoryMapper;
+import com.apinayami.demo.mapper.DiscountDetailMapper;
 import com.apinayami.demo.model.ConfigurationModel;
 import com.apinayami.demo.model.ImageModel;
 import com.apinayami.demo.model.OtherConfigurationModel;
@@ -33,6 +36,9 @@ public class ProductServiceImpl implements IProductService {
     private final IOtherConfigurationRepository otherConfigurationRepository;
     private final IConfigurationRepository configurationRepository;
     private final IImageService imageService;
+    private final BrandMapper brandMapper;
+    private final CategoryMapper categoryMapper;
+    private final DiscountDetailMapper discountDetailMapper;
 
     public String saveProduct(ProductDTO productRequestDTO, List<MultipartFile> files) {
         List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
@@ -60,10 +66,10 @@ public class ProductServiceImpl implements IProductService {
 
         ProductModel productModel = ProductModel.builder()
                 .productName(productRequestDTO.getName())
-                .brandModel(brandService.findBrandById(productRequestDTO.getBrandID()))
-                .categoryModel(categoryService.findCategoryById(productRequestDTO.getCategoryID()))
+                .brandModel(brandService.findBrandById(productRequestDTO.getBrandDTO().getId()))
+                .categoryModel(categoryService.findCategoryById(productRequestDTO.getCategoryDTO().getId()))
                 .description(productRequestDTO.getDescription())
-                .discountDetailModel(productRequestDTO.getDiscountID() == 0 ? null : discountDetailService.findDiscountDetailById(productRequestDTO.getDiscountID()))
+                .discountDetailModel(productRequestDTO.getDiscountDTO() == null ? null : discountDetailService.findDiscountDetailById(productRequestDTO.getDiscountDTO().getId()))
                 .quantity(productRequestDTO.getQuantity())
                 .unitPrice(productRequestDTO.getUnitPrice())
                 .originalPrice(productRequestDTO.getOriginalPrice())
@@ -74,33 +80,34 @@ public class ProductServiceImpl implements IProductService {
                 .configurationModel(configurationModel)
                 .listImage(null)
                 .build();
+        if (productRequestDTO.getId() != 0)
+            productModel.setId(productRequestDTO.getId());
+        productRepository.save(productModel);
+
         List<ImageModel> imageModelList = new ArrayList<>();
         if (!files.isEmpty()) {
             for (MultipartFile file : files) {
                 ImageModel imageProduct = null;
-                if (!files.isEmpty()) {
-                    String fileName = imageService.upload(file);
-                    if (fileName.contains("Something went wrong"))
-                        throw new CustomException("Failed");
-                    if (!imageService.isPresent(fileName)) {
-                        imageService.addImage(fileName);
-                    }
-                    imageProduct = imageService.findImageByURL(fileName);
-                    imageModelList.add(imageProduct);
+                String fileName = imageService.upload(file);
+                if (fileName.contains("Something went wrong")) {
+                    throw new CustomException("Failed");
                 }
+                if (!imageService.isPresent(fileName, productModel.getId())) {
+                    imageService.addImage(fileName, productModel);
+                }
+                imageProduct = imageService.findImageByURLAndProductId(fileName, productModel.getId());
+                imageModelList.add(imageProduct);
             }
         } else {
             for (String url : productRequestDTO.getListImage()) {
-                ImageModel imageProduct = null;
-                imageProduct = imageService.findImageByURL(url);
-                imageModelList.add(imageProduct);
+                ImageModel imageProduct = imageService.findImageByURLAndProductId(url, productModel.getId());
+                if (imageProduct != null) {
+                    imageModelList.add(imageProduct);
+                }
             }
 
         }
         productModel.setListImage(imageModelList);
-
-        if (productRequestDTO.getId() != 0)
-            productModel.setId(productRequestDTO.getId());
         productRepository.save(productModel);
         return productRequestDTO.getName();
     }
@@ -155,9 +162,9 @@ public class ProductServiceImpl implements IProductService {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(productModel.getId());
         productDTO.setName(productModel.getProductName());
-        productDTO.setBrandID(productModel.getBrandModel().getId());
-        productDTO.setCategoryID(productModel.getCategoryModel().getId());
-        productDTO.setDiscountID(productModel.getDiscountDetailModel() != null ? productModel.getDiscountDetailModel().getId() : 0);
+        productDTO.setBrandDTO(brandMapper.toDetailDto(productModel.getBrandModel()));
+        productDTO.setCategoryDTO(categoryMapper.toCategoryDTO(productModel.getCategoryModel()));
+        productDTO.setDiscountDTO(productModel.getDiscountDetailModel() != null ? discountDetailMapper.toDetailDto(productModel.getDiscountDetailModel()) : null);
         productDTO.setListImage(productModel.getListImage().stream().map(ImageModel::getUrl).toList());
         productDTO.setDescription(productModel.getDescription());
         productDTO.setUnitPrice(productModel.getUnitPrice());

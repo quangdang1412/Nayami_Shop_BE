@@ -1,6 +1,7 @@
 package com.apinayami.demo.service.Impl;
 
 import com.apinayami.demo.model.ImageModel;
+import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.repository.IImageRepository;
 import com.apinayami.demo.service.IImageService;
 import com.google.auth.Credentials;
@@ -41,21 +42,22 @@ public class ImageServiceImpl implements IImageService {
     }
 
     @Override
-    public ImageModel findImageByURL(String url) {
-        return imageRepository.findByUrl(url);
+    public ImageModel findImageByURLAndProductId(String url, long pid) {
+        return imageRepository.findByUrlAndProductModelId(url, pid);
     }
 
+
     @Override
-    public void addImage(String code) {
+    public void addImage(String code, ProductModel productModel) {
         ImageModel imageModel = new ImageModel();
         imageModel.setUrl(code);
+        imageModel.setProductModel(productModel);
         imageRepository.save(imageModel);
-        System.out.println("hmm");
     }
 
     @Override
-    public boolean isPresent(String url) {
-        return imageRepository.findByUrl(url) != null;
+    public boolean isPresent(String url, long id) {
+        return imageRepository.findByUrlAndProductModelId(url, id) != null;
     }
 
 

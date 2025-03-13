@@ -4,17 +4,17 @@ import com.apinayami.demo.dto.request.BrandDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
+import com.apinayami.demo.mapper.BrandMapper;
 import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.service.IBrandService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -25,6 +25,7 @@ import java.util.List;
 public class BrandController {
 
     private final IBrandService brandService;
+    private final BrandMapper brandMapper;
 
     @GetMapping
     public ResponseEntity<List<BrandDTO>> getAllBrands() {
@@ -33,9 +34,9 @@ public class BrandController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BrandModel> getBrandById(@PathVariable Long id) {
+    public ResponseEntity<BrandDTO> getBrandById(@PathVariable Long id) {
         BrandModel brand = brandService.findBrandById(id);
-        return brand != null ? ResponseEntity.ok(brand) : ResponseEntity.notFound().build();
+        return brand != null ? ResponseEntity.ok(brandMapper.toDetailDto(brand)) : ResponseEntity.notFound().build();
     }
 
     @SuppressWarnings("unchecked")

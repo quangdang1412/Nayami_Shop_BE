@@ -1,19 +1,17 @@
 package com.apinayami.demo.service.Impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import com.apinayami.demo.dto.request.BrandDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.BrandMapper;
 import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.repository.IBrandRepository;
 import com.apinayami.demo.service.IBrandService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

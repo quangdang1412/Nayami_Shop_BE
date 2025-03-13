@@ -3,12 +3,13 @@ package com.apinayami.demo.controller;
 import com.apinayami.demo.dto.request.CategoryDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
-import com.apinayami.demo.model.BrandModel;
+import com.apinayami.demo.mapper.CategoryMapper;
 import com.apinayami.demo.model.CategoryModel;
 import com.apinayami.demo.service.ICategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,16 +21,19 @@ import java.util.List;
 @Validated
 public class CategoryController {
     private final ICategoryService categoryService;
+    private final CategoryMapper categoryMapper;
 
     @GetMapping
     public List<CategoryDTO> getAllCategories() {
         return categoryService.getAll();
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryModel> getCategoryById(@PathVariable Long id) {
-        CategoryModel category = categoryService.findById(id);
-        return category != null ? ResponseEntity.ok(category) : ResponseEntity.notFound().build();
+    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
+        CategoryModel category = categoryService.findCategoryById(id);
+        return category != null ? ResponseEntity.ok(categoryMapper.toCategoryDTO(category)) : ResponseEntity.notFound().build();
     }
+
     @SuppressWarnings("unchecked")
     @PostMapping
     public ResponseData<String> addCategory(@RequestBody @Valid CategoryModel category) {
