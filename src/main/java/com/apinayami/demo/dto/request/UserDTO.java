@@ -3,20 +3,21 @@ package com.apinayami.demo.dto.request;
 import com.apinayami.demo.util.Enum.Role;
 import com.apinayami.demo.util.Validation.EnumValue;
 import com.apinayami.demo.util.Validation.PhoneNumber;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.io.Serializable;
-
 @Data
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserRequestDTO implements Serializable {
+public class UserDTO{
+    private Long userId;
     @NotBlank(message = "UserName must be not blank")
     @NotNull
     private String userName;
@@ -32,5 +33,8 @@ public class UserRequestDTO implements Serializable {
     private String phoneNumber;
 
     @EnumValue(enumClass = Role.class, message = "Invalid role. Must be ADMIN, STAFF, or USER")
+    @NotNull
     private String type;
+
+    private boolean active;
 }
