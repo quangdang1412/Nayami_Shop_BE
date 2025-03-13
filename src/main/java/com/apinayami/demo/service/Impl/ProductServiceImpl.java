@@ -3,6 +3,7 @@ package com.apinayami.demo.service.Impl;
 import com.apinayami.demo.dto.request.ConfigurationDTO;
 import com.apinayami.demo.dto.request.OtherConfigurationDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
+import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.model.ConfigurationModel;
 import com.apinayami.demo.model.ImageModel;
@@ -11,10 +12,7 @@ import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.repository.IConfigurationRepository;
 import com.apinayami.demo.repository.IOtherConfigurationRepository;
 import com.apinayami.demo.repository.IProductRepository;
-import com.apinayami.demo.service.IBrandService;
-import com.apinayami.demo.service.ICategoryService;
-import com.apinayami.demo.service.IDiscountDetailService;
-import com.apinayami.demo.service.IProductService;
+import com.apinayami.demo.service.*;
 import com.apinayami.demo.util.Enum.EProductStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +32,7 @@ public class ProductServiceImpl implements IProductService {
     private final IDiscountDetailService discountDetailService;
     private final IOtherConfigurationRepository otherConfigurationRepository;
     private final IConfigurationRepository configurationRepository;
+    private final IImageService imageService;
 
     public String saveProduct(ProductDTO productRequestDTO, List<MultipartFile> files) {
         List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
@@ -75,6 +74,30 @@ public class ProductServiceImpl implements IProductService {
                 .configurationModel(configurationModel)
                 .listImage(null)
                 .build();
+        List<ImageModel> imageModelList = new ArrayList<>();
+        if (!files.isEmpty()) {
+            for (MultipartFile file : files) {
+                ImageModel imageProduct = null;
+                if (!files.isEmpty()) {
+                    String fileName = imageService.upload(file);
+                    if (fileName.contains("Something went wrong"))
+                        throw new CustomException("Failed");
+                    if (!imageService.isPresent(fileName)) {
+                        imageService.addImage(fileName);
+                    }
+                    imageProduct = imageService.findImageByURL(fileName);
+                    imageModelList.add(imageProduct);
+                }
+            }
+        } else {
+            for (String url : productRequestDTO.getListImage()) {
+                ImageModel imageProduct = null;
+                imageProduct = imageService.findImageByURL(url);
+                imageModelList.add(imageProduct);
+            }
+
+        }
+        productModel.setListImage(imageModelList);
 
         if (productRequestDTO.getId() != 0)
             productModel.setId(productRequestDTO.getId());
@@ -147,4 +170,27 @@ public class ProductServiceImpl implements IProductService {
         productDTO.setConfigDTO(configurationDTO);
         return productDTO;
     }
+
+//    @Override
+//    public Page<ProductModel> getProductForPage(Integer pageNumber, String categoryID, String brandID, String sortBy, String searchQuery) {
+//        Pageable pageable = null;
+//        if (sortBy == null)
+//            pageable = PageRequest.of(pageNumber - 1, 9);
+//
+//        else {
+//            if (sortBy.equalsIgnoreCase("asc")) {
+//                pageable = PageRequest.of(pageNumber - 1, 9, Sort.by(Sort.Direction.ASC, "unitPrice"));
+//            } else {
+//                pageable = PageRequest.of(pageNumber - 1, 9, Sort.by(Sort.Direction.DESC, "unitPrice"));
+//            }
+//        }
+//
+//        return productRepository.getProductForPage(
+//                categoryID != null ? "%" + categoryID + "%" : null,
+//                brandID != null ? "%" + brandID + "%" : null,
+//                searchQuery != null ? "%" + searchQuery + "%" : null,
+//                pageable
+//        );
+//    }
+
 }
