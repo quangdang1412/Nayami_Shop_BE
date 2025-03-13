@@ -21,6 +21,9 @@ public class CartController {
 
     @GetMapping
     public ResponseData<List<CartItemDTO>> getCart(@AuthenticationPrincipal UserModel user) {
+        if (user == null) {
+            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xem giỏ hàng");
+        }
         List<CartItemDTO> cart = cartItemService.getUserCart(user.getEmail());
         return new ResponseData<>(HttpStatus.OK.value(), "Lấy giỏ hàng thành công", cart);
     }
@@ -29,6 +32,10 @@ public class CartController {
     public ResponseData<CartItemDTO> addToCart(
             @AuthenticationPrincipal UserModel user,
             @RequestBody CartItemDTO request) {
+
+        if (user == null) {
+            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để thêm vào giỏ hàng");
+        }        
         CartItemDTO addedItem = cartItemService.addToCart(user.getEmail(), request);
         return new ResponseData<>(HttpStatus.CREATED.value(), "Thêm vào giỏ hàng thành công", addedItem);
     }
@@ -37,12 +44,18 @@ public class CartController {
     public ResponseData<Void> removeFromCart(
             @AuthenticationPrincipal UserModel user,
             @PathVariable Long id) {
+        if (user == null) {
+                return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để thêm vào giỏ hàng");
+        }         
         cartItemService.removeFromCart(user.getEmail(), id);
         return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "Xóa sản phẩm khỏi giỏ hàng thành công");
     }
 
     @DeleteMapping
     public ResponseData<Void> clearCart(@AuthenticationPrincipal UserModel user) {
+        if (user == null) {
+            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để thêm vào giỏ hàng");
+        } 
         cartItemService.clearCart(user.getEmail());
         return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "Đã xóa toàn bộ giỏ hàng");
     }
