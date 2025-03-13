@@ -10,6 +10,9 @@ import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,25 +24,30 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements IUserService {
     private final IUserRepository userRepository;
     private final UserMapper userMapper;
+
+    @Override
+    public UserDetailsService userDetailService() {
+        return email -> userRepository.getUserByEmail(email);
+    }
+
     @Override
     public String create(UserDTO userDTO) {
         try {
             UserModel userModel = userMapper.toDetailModel(userDTO);
 
             /*
-            * Tránh trường hợp lúc chèn xuống lỗi trùng nó vẫn tăng key lên.
-            * */
-            if(userRepository.existsByEmail(userModel.getEmail())) {
+             * Tránh trường hợp lúc chèn xuống lỗi trùng nó vẫn tăng key lên.
+             */
+            if (userRepository.existsByEmail(userModel.getEmail())) {
                 throw new CustomException("Email already exists");
             }
-            if(userRepository.existsByPhoneNumber(userModel.getPhoneNumber())) {
+            if (userRepository.existsByPhoneNumber(userModel.getPhoneNumber())) {
                 throw new CustomException("Phone number already exists");
             }
 
-
             userModel.setActive(true);
             userRepository.save(userModel);
-            return "Thêm thành công "+userModel.getType()+" "+ userModel.getId();
+            return "Thêm thành công " + userModel.getType() + " " + userModel.getId();
 
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
@@ -47,16 +55,15 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
-
     @Override
     public String update(UserDTO userDTO) {
         try {
             UserModel userModel = userMapper.toDetailModel(userDTO);
 
-            if(userModel != null){
+            if (userModel != null) {
                 userRepository.save(userModel);
             }
-            return "Cập nhật thành công " +userDTO.getUserName();
+            return "Cập nhật thành công " + userDTO.getUserName();
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
             return "Lỗi khi cập nhật " + userDTO.getUserName();
@@ -68,10 +75,10 @@ public class UserServiceImpl implements IUserService {
         try {
             UserModel userModel = userMapper.toDetailModel(userDTO);
 
-            if(userModel != null){
+            if (userModel != null) {
                 userRepository.delete(userModel);
             }
-            return "Xóa thành công " +userDTO.getUserName();
+            return "Xóa thành công " + userDTO.getUserName();
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
             return "Lỗi khi xóa " + userDTO.getUserName();
@@ -88,9 +95,23 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserDTO getUserById(Long id) {
         UserModel userModel = userRepository.findById(id).orElse(null);
-        if(userModel == null) {
+        if (userModel == null) {
             return null;
         }
         return userMapper.toDetailDto(userModel);
     }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean existsByPhoneNumber(String phoneNumber) {
+        return userRepository.existsByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public UserModel getUserByEmail(String email) {
+        return userRepository.getUserByEmail(email);
+    }
+
 }

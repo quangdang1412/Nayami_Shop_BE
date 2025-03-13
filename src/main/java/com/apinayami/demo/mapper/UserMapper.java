@@ -24,7 +24,7 @@ public class UserMapper {
                 .phoneNumber(user.getPhoneNumber())
                 .active(user.isActive())
                 .password(user.getPassword())
-                .userName(user.getUserName())
+                .userName(user.getUsername())
                 .build();
     }
     public UserModel toDetailModel(UserDTO user) {
