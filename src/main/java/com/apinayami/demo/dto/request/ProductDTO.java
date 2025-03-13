@@ -24,11 +24,9 @@ public class ProductDTO implements Serializable {
     @NotNull
     private String description;
 
-    @NotNull
-    private long brandID;
-    @NotNull
-    private long categoryID;
-    private long discountID;
+    private BrandDTO brandDTO;
+    private CategoryDTO categoryDTO;
+    private DiscountDetailDTO discountDTO;
     private int ratingAvg;
     private int quantity;
     private double originalPrice;
