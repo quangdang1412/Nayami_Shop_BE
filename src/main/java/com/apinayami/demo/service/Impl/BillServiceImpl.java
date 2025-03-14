@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
+import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.BillMapper;
 import com.apinayami.demo.model.BillModel;
 import com.apinayami.demo.model.CartItemModel;
@@ -58,10 +59,10 @@ public class BillServiceImpl implements IBillService {
        
         UserModel customer = userRepository.getUserByEmail(email);
         if (customer == null) {
-                throw new RuntimeException("User is empty");
+                throw new ResourceNotFoundException("User is empty");
         }
         ShippingModel shipping = shippingRepository.findById(request.getShippingId())
-                .orElseThrow(() -> new RuntimeException("Shipping not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Shipping not found"));
 
         CouponModel coupon = request.getCouponId() != null ? couponRepository.findById(request.getCouponId()).orElse(null) : null;
 
@@ -78,7 +79,7 @@ public class BillServiceImpl implements IBillService {
                 .build();
         List<CartItemModel> cartItem = cartItemRepository.findByCustomerModel(customer);
         if (cartItem.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new ResourceNotFoundException("Cart is empty");
         }
         Double totalPrice=0.0;
         for (CartItemModel item : cartItem) {
@@ -88,7 +89,7 @@ public class BillServiceImpl implements IBillService {
         .map((CartItemModel item) -> { 
             ProductModel product = item.getProductModel();
             if (product == null) {
-                throw new RuntimeException("ProductModel is null for CartItem: " + item.getId());
+                throw new ResourceNotFoundException("ProductModel is null for CartItem: " + item.getId());
             }
             return LineItemModel.builder()
                     .productModel(product)
