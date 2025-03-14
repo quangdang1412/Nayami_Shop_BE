@@ -1,24 +1,21 @@
 package com.apinayami.demo.model;
 
 import com.apinayami.demo.util.Enum.Role;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = "email"),
-                @UniqueConstraint(columnNames = "phoneNumber") })
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "email"),
+        @UniqueConstraint(columnNames = "phoneNumber")})
 public class UserModel extends AbstractEntity<Long> {
     protected String userName;
     protected String password;
@@ -29,11 +26,11 @@ public class UserModel extends AbstractEntity<Long> {
     protected String phoneNumber;
 
     //reference
-        //staff
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "staffModel", cascade = CascadeType.ALL)
+    //staff
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "staffModel", cascade = CascadeType.ALL)
     private Set<ResponseCommentModel> listResponseComments;
 
-        //customer
+    //customer
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
     private Set<AddressModel> listAddress;
 
