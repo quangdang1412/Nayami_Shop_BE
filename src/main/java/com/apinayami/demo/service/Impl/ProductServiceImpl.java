@@ -47,20 +47,28 @@ public class ProductServiceImpl implements IProductService {
                     .name(a.getName())
                     .value(a.getValue())
                     .build();
-            if (a.getId() != 0)
-                otherConfig.setId(a.getId());
             otherConfigurationModelList.add(otherConfig);
-
         }
-        ConfigurationModel configurationModel = ConfigurationModel.builder()
-                .categoryModel(categoryService.findCategoryById(productRequestDTO.getConfigDTO().getCategory()))
-                .otherConfigurationModelList(otherConfigurationModelList)
-                .build();
+        ConfigurationModel configurationModel;
+        if (productRequestDTO.getConfigDTO().getId() != 0) {
+            configurationModel = configurationRepository.findById(productRequestDTO.getConfigDTO().getId())
+                    .orElseThrow(() -> new RuntimeException("Configuration not found"));
+
+            otherConfigurationRepository.deleteByConfigurationModel(configurationModel.getId());
+        } else {
+            configurationModel = ConfigurationModel.builder().build();
+        }
+
+        configurationModel.setCategoryModel(categoryService.findCategoryById(productRequestDTO.getConfigDTO().getCategory()));
+        configurationModel.setOtherConfigurationModelList(otherConfigurationModelList);
+
         for (OtherConfigurationModel otherConfig : otherConfigurationModelList) {
             otherConfig.setConfigurationModel(configurationModel);
         }
+
         if (productRequestDTO.getConfigDTO().getId() != 0)
             configurationModel.setId(productRequestDTO.getConfigDTO().getId());
+
         configurationModel = configurationRepository.save(configurationModel);
         otherConfigurationRepository.saveAll(otherConfigurationModelList);
 
@@ -85,7 +93,8 @@ public class ProductServiceImpl implements IProductService {
         productRepository.save(productModel);
 
         List<ImageModel> imageModelList = new ArrayList<>();
-        if (!files.isEmpty()) {
+
+        if (!files.getFirst().getName().isEmpty()) {
             for (MultipartFile file : files) {
                 ImageModel imageProduct = null;
                 String fileName = imageService.upload(file);
@@ -122,6 +131,11 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ProductModel getProductByID(long id) {
         return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    }
+
+    @Override
+    public ProductDTO getProductDTOByID(long id) {
+        return convertToDTO(productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
     }
 
     @Override

@@ -14,6 +14,8 @@ public interface IProductService {
 
     ProductModel getProductByID(long id);
 
+    ProductDTO getProductDTOByID(long id);
+
     List<ProductDTO> getAllProduct();
 
     List<ProductDTO> findProductByCategoryId(long id);

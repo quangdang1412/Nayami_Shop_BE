@@ -30,7 +30,7 @@ public class DataInitializer {
 //                return;
 //            }
 
-            // ✅ Tạo Brand
+//            // ✅ Tạo Brand
             BrandModel brandApple = BrandModel.builder().brandName("Apple").build();
             BrandModel brandSamsung = BrandModel.builder().brandName("Samsung").build();
             brandRepository.saveAll(Arrays.asList(brandApple, brandSamsung));
