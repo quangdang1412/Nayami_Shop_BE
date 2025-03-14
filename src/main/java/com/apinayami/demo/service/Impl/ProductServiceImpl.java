@@ -134,6 +134,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public ProductDTO getProductDTOByID(long id) {
+        return convertToDTO(productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
+    }
+
+    @Override
     public List<ProductDTO> getAllProduct() {
 //        for (ProductModel productModel : productRepository.findAll()) {
 //            if (productModel.getDiscountDetailModel() != null && productModel.getDiscount().getEndDate().toLocalDate().isBefore(LocalDate.now())) {
