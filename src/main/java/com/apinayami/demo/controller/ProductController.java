@@ -27,7 +27,7 @@ public class ProductController {
     private final IProductService productService;
 
     @Operation(method = "POST", summary = "Add new product", description = "Send a request via this API to create new product")
-    @PostMapping("/add-product")
+    @PostMapping()
     public ResponseData<String> addProduct(@RequestPart("productDTO") @Valid String productDTOJson,
                                            @RequestPart("files") List<MultipartFile> files) {
         try {
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     @Operation(method = "PUT", summary = "Update product", description = "Send a request via this API to update product")
-    @PutMapping("/update-product")
+    @PutMapping()
     public ResponseData<String> updateProduct(@RequestPart("productDTO") @Valid String productDTOJson,
                                               @RequestPart("files") List<MultipartFile> files) {
         try {
@@ -62,7 +62,7 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping(value = "/delete-product/{proID}")
+    @DeleteMapping(value = "{proID}")
     public ResponseData<?> deleteProduct(@PathVariable long proID) {
         try {
             log.info("Request update display status : {}", proID);
@@ -88,7 +88,7 @@ public class ProductController {
 //        }
 //
 //    }
-    @GetMapping("/get-all-product")
+    @GetMapping()
     public ResponseData<?> getAllProduct() {
 
         try {
