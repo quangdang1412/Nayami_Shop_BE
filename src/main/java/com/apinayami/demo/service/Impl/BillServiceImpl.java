@@ -28,7 +28,11 @@ import com.apinayami.demo.repository.IShippingRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IBillService;
 import com.apinayami.demo.util.Enum.EPaymentCurrency;
+import com.apinayami.demo.util.Enum.EPaymentMethod;
 import com.apinayami.demo.util.Enum.EPaymentStatus;
+import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
+import com.apinayami.demo.util.Strategy.PaymentStrategy;
+import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -45,27 +49,24 @@ public class BillServiceImpl implements IBillService {
     private final IPaymentRepository paymentRepository;
     private final ICartItemRepository  cartItemRepository;
     private final BillMapper billMapper;
+    private final PaymentStrategyFactory  paymentStrategyFactory;
+
+
     
     @Transactional
-    public BillResponseDTO createBill(String email,BillRequestDTO request) {
+    public Object createBill(String email,BillRequestDTO request) {
        
-        UserModel customer = userRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
-        if (!email.equals(customer.getEmail())) {
-                return null;
+        UserModel customer = userRepository.getUserByEmail(email);
+        if (customer == null) {
+                throw new RuntimeException("User is empty");
         }
         ShippingModel shipping = shippingRepository.findById(request.getShippingId())
                 .orElseThrow(() -> new RuntimeException("Shipping not found"));
 
         CouponModel coupon = request.getCouponId() != null ? couponRepository.findById(request.getCouponId()).orElse(null) : null;
 
-        PaymentModel payment = PaymentModel.builder()
-                .paymentMethod(request.getPaymentMethod())
-                .currency(EPaymentCurrency.VND)
-                .paymentStatus(EPaymentStatus.PENDING) 
-                .build();
-        payment = paymentRepository.save(payment);
-
+        PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(request.getPaymentMethod().name());
+        PaymentModel payment = paymentRepository.save(paymentStrategy.processPayment(request));
         BillModel bill = BillModel.builder()
                 .totalPrice(123241.1)
                 .discount(request.getDiscount())
@@ -76,6 +77,9 @@ public class BillServiceImpl implements IBillService {
                 .paymentModel(payment)
                 .build();
         List<CartItemModel> cartItem = cartItemRepository.findByCustomerModel(customer);
+        if (cartItem.isEmpty()) {
+            throw new RuntimeException("Cart is empty");
+        }
         Double totalPrice=0.0;
         for (CartItemModel item : cartItem) {
             totalPrice += item.getUnitPrice() * item.getQuantity();
@@ -99,6 +103,15 @@ public class BillServiceImpl implements IBillService {
         cartItemRepository.deleteByCustomerModel(customer);
         bill.setTotalPrice(totalPrice);
         BillModel savedBill = billRepository.save(bill);
+        if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
+                String returnUrl = "/api/bills";
+                String cancelUrl = "/api/bills";
+                
+                String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategy)
+                        .createCheckout(totalPrice.intValue(), savedBill.getId().toString(), returnUrl, cancelUrl);
+
+                return paymentUrl; 
+        }
         return billMapper.toResponseDTO(savedBill);
     }
 }

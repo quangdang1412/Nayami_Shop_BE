@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,17 +33,11 @@ public class BillController {
         if (user == null) {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xem giỏ hàng");
         }
-        BillResponseDTO response = billService.createBill(user.getEmail(),billRequestDTO);
-        // Nếu là thanh toán BANKING, trả về thêm thông tin URL thanh toán
-        if (billRequestDTO.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
-            Map<String, Object> result = new HashMap<>();
-            result.put("bill", response);
-            result.put("paymentUrl", response.getPaymentUrl());
-            result.put("message", "Vui lòng chuyển hướng khách hàng đến URL thanh toán");
-            return new ResponseData<>(HttpStatus.OK.value(), "Tạo hóa đơn thành công", result);
+        Object response = billService.createBill(user.getEmail(),billRequestDTO);
+        if (response instanceof String) {
+            return new ResponseData<>(HttpStatus.OK.value(), "Thanh toán online", Map.of("paymentUrl", response));
         }
         
-        // Nếu là COD, chỉ trả về thông tin hóa đơn
         return new ResponseData<>(HttpStatus.CREATED.value(), "Đặt hàng thành công",response);
 
     }
