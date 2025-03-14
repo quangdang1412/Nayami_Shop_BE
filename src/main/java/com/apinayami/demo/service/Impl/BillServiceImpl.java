@@ -3,6 +3,7 @@ package com.apinayami.demo.service.Impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.sound.sampled.Line;
 
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.mapper.BillMapper;
 import com.apinayami.demo.model.BillModel;
+import com.apinayami.demo.model.CartItemModel;
 import com.apinayami.demo.model.CouponModel;
 import com.apinayami.demo.model.LineItemModel;
 import com.apinayami.demo.model.PaymentModel;
@@ -18,6 +20,7 @@ import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.model.ShippingModel;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.repository.IBillRepository;
+import com.apinayami.demo.repository.ICartItemRepository;
 import com.apinayami.demo.repository.ICouponRepository;
 import com.apinayami.demo.repository.IPaymentRepository;
 import com.apinayami.demo.repository.IProductRepository;
@@ -39,8 +42,8 @@ public class BillServiceImpl implements IBillService {
     private final IUserRepository userRepository;
     private final IShippingRepository shippingRepository;
     private final ICouponRepository couponRepository;
-    private final IProductRepository productRepository;
     private final IPaymentRepository paymentRepository;
+    private final ICartItemRepository  cartItemRepository;
     private final BillMapper billMapper;
     
     @Transactional
@@ -72,23 +75,30 @@ public class BillServiceImpl implements IBillService {
                 .couponModel(coupon)
                 .paymentModel(payment)
                 .build();
-        double totalPrice = request.getCartItem().stream()
-                        .mapToDouble(CartItemDTO::getTotalPrice)
-                        .sum();
-        BillModel savedBill = billRepository.save(bill);
-        List<LineItemModel> lineItems = request.getCartItem().stream().map(item -> {
-            ProductModel product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-
+        List<CartItemModel> cartItem = cartItemRepository.findByCustomerModel(customer);
+        Double totalPrice=0.0;
+        for (CartItemModel item : cartItem) {
+            totalPrice += item.getUnitPrice() * item.getQuantity();
+        }
+        List<LineItemModel> items = cartItem.stream()
+        .map((CartItemModel item) -> { 
+            ProductModel product = item.getProductModel();
+            if (product == null) {
+                throw new RuntimeException("ProductModel is null for CartItem: " + item.getId());
+            }
             return LineItemModel.builder()
-                    .unitPrice(product.getUnitPrice())
-                    .quantity(item.getQuantity())
                     .productModel(product)
-                    .billModel(savedBill)
+                    .billModel(bill)
+                    .quantity(item.getQuantity())
+                    .unitPrice(product.getUnitPrice())
                     .build();
-        }).collect(Collectors.toList());
-        savedBill.setItems(lineItems);
-        savedBill.setTotalPrice(totalPrice);
+            
+        })
+        .collect(Collectors.toList());
+        bill.setItems(items);
+        cartItemRepository.deleteByCustomerModel(customer);
+        bill.setTotalPrice(totalPrice);
+        BillModel savedBill = billRepository.save(bill);
         return billMapper.toResponseDTO(savedBill);
     }
 }

@@ -14,5 +14,4 @@ public class BillRequestDTO {
     private Long customerId;
     private Long shippingId;
     private Long couponId;
-    private List<CartItemDTO> cartItem;
 }
