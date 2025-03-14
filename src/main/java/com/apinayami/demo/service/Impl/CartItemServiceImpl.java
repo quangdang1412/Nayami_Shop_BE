@@ -53,36 +53,35 @@ public class CartItemServiceImpl implements ICartItemService {
             cartItem = cartItemMapper.toCartItemModel(request);
             cartItem.setCustomerModel(user);
             cartItem.setProductModel(product);
-            cartItem.setUnitPrice(product.getUnitPrice() * request.getQuantity());
+            cartItem.setUnitPrice(product.getUnitPrice());
         } else {
             cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
-            cartItem.setUnitPrice(cartItem.getUnitPrice() + (product.getUnitPrice() * request.getQuantity()));
         }
 
         cartItem = cartItemRepository.save(cartItem);
         return cartItemMapper.toCartItemDTO(cartItem);
     }
 
-    // @Transactional
-    public CartItemDTO updateCartItem(String email, Long cartItemId, CartItemDTO request) {
+    @Transactional
+    public CartItemDTO updateCartItem(String email, Long cartItemId, Integer quantity) {
         UserModel user = getUserByEmail(email);
-        CartItemModel cartItem = cartItemRepository.findById(request.getId())
-                .orElseThrow(() -> {
-                    log.error("❌ [User: {}] Không tìm thấy CartItem với ID: {}", email, cartItemId);
-                    return new ResourceNotFoundException("Cart item not found");
-                });
-
+        CartItemModel cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
+        
         if (!cartItem.getCustomerModel().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Bạn không có quyền cập nhật sản phẩm này trong giỏ hàng");
+            throw new IllegalArgumentException("You do not have permission to update this cart item");
         }
-
-        cartItem.setQuantity(request.getQuantity());
-        cartItem.setUnitPrice(request.getUnitPrice() * request.getQuantity());
+        
+        if (quantity <= 0) {
+            cartItemRepository.delete(cartItem);
+            return null;
+        }
+        
+        cartItem.setQuantity(quantity);
         cartItem = cartItemRepository.save(cartItem);
-
+        
         return cartItemMapper.toCartItemDTO(cartItem);
     }
-
     @Transactional
     public void removeFromCart(String email, Long cartItemId) {
         UserModel user = getUserByEmail(email);

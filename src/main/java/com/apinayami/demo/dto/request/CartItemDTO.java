@@ -1,5 +1,8 @@
 package com.apinayami.demo.dto.request;
 
+import java.util.List;
+
+
 import lombok.*;
 
 @Data
@@ -12,7 +15,8 @@ public class CartItemDTO {
     private Long id;
     private Long productId;
     private String productName;
-    private String productImage;
+    private List<String> listImage;
     private Integer quantity;
     private Double unitPrice;
+    private Double totalPrice;
 }

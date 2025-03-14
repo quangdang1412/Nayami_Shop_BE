@@ -39,6 +39,19 @@ public class CartController {
         CartItemDTO addedItem = cartItemService.addToCart(user.getEmail(), request);
         return new ResponseData<>(HttpStatus.CREATED.value(), "Thêm vào giỏ hàng thành công", addedItem);
     }
+    @PutMapping("/{id}")
+    public ResponseData<CartItemDTO> updateCartItem(
+        @AuthenticationPrincipal UserModel user,
+        @PathVariable Long id,
+        @RequestBody CartItemDTO request) {
+        
+        if (user == null) {
+        return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để cập nhật giỏ hàng");
+        }
+        
+        CartItemDTO updatedItem = cartItemService.updateCartItem(user.getEmail(), id, request.getQuantity());
+        return new ResponseData<>(HttpStatus.OK.value(), "Cập nhật giỏ hàng thành công", updatedItem);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseData<Void> removeFromCart(

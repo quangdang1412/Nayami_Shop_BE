@@ -26,6 +26,7 @@ public class WebSecurityConfig {
     private final AuthenticationFilter authenticationFilter;
     private final AuthenticationProvider authenticationProvider;
     private final String[] WHITE_LITS = {"/",
+            "/swagger-ui/**",
             "/static/**",
             "/template/**",
             "/signinoauth2",
@@ -53,6 +54,7 @@ public class WebSecurityConfig {
             "/api/payments/**",
             "/search",
             "api/**",
+            "v3/**"
     };
     private final String[] EMPLOYEE_LIST = {
             "/api/order/update",
@@ -83,6 +85,7 @@ public class WebSecurityConfig {
                         .requestMatchers(ADMIN_LIST).hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class) // Thêm JWT filter
