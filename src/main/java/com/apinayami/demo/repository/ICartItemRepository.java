@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CartItemRepository extends JpaRepository<CartItemModel, Long> {
+public interface ICartItemRepository extends JpaRepository<CartItemModel, Long> {
     List<CartItemModel> findByCustomerModel(UserModel customerModel);
     Optional<CartItemModel> findByCustomerModelAndProductModel(UserModel customerModel, ProductModel productModel);
     void deleteByCustomerModel(UserModel customerModel);

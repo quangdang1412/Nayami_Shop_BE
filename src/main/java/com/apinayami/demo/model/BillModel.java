@@ -1,5 +1,6 @@
 package com.apinayami.demo.model;
 
+import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,10 @@ public class BillModel extends AbstractEntity<Long> {
 
     private Double totalPrice;
     private Double discount;
+    @Enumerated(EnumType.STRING)
     private EPaymentMethod paymentMethod;
+    @Enumerated(EnumType.STRING)
+    private EBillStatus status;
     //reference
     @ManyToOne
     @JoinColumn(name = "customer_id")

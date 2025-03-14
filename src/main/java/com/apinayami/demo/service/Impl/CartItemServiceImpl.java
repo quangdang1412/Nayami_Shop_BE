@@ -6,7 +6,7 @@ import com.apinayami.demo.mapper.CartItemMapper;
 import com.apinayami.demo.model.CartItemModel;
 import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.model.UserModel;
-import com.apinayami.demo.repository.CartItemRepository;
+import com.apinayami.demo.repository.ICartItemRepository;
 import com.apinayami.demo.repository.IProductRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.ICartItemService;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartItemServiceImpl implements ICartItemService {
 
-    private final CartItemRepository cartItemRepository;
+    private final ICartItemRepository cartItemRepository;
     private final IUserRepository userRepository;
     private final IProductRepository productRepository;
     private final CartItemMapper cartItemMapper;

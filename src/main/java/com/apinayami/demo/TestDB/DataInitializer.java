@@ -1,7 +1,11 @@
 package com.apinayami.demo.TestDB;
 
+import com.apinayami.demo.model.AddressModel;
 import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.model.CategoryModel;
+import com.apinayami.demo.model.LineItemModel;
+import com.apinayami.demo.model.ProductModel;
+import com.apinayami.demo.model.ShippingModel;
 import com.apinayami.demo.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -13,7 +17,8 @@ import java.util.Arrays;
 @Configuration
 @RequiredArgsConstructor
 public class DataInitializer {
-
+    private final IAddressRepository addressRepository;
+    private final IShippingRepository shippingRepository;
     private final IUserRepository userRepository;
     private final ICategoryRepository categoryRepository;
     private final IProductRepository productRepository;
@@ -75,7 +80,22 @@ public class DataInitializer {
 //            // ✅ Lưu Product vào Database
 //            productRepository.save(productSamsung);
 
-            System.out.println("✅ Dữ liệu mẫu đã được tạo!");
+            // ✅ Tạo Address
+            AddressModel address1 = AddressModel.builder()
+                .shippingContactNumber("0123456789")
+                .detail("123 Main St")
+                .province("Ho Chi Minh City")
+                .district("District 1")
+                .ward("Ward 1")
+                .active(true)
+                .build();
+            addressRepository.save(address1);
+            ShippingModel shipping1 = ShippingModel.builder()
+                .shippingAddress(address1)
+                .shippingFee(50_000)
+                .build();
+            shippingRepository.save(shipping1);
+            
         };
     }
 }
