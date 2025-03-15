@@ -10,6 +10,7 @@ import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,11 +22,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements IUserService {
     private final IUserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public String create(UserDTO userDTO) {
         try {
             UserModel userModel = userMapper.toDetailModel(userDTO);
-
             /*
             * Tránh trường hợp lúc chèn xuống lỗi trùng nó vẫn tăng key lên.
             * */
@@ -35,6 +36,10 @@ public class UserServiceImpl implements IUserService {
             if(userRepository.existsByPhoneNumber(userModel.getPhoneNumber())) {
                 throw new CustomException("Phone number already exists");
             }
+
+            //hash password
+            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
+            userModel.setPassword(hashedPassword);
 
 
             userModel.setActive(true);

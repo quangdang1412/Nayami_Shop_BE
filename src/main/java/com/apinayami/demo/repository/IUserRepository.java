@@ -9,6 +9,7 @@ import java.util.List;
 public interface IUserRepository extends JpaRepository<UserModel,Long> {
     List<UserModel> findByType(Role role);
     UserModel findById(long id);
+    UserModel findByEmail(String email);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
 }
