@@ -30,6 +30,7 @@ public class DiscountCampaignMapper {
                 .startDate(discountCampaignModel.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .endDate(discountCampaignModel.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .discountDetailDTOList(discountDetailDTOList)
+                .active(discountCampaignModel.isActive())
                 .build();
         return a;
     }

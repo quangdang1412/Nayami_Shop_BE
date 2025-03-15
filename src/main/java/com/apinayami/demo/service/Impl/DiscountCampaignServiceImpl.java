@@ -93,6 +93,7 @@ public class DiscountCampaignServiceImpl implements IDiscountCampaignService {
                 productRepository.save(productModel);
             }
         }
+        discountCampaignRepository.save(discountCampaignModel);
         return discountCampaignModel.getName();
     }
 
