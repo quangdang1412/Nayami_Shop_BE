@@ -1,12 +1,8 @@
 package com.apinayami.demo.model;
 
 import com.apinayami.demo.util.Enum.Role;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -18,14 +14,15 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = "email"),
-        @UniqueConstraint(columnNames = "phoneNumber") })
-public class UserModel extends AbstractEntity<Long> implements UserDetails {
+                @UniqueConstraint(columnNames = "phoneNumber") })
+public class UserModel extends AbstractEntity<Long> {
     protected String userName;
     protected String password;
     @Enumerated(EnumType.STRING)
@@ -34,12 +31,12 @@ public class UserModel extends AbstractEntity<Long> implements UserDetails {
     protected boolean active;
     protected String phoneNumber;
 
-    // reference
-    // staff
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "staffModel", cascade = CascadeType.ALL)
+    //reference
+        //staff
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "staffModel", cascade = CascadeType.ALL)
     private Set<ResponseCommentModel> listResponseComments;
 
-    // customer
+        //customer
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
     private Set<AddressModel> listAddress;
 

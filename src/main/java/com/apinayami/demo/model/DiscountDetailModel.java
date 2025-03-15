@@ -1,20 +1,18 @@
 package com.apinayami.demo.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Set;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true, exclude = {"listProduct"})
+@EqualsAndHashCode(callSuper = true, exclude = {"listProduct", "discountCampaignModel"})
 public class DiscountDetailModel extends AbstractEntity<Long> {
 
     private Double percentage;
@@ -22,7 +20,8 @@ public class DiscountDetailModel extends AbstractEntity<Long> {
     //reference
     @ManyToOne()
     @JoinColumn(name = "discount_campaign_id")
+    @ToString.Exclude
     private DiscountCampaignModel discountCampaignModel;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "discountDetailModel", cascade = CascadeType.ALL)
-    Set<ProductModel> listProduct;
+    List<ProductModel> listProduct;
 }

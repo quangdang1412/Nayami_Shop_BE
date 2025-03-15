@@ -1,13 +1,10 @@
 package com.apinayami.demo.service.Impl;
 
-import com.apinayami.demo.dto.request.ConfigurationDTO;
 import com.apinayami.demo.dto.request.OtherConfigurationDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
-import com.apinayami.demo.mapper.BrandMapper;
-import com.apinayami.demo.mapper.CategoryMapper;
-import com.apinayami.demo.mapper.DiscountDetailMapper;
+import com.apinayami.demo.mapper.ProductMapper;
 import com.apinayami.demo.model.ConfigurationModel;
 import com.apinayami.demo.model.ImageModel;
 import com.apinayami.demo.model.OtherConfigurationModel;
@@ -36,9 +33,7 @@ public class ProductServiceImpl implements IProductService {
     private final IOtherConfigurationRepository otherConfigurationRepository;
     private final IConfigurationRepository configurationRepository;
     private final IImageService imageService;
-    private final BrandMapper brandMapper;
-    private final CategoryMapper categoryMapper;
-    private final DiscountDetailMapper discountDetailMapper;
+    private final ProductMapper productMapper;
 
     public String saveProduct(ProductDTO productRequestDTO, List<MultipartFile> files) {
         List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
@@ -47,20 +42,28 @@ public class ProductServiceImpl implements IProductService {
                     .name(a.getName())
                     .value(a.getValue())
                     .build();
-            if (a.getId() != 0)
-                otherConfig.setId(a.getId());
             otherConfigurationModelList.add(otherConfig);
-
         }
-        ConfigurationModel configurationModel = ConfigurationModel.builder()
-                .categoryModel(categoryService.findCategoryById(productRequestDTO.getConfigDTO().getCategory()))
-                .otherConfigurationModelList(otherConfigurationModelList)
-                .build();
+        ConfigurationModel configurationModel;
+        if (productRequestDTO.getConfigDTO().getId() != 0) {
+            configurationModel = configurationRepository.findById(productRequestDTO.getConfigDTO().getId())
+                    .orElseThrow(() -> new RuntimeException("Configuration not found"));
+
+            otherConfigurationRepository.deleteByConfigurationModel(configurationModel.getId());
+        } else {
+            configurationModel = ConfigurationModel.builder().build();
+        }
+
+        configurationModel.setCategoryModel(categoryService.findCategoryById(productRequestDTO.getConfigDTO().getCategory()));
+        configurationModel.setOtherConfigurationModelList(otherConfigurationModelList);
+
         for (OtherConfigurationModel otherConfig : otherConfigurationModelList) {
             otherConfig.setConfigurationModel(configurationModel);
         }
+
         if (productRequestDTO.getConfigDTO().getId() != 0)
             configurationModel.setId(productRequestDTO.getConfigDTO().getId());
+
         configurationModel = configurationRepository.save(configurationModel);
         otherConfigurationRepository.saveAll(otherConfigurationModelList);
 
@@ -85,7 +88,8 @@ public class ProductServiceImpl implements IProductService {
         productRepository.save(productModel);
 
         List<ImageModel> imageModelList = new ArrayList<>();
-        if (!files.isEmpty()) {
+
+        if (files != null && !files.getFirst().getName().isEmpty()) {
             for (MultipartFile file : files) {
                 ImageModel imageProduct = null;
                 String fileName = imageService.upload(file);
@@ -125,6 +129,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public ProductDTO getProductDTOByID(long id) {
+        return productMapper.convertToDTO(productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
+    }
+
+    @Override
     public List<ProductDTO> getAllProduct() {
 //        for (ProductModel productModel : productRepository.findAll()) {
 //            if (productModel.getDiscountDetailModel() != null && productModel.getDiscount().getEndDate().toLocalDate().isBefore(LocalDate.now())) {
@@ -132,51 +141,24 @@ public class ProductServiceImpl implements IProductService {
 //                productRepository.save(productModel);
 //            }
 //        }
-        return productRepository.findAll().stream().map(v -> convertToDTO(v)).toList();
+        return productRepository.findAll().stream().map(productMapper::convertToDTO).toList();
     }
 
     @Override
     public List<ProductDTO> findProductByCategoryId(long id) {
-        return productRepository.getProductModelsByCategoryModel_Id(id).stream().map(v -> convertToDTO(v)).toList();
+        return productRepository.getProductModelsByCategoryModel_Id(id).stream().map(productMapper::convertToDTO).toList();
     }
 
     @Override
     public List<ProductDTO> findProductByBrandId(long id) {
-        return productRepository.getProductModelsByBrandModelId(id).stream().map(v -> convertToDTO(v)).toList();
+        return productRepository.getProductModelsByBrandModelId(id).stream().map(productMapper::convertToDTO).toList();
     }
 
     @Override
     public List<ProductDTO> getProductOutOfStock() {
-        return productRepository.getProductOutOfStock().stream().map(v -> convertToDTO(v)).toList();
+        return productRepository.getProductOutOfStock().stream().map(productMapper::convertToDTO).toList();
     }
 
-    private ProductDTO convertToDTO(ProductModel productModel) {
-        ConfigurationDTO configurationDTO = new ConfigurationDTO();
-        configurationDTO.setCategory(productModel.getCategoryModel().getId());
-        List<OtherConfigurationDTO> otherConfigurationDTOList = new ArrayList<>();
-        for (OtherConfigurationModel a : productModel.getConfigurationModel().getOtherConfigurationModelList()) {
-            otherConfigurationDTOList.add(new OtherConfigurationDTO(a.getId(), a.getName(), a.getValue()));
-        }
-        configurationDTO.setListOtherConfigDTO(otherConfigurationDTOList);
-        configurationDTO.setId(productModel.getConfigurationModel().getId());
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(productModel.getId());
-        productDTO.setName(productModel.getProductName());
-        productDTO.setBrandDTO(brandMapper.toDetailDto(productModel.getBrandModel()));
-        productDTO.setCategoryDTO(categoryMapper.toCategoryDTO(productModel.getCategoryModel()));
-        productDTO.setDiscountDTO(productModel.getDiscountDetailModel() != null ? discountDetailMapper.toDetailDto(productModel.getDiscountDetailModel()) : null);
-        productDTO.setListImage(productModel.getListImage().stream().map(ImageModel::getUrl).toList());
-        productDTO.setDescription(productModel.getDescription());
-        productDTO.setUnitPrice(productModel.getUnitPrice());
-        productDTO.setQuantity(productModel.getQuantity());
-        productDTO.setDisplayStatus(productModel.isDisplayStatus());
-        productDTO.setUnitPrice(productModel.getUnitPrice());
-        productDTO.setOriginalPrice(productModel.getOriginalPrice());
-        productDTO.setRatingAvg(productModel.getRatingAvg());
-        productDTO.setProductStatus(productModel.getProductStatus().toString());
-        productDTO.setConfigDTO(configurationDTO);
-        return productDTO;
-    }
 
 //    @Override
 //    public Page<ProductModel> getProductForPage(Integer pageNumber, String categoryID, String brandID, String sortBy, String searchQuery) {

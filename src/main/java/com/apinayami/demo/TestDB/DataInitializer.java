@@ -35,10 +35,10 @@ public class DataInitializer {
 //                return;
 //            }
 
-            // // ✅ Tạo Brand
-            // BrandModel brandApple = BrandModel.builder().brandName("Apple").build();
-            // BrandModel brandSamsung = BrandModel.builder().brandName("Samsung").build();
-            // brandRepository.saveAll(Arrays.asList(brandApple, brandSamsung));
+            // ✅ Tạo Brand
+            BrandModel brandApple = BrandModel.builder().brandName("Apple").build();
+            BrandModel brandSamsung = BrandModel.builder().brandName("Samsung").build();
+            brandRepository.saveAll(Arrays.asList(brandApple, brandSamsung));
 
             // // ✅ Tạo Category
             // CategoryModel categoryPhone = CategoryModel.builder().categoryName("Phone").build();

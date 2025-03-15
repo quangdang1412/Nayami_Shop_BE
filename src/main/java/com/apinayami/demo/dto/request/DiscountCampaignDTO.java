@@ -9,21 +9,27 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 public class DiscountCampaignDTO implements Serializable {
+    private long id;
+    @NotBlank(message = "description must be not blank")
+    @NotNull
+    private String name;
     @NotBlank(message = "description must be not blank")
     @NotNull
     private String description;
     private boolean active;
     @NotNull(message = " Percentage cannot be null")
 
-    private Integer percentage;
     @NotNull(message = "Start date cannot be null")
     private LocalDate startDate;
     @NotNull(message = "End date cannot be null")
     private LocalDate endDate;
+
+    private List<DiscountDetailDTO> discountDetailDTOList;
 }
