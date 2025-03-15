@@ -22,7 +22,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = "email"),
                 @UniqueConstraint(columnNames = "phoneNumber") })
-public class UserModel extends AbstractEntity<Long> {
+public class UserModel extends AbstractEntity<Long> implements UserDetails {
     protected String userName;
     protected String password;
     @Enumerated(EnumType.STRING)
