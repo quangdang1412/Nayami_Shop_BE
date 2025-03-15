@@ -27,9 +27,9 @@ public class ProductController {
     private final IProductService productService;
 
     @Operation(method = "POST", summary = "Add new product", description = "Send a request via this API to create new product")
-    @PostMapping("/add-product")
+    @PostMapping()
     public ResponseData<String> addProduct(@RequestPart("productDTO") @Valid String productDTOJson,
-                                           @RequestPart("files") List<MultipartFile> files) {
+                                           @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             ProductDTO productDTO = objectMapper.readValue(productDTOJson, ProductDTO.class);
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     @Operation(method = "PUT", summary = "Update product", description = "Send a request via this API to update product")
-    @PutMapping("/update-product")
+    @PutMapping()
     public ResponseData<String> updateProduct(@RequestPart("productDTO") @Valid String productDTOJson,
                                               @RequestPart("files") List<MultipartFile> files) {
         try {
@@ -62,7 +62,7 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping(value = "/delete-product/{proID}")
+    @DeleteMapping(value = "{proID}")
     public ResponseData<?> deleteProduct(@PathVariable long proID) {
         try {
             log.info("Request update display status : {}", proID);
@@ -88,11 +88,23 @@ public class ProductController {
 //        }
 //
 //    }
-    @GetMapping("/get-all-product")
+    @GetMapping()
     public ResponseData<?> getAllProduct() {
 
         try {
             return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getAllProduct());
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
+    @GetMapping(value = "{proID}")
+    public ResponseData<?> getProductById(@PathVariable long proID) {
+
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get product successfully", productService.getProductDTOByID(proID));
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());

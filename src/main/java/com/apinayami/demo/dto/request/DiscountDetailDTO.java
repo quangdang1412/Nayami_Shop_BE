@@ -13,8 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiscountDetailDTO implements Serializable {
+    private long id;
 
     private double percentage;
 
-    private List<String> productID;
+    private List<Long> productID;
 }

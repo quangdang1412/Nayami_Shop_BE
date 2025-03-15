@@ -1,20 +1,18 @@
 package com.apinayami.demo.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true, exclude = {"categoryModel", "otherConfigurationList"})
+@EqualsAndHashCode(callSuper = true, exclude = {"categoryModel", "otherConfigurationModelList"})
 public class ConfigurationModel extends AbstractEntity<Long> {
 
 
