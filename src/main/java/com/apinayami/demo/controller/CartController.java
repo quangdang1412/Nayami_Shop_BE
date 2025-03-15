@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.service.Impl.CartItemServiceImpl;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import com.apinayami.demo.model.UserModel;
 
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cart")
+@SecurityRequirement(name = "bearerAuth") 
 public class CartController {
 
     private final CartItemServiceImpl cartItemService;

@@ -12,4 +12,5 @@ public class BillRequestDTO {
     private EPaymentMethod paymentMethod;
     private Long shippingId;
     private Long couponId;
+    List<Long> cartId;
 }

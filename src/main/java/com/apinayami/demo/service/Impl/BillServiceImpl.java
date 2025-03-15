@@ -1,17 +1,23 @@
 package com.apinayami.demo.service.Impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.sound.sampled.Line;
 
+import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
 import org.springframework.stereotype.Service;
 
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartItemDTO;
+import com.apinayami.demo.dto.request.CartPayment;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.exception.ResourceNotFoundException;
+import com.apinayami.demo.mapper.AddressMapper;
 import com.apinayami.demo.mapper.BillMapper;
+import com.apinayami.demo.mapper.CartItemMapper;
+import com.apinayami.demo.model.AddressModel;
 import com.apinayami.demo.model.BillModel;
 import com.apinayami.demo.model.CartItemModel;
 import com.apinayami.demo.model.CouponModel;
@@ -20,17 +26,16 @@ import com.apinayami.demo.model.PaymentModel;
 import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.model.ShippingModel;
 import com.apinayami.demo.model.UserModel;
+import com.apinayami.demo.repository.IAddressRepository;
 import com.apinayami.demo.repository.IBillRepository;
 import com.apinayami.demo.repository.ICartItemRepository;
 import com.apinayami.demo.repository.ICouponRepository;
 import com.apinayami.demo.repository.IPaymentRepository;
-import com.apinayami.demo.repository.IProductRepository;
 import com.apinayami.demo.repository.IShippingRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IBillService;
-import com.apinayami.demo.util.Enum.EPaymentCurrency;
+import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
-import com.apinayami.demo.util.Enum.EPaymentStatus;
 import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
@@ -49,9 +54,40 @@ public class BillServiceImpl implements IBillService {
     private final ICouponRepository couponRepository;
     private final IPaymentRepository paymentRepository;
     private final ICartItemRepository  cartItemRepository;
+    private final IAddressRepository addressRepository;
     private final BillMapper billMapper;
     private final PaymentStrategyFactory  paymentStrategyFactory;
+    private final CartItemMapper cartItemMapper;
+    private final AddressMapper addressMapper;
 
+    @Transactional
+    public BillResponseDTO getBill(String email,CartPayment billRequestDTO){
+        UserModel customer = userRepository.getUserByEmail(email);
+        if (customer == null) {
+                throw new ResourceNotFoundException("User is empty");
+        }
+        BillResponseDTO bill = new BillResponseDTO();
+        List<CartItemModel> cartItems = billRequestDTO.getCartId().stream()
+            .map(id -> cartItemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + id)))
+            .collect(Collectors.toList());
+        bill.setListCartItem(cartItems.stream()
+        .map(cartItemMapper::toCartItemDTO)
+        .collect(Collectors.toList()));
+       List<AddressModel> address = addressRepository.findByCustomerModel(customer);
+    
+       if (address.isEmpty()) {
+            throw new ResourceNotFoundException("Address is empty");
+        }
+        bill.setListAddress(address.stream()
+        .map(addressMapper::toResponseDTO)
+        .collect(Collectors.toList()));
+
+        bill.setCoupon(billRequestDTO.getCouponId());
+        bill.setDiscount(null);
+        return bill;
+
+    }
 
     
     @Transactional
@@ -75,6 +111,7 @@ public class BillServiceImpl implements IBillService {
                 .customerModel(customer)
                 .shippingModel(shipping)
                 .couponModel(coupon)
+                .status(EBillStatus.PENDING)
                 .paymentModel(payment)
                 .build();
         List<CartItemModel> cartItem = cartItemRepository.findByCustomerModel(customer);

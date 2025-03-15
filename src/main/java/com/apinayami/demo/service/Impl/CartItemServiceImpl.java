@@ -44,7 +44,6 @@ public class CartItemServiceImpl implements ICartItemService {
         UserModel user = getUserByEmail(email);
         ProductModel product = getProductById(request.getProductId());
 
-        // Check if item already exists in cart
         CartItemModel cartItem = cartItemRepository
                 .findByCustomerModelAndProductModel(user, product)
                 .orElse(null);
