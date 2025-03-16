@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 public class CartPayment {
     List<Long> cartId;
-    private Long couponId;
+    private String couponId;
     private Double discount;
 }

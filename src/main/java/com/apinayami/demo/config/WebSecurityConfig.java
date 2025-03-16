@@ -57,22 +57,10 @@ public class WebSecurityConfig {
             "v3/**"
     };
     private final String[] EMPLOYEE_LIST = {
-            "/api/order/update",
-            "/api/product/**",
-            "/api/dashboard/**",
+          
     };
     private final String[] ADMIN_LIST = {
-            "/api/order/update",
-            "/api/order/delete/**",
-            "/api/other/**",
-            "/api/product/add",
-            "/api/product/update",
-            "/api/dashboard/**",
-            "/api/product/delete/**",
-            "/api/supplier/**",
-            "/api/user/add",
-            "/api/user/delete/**",
-            "/api/user/update"
+           
     };
     private final String[] role_more = {"SELLER", "ADMIN" };
 

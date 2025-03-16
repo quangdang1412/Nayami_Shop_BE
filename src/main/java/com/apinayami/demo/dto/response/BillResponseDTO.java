@@ -15,6 +15,6 @@ import lombok.NoArgsConstructor;
 public class BillResponseDTO {
     private Double discount;
     private List< AddressResponseDTO> listAddress;
-    private Long coupon;
+    private String coupon;
     private List<CartItemDTO> listCartItem;
 }

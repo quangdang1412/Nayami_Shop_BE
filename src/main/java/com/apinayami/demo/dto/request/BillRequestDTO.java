@@ -11,6 +11,6 @@ public class BillRequestDTO {
     private Double discount;
     private EPaymentMethod paymentMethod;
     private Long shippingId;
-    private Long couponId;
+    private String couponId;
     List<Long> cartId;
 }
