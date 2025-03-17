@@ -7,6 +7,7 @@ import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.service.IProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class ProductController {
                                               @RequestPart("files") List<MultipartFile> files) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
             ProductDTO productDTO = objectMapper.readValue(productDTOJson, ProductDTO.class);
             log.info("Request update product: {}", productDTO.getName());
             String productName = productService.saveProduct(productDTO, files);
@@ -105,6 +107,18 @@ public class ProductController {
 
         try {
             return new ResponseData<>(HttpStatus.OK.value(), "Get product successfully", productService.getProductDTOByID(proID));
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
+    @GetMapping(value = "/categories/{categoryID}")
+    public ResponseData<?> getProductByBrand(@PathVariable long categoryID) {
+
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get product successfully", productService.findProductByCategoryId(categoryID));
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());

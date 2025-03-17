@@ -7,8 +7,6 @@ import com.apinayami.demo.repository.IDiscountCampaignRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneId;
-
 @Component
 @RequiredArgsConstructor
 public class DiscountDetailMapper {
@@ -22,8 +20,8 @@ public class DiscountDetailMapper {
         return DiscountDetailDTO.builder()
                 .id(user.getId())
                 .percentage(user.getPercentage())
-                .startDate(discountCampaignModel != null ? discountCampaignModel.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null)
-                .endDate(discountCampaignModel != null ? discountCampaignModel.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null)
+                .startDate(discountCampaignModel != null ? discountCampaignModel.getStartDate() : null)
+                .endDate(discountCampaignModel != null ? discountCampaignModel.getEndDate() : null)
                 .build();
     }
 }
