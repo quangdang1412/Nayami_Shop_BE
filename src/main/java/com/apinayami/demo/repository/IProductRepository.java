@@ -16,6 +16,9 @@ public interface IProductRepository extends JpaRepository<ProductModel, Long> {
 
     List<ProductModel> getProductModelsByBrandModelId(long id);
 
+    @Query("from ProductModel p where p.discountDetailModel IS NOT NULL")
+    List<ProductModel> getProductModelsHaveDiscountModel();
+
 //    @Query("SELECT p FROM ProductModel p WHERE p.displayStatus = true AND (:categoryID IS NULL OR lower(p.categoryModel.id) LIKE lower(:categoryID)) AND (:brandID IS NULL OR lower(p.brandModel.id) LIKE lower(:brandID)) AND (:searchQuery IS NULL OR lower(p.productName) LIKE lower(:searchQuery))")
 //    Page<ProductModel> getProductForPage(
 //            @Param("categoryID") String categoryID,
@@ -23,4 +26,7 @@ public interface IProductRepository extends JpaRepository<ProductModel, Long> {
 //            @Param("searchQuery") String searchQuery,
 //            Pageable pageable
 //    );
+
+    @Query("SELECT COUNT(d) FROM ProductModel d WHERE d.ratingAvg = :star")
+    Integer getQuantityProductOfRating(Integer star);
 }

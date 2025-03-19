@@ -15,6 +15,7 @@ public class BrandMapper {
         return BrandDTO.builder()
                 .id(brand.getId())
                 .name(brand.getBrandName())
+                .quantityProduct(brand.getListProduct().size())
                 .build();
     }
 

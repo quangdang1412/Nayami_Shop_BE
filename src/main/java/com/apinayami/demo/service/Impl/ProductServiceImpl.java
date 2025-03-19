@@ -1,5 +1,6 @@
 package com.apinayami.demo.service.Impl;
 
+import com.apinayami.demo.dto.request.FilterOptionDTO;
 import com.apinayami.demo.dto.request.OtherConfigurationDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.exception.CustomException;
@@ -128,6 +129,7 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 
+
     @Override
     public ProductDTO getProductDTOByID(long id) {
         return productMapper.convertToDTO(productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
@@ -145,6 +147,12 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public List<ProductDTO> getProductsHaveDiscount() {
+        return productRepository.getProductModelsHaveDiscountModel().stream().map(productMapper::convertToDTO).toList();
+    }
+
+
+    @Override
     public List<ProductDTO> findProductByCategoryId(long id) {
         return productRepository.getProductModelsByCategoryModel_Id(id).stream().map(productMapper::convertToDTO).toList();
     }
@@ -159,7 +167,31 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.getProductOutOfStock().stream().map(productMapper::convertToDTO).toList();
     }
 
+    @Override
+    public FilterOptionDTO getFilterOption() {
+        FilterOptionDTO filterOptionDTO = new FilterOptionDTO();
+        filterOptionDTO.setListBrandDTO(brandService.getAllBrand());
+        filterOptionDTO.setListCategoryDTO(categoryService.getAll());
+        List<Integer> listRating = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            listRating.add(productRepository.getQuantityProductOfRating(i));
+        }
+        List<Integer> listDiscount = new ArrayList<>();
+        double a = 0, b = 5;
+        for (int i = 1; i <= 5; i++) {
+            listDiscount.add(discountDetailService.getQuantityProductOfDiscount(a, b));
+            a += 5;
+            b += 5;
+            if (i == 3)
+                b = 25;
+            else if (i == 4)
+                b = 100;
+        }
+        filterOptionDTO.setListQuantityProductOfRating(listRating);
+        filterOptionDTO.setListQuantityProductOfDiscount(listDiscount);
 
+        return filterOptionDTO;
+    }
 //    @Override
 //    public Page<ProductModel> getProductForPage(Integer pageNumber, String categoryID, String brandID, String sortBy, String searchQuery) {
 //        Pageable pageable = null;

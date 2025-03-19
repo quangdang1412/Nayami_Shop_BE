@@ -1,5 +1,6 @@
 package com.apinayami.demo.service;
 
+import com.apinayami.demo.dto.request.FilterOptionDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.model.ProductModel;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +15,13 @@ public interface IProductService {
 
     ProductModel getProductByID(long id);
 
+    FilterOptionDTO getFilterOption();
+
     ProductDTO getProductDTOByID(long id);
 
     List<ProductDTO> getAllProduct();
+
+    List<ProductDTO> getProductsHaveDiscount();
 
     List<ProductDTO> findProductByCategoryId(long id);
 

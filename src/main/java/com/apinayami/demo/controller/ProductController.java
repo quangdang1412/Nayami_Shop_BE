@@ -102,7 +102,7 @@ public class ProductController {
 
     }
 
-    @GetMapping(value = "{proID}")
+    @GetMapping("/{proID}")
     public ResponseData<?> getProductById(@PathVariable long proID) {
 
         try {
@@ -119,6 +119,30 @@ public class ProductController {
 
         try {
             return new ResponseData<>(HttpStatus.OK.value(), "Get product successfully", productService.findProductByCategoryId(categoryID));
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
+    @GetMapping("/discounts")
+    public ResponseData<?> getProductsHaveDiscount() {
+
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getProductsHaveDiscount());
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
+    @GetMapping("/filter")
+    public ResponseData<?> getFilterOption() {
+
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all filter option successfully", productService.getFilterOption());
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
