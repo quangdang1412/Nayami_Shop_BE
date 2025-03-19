@@ -23,6 +23,8 @@ public class CreateCouponRequest {
 
     private ETypeCoupon type;
 
+    private boolean active;
+
     private Double constraintMoney;
 
     @NotNull(message = "Start date cannot be null")

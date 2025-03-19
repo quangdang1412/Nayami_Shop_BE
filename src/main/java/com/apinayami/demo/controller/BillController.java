@@ -39,9 +39,7 @@ public class BillController {
         }
         BillResponseDTO response = billService.getBill(user.getEmail(),cartPayment);
 
-
-
-        return new ResponseData<>(HttpStatus.CREATED.value(), "Đặt hàng thành công",response);
+        return new ResponseData<>(HttpStatus.OK.value(), "Lấy dữ liệu thành công",response);
 
     }
     

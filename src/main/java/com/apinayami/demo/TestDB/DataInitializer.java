@@ -81,20 +81,20 @@ public class DataInitializer {
 //            productRepository.save(productSamsung);
 
             // ✅ Tạo Address
-            AddressModel address1 = AddressModel.builder()
-                .shippingContactNumber("0123456789")
-                .detail("123 Main St")
-                .province("Ho Chi Minh City")
-                .district("District 1")
-                .ward("Ward 1")
-                .active(true)
-                .build();
-            addressRepository.save(address1);
-            ShippingModel shipping1 = ShippingModel.builder()
-                .shippingAddress(address1)
-                .shippingFee(50_000)
-                .build();
-            shippingRepository.save(shipping1);
+            // AddressModel address1 = AddressModel.builder()
+            //     .shippingContactNumber("0123456789")
+            //     .detail("123 Main St")
+            //     .province("Ho Chi Minh City")
+            //     .district("District 1")
+            //     .ward("Ward 1")
+            //     .active(true)
+            //     .build();
+            // addressRepository.save(address1);
+            // ShippingModel shipping1 = ShippingModel.builder()
+            //     .shippingAddress(address1)
+            //     .shippingFee(50_000)
+            //     .build();
+            // shippingRepository.save(shipping1);
             
         };
     }

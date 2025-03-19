@@ -6,7 +6,6 @@ import java.util.Date;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.apinayami.demo.dto.request.AllArgsConstructorpublic;
 import com.apinayami.demo.util.Enum.ETypeCoupon;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructorpublic
+@AllArgsConstructor
 public class CouponModel {
     
     @Id

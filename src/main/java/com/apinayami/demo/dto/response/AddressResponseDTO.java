@@ -6,10 +6,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressResponseDTO {
-    private String shippingContactNumber;
-    private String detail;
+    private Long id;
+    private String phone;
+    private String recipientName;
+    private String addressName;
     private String province;
-    private String ward;
     private String district;
-    private boolean active;
+    private String ward;
 }

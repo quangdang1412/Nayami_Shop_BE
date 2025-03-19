@@ -74,11 +74,8 @@ public class BillServiceImpl implements IBillService {
         bill.setListCartItem(cartItems.stream()
         .map(cartItemMapper::toCartItemDTO)
         .collect(Collectors.toList()));
-       List<AddressModel> address = addressRepository.findByCustomerModel(customer);
-    
-       if (address.isEmpty()) {
-            throw new ResourceNotFoundException("Address is empty");
-        }
+       List<AddressModel> address = addressRepository.findByCustomerModel_IdAndActiveTrue(customer.getId());
+        
         bill.setListAddress(address.stream()
         .map(addressMapper::toResponseDTO)
         .collect(Collectors.toList()));

@@ -85,7 +85,9 @@ public class CouponServiceImpl implements ICouponService {
         coupon.setValue(request.getValue());
         coupon.setType(request.getType());
         coupon.setConstraintMoney(request.getConstraintMoney());
-        coupon.setActive(true);
+        coupon.setActive(request.isActive());
+        coupon.setStartDate(request.getStartDate());
+        coupon.setEndDate(request.getEndDate());
         
         if (request.getCustomerId() != null) {
             UserModel customer = userRepository.findById(request.getCustomerId())
@@ -102,35 +104,11 @@ public class CouponServiceImpl implements ICouponService {
         if (!couponRepository.existsById(id)) {
             throw new EntityNotFoundException("Coupon not found with id: " + id);
         }
-        couponRepository.deleteById(id);
-    }
-    
-    @Transactional
-    public CouponDto assignCouponToCustomer(String id, Long customerId) {
         CouponModel coupon = couponRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
-                
-        UserModel customer = userRepository.findById(customerId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + customerId));
-        
-        coupon.setCustomerModel(customer);
-        CouponModel savedCoupon = couponRepository.save(coupon);
-        return couponMapper.toDto(savedCoupon);
-    }
-    
-    @Transactional
-    public CouponDto activateCoupon(String id) {
-        CouponModel coupon = couponRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
-        coupon.setActive(true);
-        return couponMapper.toDto(couponRepository.save(coupon));
-    }
-    
-    @Transactional
-    public CouponDto deactivateCoupon(String id) {
-        CouponModel coupon = couponRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
+        .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
         coupon.setActive(false);
-        return couponMapper.toDto(couponRepository.save(coupon));
+        couponRepository.save(coupon);
     }
+    
+
 }

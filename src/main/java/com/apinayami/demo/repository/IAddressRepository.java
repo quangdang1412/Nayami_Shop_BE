@@ -11,5 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IAddressRepository extends JpaRepository<AddressModel, Long> {
     List<AddressModel> findByCustomerModel(UserModel customerModel);
+    List<AddressModel> findByCustomerModel_IdAndActiveTrue(Long customerId);
+
 
 }
