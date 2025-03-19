@@ -34,6 +34,11 @@ public class CouponServiceImpl implements ICouponService {
                 .map(couponMapper::toDto)
                 .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
     }
+    public CouponDto getIdIsActive(String id){
+        return couponRepository.findByIdAndActiveTrue(id)
+                .map(couponMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
+    }
 
     public List<CouponDto> getCouponsByCustomerId(Long customerId) {
         UserModel customer = userRepository.findById(customerId)

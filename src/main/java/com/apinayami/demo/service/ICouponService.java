@@ -12,5 +12,6 @@ public interface ICouponService {
     void deleteCoupon(String id);
     CouponDto createCoupon(CreateCouponRequest request);
     CouponDto updateCoupon(String id, CreateCouponRequest request);
+    CouponDto getIdIsActive(String id);
 
 }

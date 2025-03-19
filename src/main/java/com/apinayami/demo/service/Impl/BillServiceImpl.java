@@ -94,9 +94,14 @@ public class BillServiceImpl implements IBillService {
         if (customer == null) {
                 throw new ResourceNotFoundException("User is empty");
         }
-        ShippingModel shipping = shippingRepository.findById(request.getShippingId())
-                .orElseThrow(() -> new ResourceNotFoundException("Shipping not found"));
-
+        
+        AddressModel address = addressRepository.findById(request.getAddressId())
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + request.getAddressId()));
+        ShippingModel shipping = ShippingModel.builder()
+                .shippingFee(request.getShippingFee())
+                .addressModel(address)
+                .build();
+        shipping = shippingRepository.save(shipping);
         CouponModel coupon = request.getCouponId() != null ? couponRepository.findById(request.getCouponId()).orElse(null) : null;
 
         PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(request.getPaymentMethod().name());

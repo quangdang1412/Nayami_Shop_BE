@@ -32,7 +32,11 @@ public class CouponController {
         CouponDto coupon = couponService.getCouponById(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Coupon applied successfully", coupon);
     }
-
+    @GetMapping("/customer/{id}")
+    public ResponseData<CouponDto> getCouponByCustomerId(@PathVariable String id) {
+        CouponDto coupon = couponService.getIdIsActive(id);
+        return new ResponseData<>(HttpStatus.OK.value(), "Coupon applied successfully", coupon);
+    }
 
     @PostMapping
     public ResponseData<CouponDto> createCoupon(@Valid @RequestBody CreateCouponRequest request) {

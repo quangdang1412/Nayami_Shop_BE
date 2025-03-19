@@ -10,7 +10,8 @@ import lombok.Data;
 public class BillRequestDTO {
     private Double discount;
     private EPaymentMethod paymentMethod;
-    private Long shippingId;
+    private Long AddressId;
+    private double ShippingFee;
     private String couponId;
     List<Long> cartId;
 }

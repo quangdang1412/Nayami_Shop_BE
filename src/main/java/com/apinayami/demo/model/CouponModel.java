@@ -30,6 +30,8 @@ public class CouponModel {
     @Enumerated(EnumType.STRING)
     private ETypeCoupon type;
     private Double constraintMoney;
+    
+    @Column(columnDefinition = "TINYINT(1)")
     private boolean active;
 
     private LocalDate startDate;
