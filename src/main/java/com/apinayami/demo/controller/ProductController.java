@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -138,7 +139,7 @@ public class ProductController {
 
     }
 
-    @GetMapping("/filter")
+    @GetMapping("/filterOption")
     public ResponseData<?> getFilterOption() {
 
         try {
@@ -148,5 +149,25 @@ public class ProductController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
 
+    }
+
+    @GetMapping("/filter")
+    public ResponseData<?> searchProducts(
+            @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(name = "sortBy", required = false) String sortBy,
+            @RequestParam(name = "search", required = false) String searchQuery,
+            @RequestParam(name = "rating", required = false) List<Integer> rating,
+            @RequestParam(name = "discounts", required = false) List<Integer> discounts,
+            @RequestParam(name = "brands", required = false) List<String> brands,
+            @RequestParam(name = "categories", required = false) List<String> categories) {
+
+        try {
+            PagedModel<?> productPage = productService.getProductFilter(pageNo, pageSize, sortBy, brands, categories, rating, discounts, searchQuery);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get product filter successfully", productPage);
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
     }
 }

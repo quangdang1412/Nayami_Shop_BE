@@ -13,10 +13,18 @@ import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.repository.IConfigurationRepository;
 import com.apinayami.demo.repository.IOtherConfigurationRepository;
 import com.apinayami.demo.repository.IProductRepository;
+import com.apinayami.demo.repository.ProductSpecification;
 import com.apinayami.demo.service.*;
 import com.apinayami.demo.util.Enum.EProductStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +43,7 @@ public class ProductServiceImpl implements IProductService {
     private final IConfigurationRepository configurationRepository;
     private final IImageService imageService;
     private final ProductMapper productMapper;
+    private final PagedResourcesAssembler<ProductDTO> pagedAssembler;
 
     public String saveProduct(ProductDTO productRequestDTO, List<MultipartFile> files) {
         List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
@@ -147,6 +156,22 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public PagedModel<?> getProductFilter(int pageNo, int pageSize, String sortBy, List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery) {
+        Sort sort = Sort.unsorted();
+        if (sortBy != null) {
+            if (sortBy.equalsIgnoreCase("desc"))
+                sort = Sort.by("unitPrice").descending();
+            else
+                sort = Sort.by("unitPrice").ascending();
+        }
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
+        Specification<ProductModel> spec = ProductSpecification.filterProducts(brands, categories, rating, discount, searchQuery);
+
+        Page<ProductModel> productsPage = productRepository.findAll(spec, pageable);
+        return pagedAssembler.toModel(productsPage.map(productMapper::convertToDTO));
+    }
+
+    @Override
     public List<ProductDTO> getProductsHaveDiscount() {
         return productRepository.getProductModelsHaveDiscountModel().stream().map(productMapper::convertToDTO).toList();
     }
@@ -173,7 +198,7 @@ public class ProductServiceImpl implements IProductService {
         filterOptionDTO.setListBrandDTO(brandService.getAllBrand());
         filterOptionDTO.setListCategoryDTO(categoryService.getAll());
         List<Integer> listRating = new ArrayList<>();
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 0; i <= 5; i++) {
             listRating.add(productRepository.getQuantityProductOfRating(i));
         }
         List<Integer> listDiscount = new ArrayList<>();
