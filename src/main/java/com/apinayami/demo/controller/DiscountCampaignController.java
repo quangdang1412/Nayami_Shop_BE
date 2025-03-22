@@ -23,7 +23,7 @@ public class DiscountCampaignController {
     private final IDiscountCampaignService discountCampaignService;
 
     @Operation(method = "POST", summary = "Add new discountCampaign", description = "Send a request via this API to create new discountCampaign")
-    @PostMapping("/discountCampaign")
+    @PostMapping()
     public ResponseData<String> addDiscountCampaign(@Valid @RequestBody DiscountCampaignDTO discountCampaignDTO) {
         try {
             log.info("Request add discountCampaign: {}", discountCampaignDTO.getName());

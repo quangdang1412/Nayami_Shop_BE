@@ -89,7 +89,7 @@ public class ProductServiceImpl implements IProductService {
 
         List<ImageModel> imageModelList = new ArrayList<>();
 
-        if (!files.getFirst().getName().isEmpty()) {
+        if (files != null && !files.getFirst().getName().isEmpty()) {
             for (MultipartFile file : files) {
                 ImageModel imageProduct = null;
                 String fileName = imageService.upload(file);
