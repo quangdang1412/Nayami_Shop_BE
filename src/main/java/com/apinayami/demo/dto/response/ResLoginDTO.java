@@ -8,4 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 public class ResLoginDTO {
     private String accessToken;
+    private String refreshToken;
 }

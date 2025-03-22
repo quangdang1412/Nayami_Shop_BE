@@ -49,5 +49,13 @@ public class JwtConfig {
            }
         };
     }
+    public Jwt decodeToken(String token){
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.
+                withSecretKey(getSecretKey()).
+                macAlgorithm(SecurityUtil.JWT_ALGORITHM).
+                build();
+        return jwtDecoder.decode(token);
+    }
+
 
 }
