@@ -1,6 +1,7 @@
 package com.apinayami.demo.service.Impl;
 
 import com.apinayami.demo.dto.request.UserDTO;
+import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.BrandMapper;
 import com.apinayami.demo.mapper.UserMapper;
@@ -10,6 +11,7 @@ import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,23 +33,22 @@ public class UserServiceImpl implements IUserService {
             * Tránh trường hợp lúc chèn xuống lỗi trùng nó vẫn tăng key lên.
             * */
             if(userRepository.existsByEmail(userModel.getEmail())) {
-                throw new CustomException("Email already exists");
+                throw new CustomException("Email đã tồn tại");
             }
             if(userRepository.existsByPhoneNumber(userModel.getPhoneNumber())) {
-                throw new CustomException("Phone number already exists");
+                throw new CustomException("Số điện thoại đã tồn tại");
             }
 
             //hash password
             String hashedPassword = passwordEncoder.encode(userModel.getPassword());
             userModel.setPassword(hashedPassword);
-
-
             userModel.setActive(true);
             userRepository.save(userModel);
             return "Thêm thành công "+userModel.getType()+" "+ userModel.getId();
 
         } catch (Exception e) {
-            log.error("Error: {}", e.getMessage());
+            if (e instanceof CustomException)
+                throw new CustomException(e.getMessage());
             throw new CustomException("Add user failed");
         }
     }

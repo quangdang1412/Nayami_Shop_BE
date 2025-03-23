@@ -123,7 +123,8 @@ public class WebSecurityConfig {
     * */
     private final String[] PUBLIC_API = {
             "/api/users", // dùng để thêm user tại chưa có tính năng đăng ký
-            "/login",
+            "/api/login",
+            "/api/signup",
             "/api/products/get-all-product",
             "/swagger-ui/**",
             "/v3/api-docs/**",
@@ -132,14 +133,18 @@ public class WebSecurityConfig {
     };
 
     private final String[] ADMIN_API = {
-            "/api/brands/**"
+            "/api/brands/**",
+            "/api/products/**",
+            "/api/categories/**"
     };
 
     private final String[] CUSTOMER_API = {
-            "/api/categories/**"
+
     };
     private final String[] STAFF_API = {
-            "/api/users/{id}"
+    };
+    private final String[] REFRESH_TOKEN = {
+            "/api/refresh"
     };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -149,6 +154,7 @@ public class WebSecurityConfig {
                         .requestMatchers(ADMIN_API).hasAuthority("ADMIN")
                         .requestMatchers(CUSTOMER_API).hasAuthority("CUSTOMER")
                         .requestMatchers(STAFF_API).hasAuthority("STAFF")
+                        .requestMatchers(REFRESH_TOKEN).hasAuthority("REFRESH_TOKEN")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtAuthConverter())))
