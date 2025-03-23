@@ -1,9 +1,6 @@
 package com.apinayami.demo.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -11,19 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import com.apinayami.demo.dto.request.AuthenticationRequest;
 import com.apinayami.demo.dto.request.RegisterRequest;
 import com.apinayami.demo.dto.response.AuthenticationResponse;
-import com.apinayami.demo.dto.response.ResponseData;
-import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.ResourceNotFoundException;
-import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.service.IUserService;
 import com.apinayami.demo.service.Impl.AuthenticationServiceImpl;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
 
 
 @RequestMapping("/api/auth")

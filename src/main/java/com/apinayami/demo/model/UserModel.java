@@ -1,6 +1,8 @@
 package com.apinayami.demo.model;
 
 import com.apinayami.demo.util.Enum.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -47,6 +49,7 @@ public class UserModel extends AbstractEntity<Long> implements UserDetails {
     private Set<CartItemModel> listCartItem;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
+    @JsonIgnore 
     private Set<BillModel> listBill;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)

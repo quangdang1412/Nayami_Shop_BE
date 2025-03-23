@@ -7,12 +7,20 @@ import java.util.stream.Collectors;
 import javax.sound.sampled.Line;
 
 import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.request.CartPayment;
 import com.apinayami.demo.dto.response.BillResponseDTO;
+import com.apinayami.demo.dto.response.HistoryOrderDTO;
+import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.AddressMapper;
 import com.apinayami.demo.mapper.BillMapper;
@@ -154,4 +162,19 @@ public class BillServiceImpl implements IBillService {
         }
         return billMapper.toResponseDTO(savedBill);
     }
+    @Transactional
+    public Page<HistoryOrderDTO> getBillHistory(String email,Pageable pageable) {
+         if (email == null) {
+            throw new ResourceNotFoundException("Vui lòng đăng nhập ");
+        } 
+        UserModel customer = userRepository.getUserByEmail(email);
+        if (customer == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        Page<BillModel> billPage = billRepository.findByCustomerModel(customer, pageable);
+        List<HistoryOrderDTO> dtos = billMapper.toDTOList(billPage.getContent());
+
+        return new PageImpl<>(dtos, pageable, billPage.getTotalElements());
+    }
 }
+

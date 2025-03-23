@@ -2,6 +2,8 @@ package com.apinayami.demo.controller;
 
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +14,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartPayment;
 import com.apinayami.demo.dto.response.BillResponseDTO;
+import com.apinayami.demo.dto.response.HistoryOrderDTO;
 import com.apinayami.demo.dto.response.ResponseData;
+import com.apinayami.demo.model.BillModel;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.service.IBillService;
 import com.apinayami.demo.service.IGHTKSerivce;
@@ -38,7 +42,7 @@ public class BillController {
 
 
         if (user == null) {
-            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xem giỏ hàng");
+            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập ");
         }
         BillResponseDTO response = billService.getBill(user.getEmail(),cartPayment);
 
@@ -56,7 +60,7 @@ public class BillController {
 
 
         if (user == null) {
-            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xem giỏ hàng");
+            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập ");
         }
         Object response = billService.createBill(user.getEmail(),billRequestDTO);
         if (response instanceof String) {
@@ -66,4 +70,16 @@ public class BillController {
         return new ResponseData<>(HttpStatus.CREATED.value(), "Đặt hàng thành công",response);
 
     }
+    @GetMapping("/history")
+    public ResponseData<?> getBillHistory(@AuthenticationPrincipal UserModel user, Pageable pageable) {
+        if (user == null) {
+            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập ");
+            
+        }
+       
+        Page<HistoryOrderDTO> response = billService.getBillHistory(user.getEmail(), pageable);
+        
+        return new ResponseData<>(HttpStatus.OK.value(), "Lấy dữ liệu thành công", response);
+    }
+    
 }

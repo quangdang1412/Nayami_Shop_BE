@@ -2,6 +2,8 @@ package com.apinayami.demo.model;
 
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -26,6 +28,7 @@ public class BillModel extends AbstractEntity<Long> {
     //reference
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @JsonIgnore  
     private UserModel customerModel;
 
     @OneToOne
