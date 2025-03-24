@@ -31,4 +31,9 @@ public class DiscountDetailService implements IDiscountDetailService {
     public DiscountDetailModel findDiscountDetailById(long id) {
         return discountDetailRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public Integer getQuantityProductOfDiscount(Double from, Double to) {
+        return discountDetailRepository.getQuantityProductOfDiscount(from, to);
+    }
 }

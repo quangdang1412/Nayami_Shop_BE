@@ -7,10 +7,12 @@ import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.service.IProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +52,7 @@ public class ProductController {
                                               @RequestPart("files") List<MultipartFile> files) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
             ProductDTO productDTO = objectMapper.readValue(productDTOJson, ProductDTO.class);
             log.info("Request update product: {}", productDTO.getName());
             String productName = productService.saveProduct(productDTO, files);
@@ -100,7 +103,7 @@ public class ProductController {
 
     }
 
-    @GetMapping(value = "{proID}")
+    @GetMapping("/{proID}")
     public ResponseData<?> getProductById(@PathVariable long proID) {
 
         try {
@@ -110,5 +113,61 @@ public class ProductController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
 
+    }
+
+    @GetMapping(value = "/categories/{categoryID}")
+    public ResponseData<?> getProductByBrand(@PathVariable long categoryID) {
+
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get product successfully", productService.findProductByCategoryId(categoryID));
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
+    @GetMapping("/discounts")
+    public ResponseData<?> getProductsHaveDiscount() {
+
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getProductsHaveDiscount());
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
+    @GetMapping("/filterOption")
+    public ResponseData<?> getFilterOption() {
+
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all filter option successfully", productService.getFilterOption());
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
+    @GetMapping("/filter")
+    public ResponseData<?> searchProducts(
+            @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(name = "sortBy", required = false) String sortBy,
+            @RequestParam(name = "search", required = false) String searchQuery,
+            @RequestParam(name = "rating", required = false) List<Integer> rating,
+            @RequestParam(name = "discounts", required = false) List<Integer> discounts,
+            @RequestParam(name = "brands", required = false) List<String> brands,
+            @RequestParam(name = "categories", required = false) List<String> categories) {
+
+        try {
+            PagedModel<?> productPage = productService.getProductFilter(pageNo, pageSize, sortBy, brands, categories, rating, discounts, searchQuery);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get product filter successfully", productPage);
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
     }
 }
