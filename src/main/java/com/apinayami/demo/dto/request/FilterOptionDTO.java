@@ -2,6 +2,7 @@ package com.apinayami.demo.dto.request;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -9,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FilterOptionDTO {
+public class FilterOptionDTO implements Serializable {
     List<BrandDTO> listBrandDTO;
     List<CategoryDTO> listCategoryDTO;
     List<Integer> listQuantityProductOfRating;

@@ -43,7 +43,7 @@ public class ProductServiceImpl implements IProductService {
     private final IConfigurationRepository configurationRepository;
     private final IImageService imageService;
     private final ProductMapper productMapper;
-    private final PagedResourcesAssembler<ProductDTO> pagedAssembler;
+    private final PagedResourcesAssembler<ProductDTO> pagedResourcesAssembler;
 
     public String saveProduct(ProductDTO productRequestDTO, List<MultipartFile> files) {
         List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
@@ -156,7 +156,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public PagedModel<?> getProductFilter(int pageNo, int pageSize, String sortBy, List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery) {
+    public PagedModel<?> getProductFilter(int pageNo, int pageSize, String sortBy, List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery, List<Integer> price) {
         Sort sort = Sort.unsorted();
         if (sortBy != null) {
             if (sortBy.equalsIgnoreCase("desc"))
@@ -165,10 +165,10 @@ public class ProductServiceImpl implements IProductService {
                 sort = Sort.by("unitPrice").ascending();
         }
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
-        Specification<ProductModel> spec = ProductSpecification.filterProducts(brands, categories, rating, discount, searchQuery);
+        Specification<ProductModel> spec = ProductSpecification.filterProducts(brands, categories, rating, discount, searchQuery, price);
 
         Page<ProductModel> productsPage = productRepository.findAll(spec, pageable);
-        return pagedAssembler.toModel(productsPage.map(productMapper::convertToDTO));
+        return pagedResourcesAssembler.toModel(productsPage.map(productMapper::convertToDTO));
     }
 
     @Override

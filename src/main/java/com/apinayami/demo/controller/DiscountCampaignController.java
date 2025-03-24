@@ -53,7 +53,7 @@ public class DiscountCampaignController {
     }
 
     @DeleteMapping(value = "{proID}")
-    public ResponseData<?> deleteDiscountCampaign(@PathVariable long proID) {
+    public ResponseData<?> changeStatusDiscountCampaign(@PathVariable long proID) {
         try {
             log.info("Request update active : {}", proID);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", discountCampaignService.delete(proID));
@@ -77,7 +77,7 @@ public class DiscountCampaignController {
     }
 
     @GetMapping(value = "{ID}")
-    public ResponseData<?> getProductById(@PathVariable long ID) {
+    public ResponseData<?> getDiscountCampaignById(@PathVariable long ID) {
 
         try {
             return new ResponseData<>(HttpStatus.OK.value(), "Get DiscountCampaign successfully", discountCampaignService.getDiscountCampaignDTOById(ID));

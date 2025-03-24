@@ -66,7 +66,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "{proID}")
-    public ResponseData<?> deleteProduct(@PathVariable long proID) {
+    public ResponseData<?> changeDisplayStatusProduct(@PathVariable long proID) {
         try {
             log.info("Request update display status : {}", proID);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", productService.delete(proID));
@@ -156,6 +156,7 @@ public class ProductController {
             @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
             @RequestParam(name = "sortBy", required = false) String sortBy,
+            @RequestParam(name = "price", required = false) List<Integer> price,
             @RequestParam(name = "search", required = false) String searchQuery,
             @RequestParam(name = "rating", required = false) List<Integer> rating,
             @RequestParam(name = "discounts", required = false) List<Integer> discounts,
@@ -163,7 +164,7 @@ public class ProductController {
             @RequestParam(name = "categories", required = false) List<String> categories) {
 
         try {
-            PagedModel<?> productPage = productService.getProductFilter(pageNo, pageSize, sortBy, brands, categories, rating, discounts, searchQuery);
+            PagedModel<?> productPage = productService.getProductFilter(pageNo, pageSize, sortBy, brands, categories, rating, discounts, searchQuery, price);
             return new ResponseData<>(HttpStatus.OK.value(), "Get product filter successfully", productPage);
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
