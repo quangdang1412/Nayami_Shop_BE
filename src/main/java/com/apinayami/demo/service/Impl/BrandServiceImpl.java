@@ -36,12 +36,16 @@ public class BrandServiceImpl implements IBrandService {
     public String create(BrandModel a) {
         try {
             log.info("Saving brand: {}", a.getBrandName());
+            if (brandRepository.existsByBrandName(a.getBrandName())) {
+                throw new CustomException("Brand already exists");
+
+            }
             brandRepository.save(a);
             return "Thêm thành công " + a.getBrandName();
 
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
-            throw new CustomException("Brand has been used");
+            throw new CustomException( e.getMessage());
         }
     }
 
@@ -49,11 +53,15 @@ public class BrandServiceImpl implements IBrandService {
     public String update(BrandModel a) {
         try {
             log.info("Updating brand: {}", a.getBrandName());
+            if (brandRepository.existsByBrandName(a.getBrandName())) {
+                throw new CustomException("Brand already exists");
+
+            }
             brandRepository.save(a);
             return "Cập nhật thành công " + a.getBrandName();
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
-            return "Lỗi khi cập nhật " + a.getBrandName();
+            throw new CustomException(e.getMessage());
         }
     }
 
@@ -61,11 +69,12 @@ public class BrandServiceImpl implements IBrandService {
     public String delete(BrandModel a) {
         try {
             log.info("Deleting brand: {}", a.getBrandName());
-            brandRepository.delete(a);
-            return "Xóa thành công " + a.getBrandName();
+            a.setActive(false);
+            brandRepository.save(a);
+            return "Thay đổi trạng thái thành công " + a.getBrandName();
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
-            return "Lỗi khi xóa " + a.getBrandName();
+            throw new CustomException(e.getMessage());
         }
     }
 

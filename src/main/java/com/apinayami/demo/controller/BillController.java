@@ -1,5 +1,6 @@
 package com.apinayami.demo.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartPayment;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
+import com.apinayami.demo.dto.response.PageResponseDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.model.BillModel;
 import com.apinayami.demo.model.UserModel;
@@ -71,13 +73,13 @@ public class BillController {
 
     }
     @GetMapping("/history")
-    public ResponseData<?> getBillHistory(@AuthenticationPrincipal UserModel user, Pageable pageable) {
+    public ResponseData<?> getBillHistory(@AuthenticationPrincipal UserModel user) {
         if (user == null) {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập ");
             
         }
        
-        Page<HistoryOrderDTO> response = billService.getBillHistory(user.getEmail(), pageable);
+        List<HistoryOrderDTO> response = billService.getBillHistory(user.getEmail());
         
         return new ResponseData<>(HttpStatus.OK.value(), "Lấy dữ liệu thành công", response);
     }

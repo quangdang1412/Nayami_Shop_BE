@@ -25,6 +25,8 @@ public class BillModel extends AbstractEntity<Long> {
     private EPaymentMethod paymentMethod;
     @Enumerated(EnumType.STRING)
     private EBillStatus status;
+
+    private String orderNumber;
     //reference
     @ManyToOne
     @JoinColumn(name = "customer_id")
@@ -42,6 +44,7 @@ public class BillModel extends AbstractEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "coupon_id")
     private CouponModel couponModel;
+
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "billModel", cascade = CascadeType.ALL)
     private List<LineItemModel> items;

@@ -20,6 +20,7 @@ import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.request.CartPayment;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
+import com.apinayami.demo.dto.response.PageResponseDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.AddressMapper;
@@ -163,7 +164,7 @@ public class BillServiceImpl implements IBillService {
         return billMapper.toResponseDTO(savedBill);
     }
     @Transactional
-    public Page<HistoryOrderDTO> getBillHistory(String email,Pageable pageable) {
+    public List<HistoryOrderDTO> getBillHistory(String email) {
          if (email == null) {
             throw new ResourceNotFoundException("Vui lòng đăng nhập ");
         } 
@@ -171,10 +172,10 @@ public class BillServiceImpl implements IBillService {
         if (customer == null) {
             throw new ResourceNotFoundException("User not found");
         }
-        Page<BillModel> billPage = billRepository.findByCustomerModel(customer, pageable);
-        List<HistoryOrderDTO> dtos = billMapper.toDTOList(billPage.getContent());
+        List<BillModel> billPage = billRepository.findByCustomerModel(customer);
+        List<HistoryOrderDTO> dtos = billMapper.toDTOList(billPage);
 
-        return new PageImpl<>(dtos, pageable, billPage.getTotalElements());
+        return dtos;
     }
 }
 

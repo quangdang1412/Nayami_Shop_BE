@@ -8,5 +8,4 @@ public class LineItemReponseDTO {
     private String productImage;
     private Double unitPrice;
     private Integer quantity;
-    private Double totalPrice;
 }

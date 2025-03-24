@@ -17,4 +17,5 @@ public class BillResponseDTO {
     private List< AddressResponseDTO> listAddress;
     private String coupon;
     private List<CartItemDTO> listCartItem;
+    private String orderNumber;
 }
