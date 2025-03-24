@@ -1,16 +1,17 @@
 package com.apinayami.demo.controller;
 
-import com.apinayami.demo.dto.request.CategoryDTO;
 import com.apinayami.demo.dto.request.CategoryWithBrandsDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
-import com.apinayami.demo.model.BrandModel;
+import com.apinayami.demo.mapper.CategoryMapper;
 import com.apinayami.demo.model.CategoryModel;
 import com.apinayami.demo.service.ICategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,10 +23,11 @@ import java.util.List;
 @Validated
 public class CategoryController {
     private final ICategoryService categoryService;
+    private final CategoryMapper categoryMapper;
 
     @GetMapping
-    public List<CategoryDTO> getAllCategories() {
-        return categoryService.getAll();
+    public ResponseData<?> getAllCategories() {
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", categoryService.getAll());
     }
 
     @Operation(summary = "Get category by ID", description = "Get a category by its ID")
@@ -34,7 +36,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryModel> getCategoryById(@PathVariable Long id) {
+    public ResponseData<?> getCategoryById(@PathVariable Long id) {
         CategoryModel category = categoryService.findCategoryById(id);
         return category != null
                 ? new ResponseData<>(HttpStatus.OK.value(), "Success", categoryMapper.toCategoryDTO(category))
