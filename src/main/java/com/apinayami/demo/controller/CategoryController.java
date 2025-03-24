@@ -4,16 +4,13 @@ import com.apinayami.demo.dto.request.CategoryDTO;
 import com.apinayami.demo.dto.request.CategoryWithBrandsDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
-import com.apinayami.demo.mapper.CategoryMapper;
+import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.model.CategoryModel;
 import com.apinayami.demo.service.ICategoryService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,16 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/categories")
 @Validated
-@Tag(name = "Category", description = "Category management APIs")
 public class CategoryController {
     private final ICategoryService categoryService;
-    private final CategoryMapper categoryMapper;
 
-    @Operation(summary = "Get all categories", description = "Retrieves a list of all categories")
     @GetMapping
-    public ResponseData<List<CategoryDTO>> getAllCategories() {
-        List<CategoryDTO> categories = categoryService.getAll();
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", categories);
+    public List<CategoryDTO> getAllCategories() {
+        return categoryService.getAll();
     }
 
     @Operation(summary = "Get category by ID", description = "Get a category by its ID")
@@ -41,7 +34,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found")
     })
     @GetMapping("/{id}")
-    public ResponseData<CategoryDTO> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<CategoryModel> getCategoryById(@PathVariable Long id) {
         CategoryModel category = categoryService.findCategoryById(id);
         return category != null
                 ? new ResponseData<>(HttpStatus.OK.value(), "Success", categoryMapper.toCategoryDTO(category))
@@ -53,8 +46,7 @@ public class CategoryController {
     public ResponseData<?> addCategory(@RequestBody @Valid CategoryModel category) {
         try {
             categoryService.create(category);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success",
-                    "Thêm thành công " + category.getCategoryName());
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + category.getCategoryName());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
@@ -68,8 +60,7 @@ public class CategoryController {
             CategoryModel updated_category = categoryService.findCategoryById(id);
             updated_category.setCategoryName(category.getCategoryName());
             categoryService.update(updated_category);
-            return new ResponseData<>(HttpStatus.OK.value(), "Success",
-                    "Cập nhật thành công " + category.getCategoryName());
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + category.getCategoryName());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
@@ -96,3 +87,4 @@ public class CategoryController {
         return new ResponseData<>(HttpStatus.OK.value(), "Success", categories);
     }
 }
+
