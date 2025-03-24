@@ -6,14 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDTO implements Serializable {
+public class CategoryWithBrandsDTO implements Serializable {
     private long id;
     private String categoryName;
-    private int quantityProduct;
-
+    private List<BrandDTO> brandDTOList;
 }

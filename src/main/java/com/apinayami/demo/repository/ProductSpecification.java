@@ -22,6 +22,15 @@ public class ProductSpecification {
         };
     }
 
+    public static Specification<ProductModel> hasPrice(List<Integer> price) {
+        return (root, query, cb) -> {
+            if (price == null || price.isEmpty()) {
+                return null;
+            }
+            return cb.between(root.get("unitPrice"), price.get(0), price.get(1));
+        };
+    }
+
     public static Specification<ProductModel> hasBrands(List<String> brands) {
         return (root, query, cb) -> {
             if (brands == null || brands.isEmpty()) return null;
@@ -68,8 +77,9 @@ public class ProductSpecification {
         };
     }
 
-    public static Specification<ProductModel> filterProducts(List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery) {
+    public static Specification<ProductModel> filterProducts(List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery, List<Integer> price) {
         return Specification.where(hasSearchQuery(searchQuery))
+                .and(hasPrice(price))
                 .and(hasBrands(brands))
                 .and(hasCategories(categories))
                 .and(hasMinRating(rating))
