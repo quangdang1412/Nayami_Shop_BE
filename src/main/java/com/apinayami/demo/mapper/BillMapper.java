@@ -21,6 +21,7 @@ public interface BillMapper {
     
     @Mapping(target = "items", source = "items") 
     @Mapping(target = "totalPrice", source = "totalPrice")
+    @Mapping(target = "paymentStatus", source = "paymentModel.paymentStatus")
     HistoryOrderDTO toDTO(BillModel billModel);
 
     List<HistoryOrderDTO> toDTOList(List<BillModel> billModels);
