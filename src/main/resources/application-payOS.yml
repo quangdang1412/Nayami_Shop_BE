@@ -1,0 +1,4 @@
+payos:
+  client-id: ${PAYOS_CLIENT_ID:"YOUR EMAIL"}
+  api-key: ${PAYOS_API_KEY:"YOUR KEY"}
+  checksum-key: ${PAYOS_CHECKSUM_KEY:"YOUR CHECKSUM KEY"}
