@@ -196,6 +196,9 @@ public class BillServiceImpl implements IBillService {
             throw new ResourceNotFoundException("Bill not found with id: " + billId);
 
         }
+        if (bill.getStatus() == EBillStatus.CANCELED) {
+            throw new ResourceNotFoundException("Bill is already canceled");
+        }
         bill.setStatus(EBillStatus.CANCELED);
         PaymentModel payment = bill.getPaymentModel();
         if (payment == null) {
