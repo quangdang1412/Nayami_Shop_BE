@@ -1,5 +1,6 @@
 package com.apinayami.demo.service.Impl;
 
+import com.apinayami.demo.dto.request.FilterOptionDTO;
 import com.apinayami.demo.dto.request.OtherConfigurationDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.exception.CustomException;
@@ -12,10 +13,18 @@ import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.repository.IConfigurationRepository;
 import com.apinayami.demo.repository.IOtherConfigurationRepository;
 import com.apinayami.demo.repository.IProductRepository;
+import com.apinayami.demo.repository.ProductSpecification;
 import com.apinayami.demo.service.*;
 import com.apinayami.demo.util.Enum.EProductStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +43,7 @@ public class ProductServiceImpl implements IProductService {
     private final IConfigurationRepository configurationRepository;
     private final IImageService imageService;
     private final ProductMapper productMapper;
+    private final PagedResourcesAssembler<ProductDTO> pagedResourcesAssembler;
 
     public String saveProduct(ProductDTO productRequestDTO, List<MultipartFile> files) {
         List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
@@ -128,6 +138,7 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 
+
     @Override
     public ProductDTO getProductDTOByID(long id) {
         return productMapper.convertToDTO(productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
@@ -145,6 +156,28 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public PagedModel<?> getProductFilter(int pageNo, int pageSize, String sortBy, List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery, List<Integer> price) {
+        Sort sort = Sort.unsorted();
+        if (sortBy != null) {
+            if (sortBy.equalsIgnoreCase("desc"))
+                sort = Sort.by("unitPrice").descending();
+            else
+                sort = Sort.by("unitPrice").ascending();
+        }
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
+        Specification<ProductModel> spec = ProductSpecification.filterProducts(brands, categories, rating, discount, searchQuery, price);
+
+        Page<ProductModel> productsPage = productRepository.findAll(spec, pageable);
+        return pagedResourcesAssembler.toModel(productsPage.map(productMapper::convertToDTO));
+    }
+
+    @Override
+    public List<ProductDTO> getProductsHaveDiscount() {
+        return productRepository.getProductModelsHaveDiscountModel().stream().map(productMapper::convertToDTO).toList();
+    }
+
+
+    @Override
     public List<ProductDTO> findProductByCategoryId(long id) {
         return productRepository.getProductModelsByCategoryModel_Id(id).stream().map(productMapper::convertToDTO).toList();
     }
@@ -159,7 +192,31 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.getProductOutOfStock().stream().map(productMapper::convertToDTO).toList();
     }
 
+    @Override
+    public FilterOptionDTO getFilterOption() {
+        FilterOptionDTO filterOptionDTO = new FilterOptionDTO();
+        filterOptionDTO.setListBrandDTO(brandService.getAllBrand());
+        filterOptionDTO.setListCategoryDTO(categoryService.getAll());
+        List<Integer> listRating = new ArrayList<>();
+        for (int i = 0; i <= 5; i++) {
+            listRating.add(productRepository.getQuantityProductOfRating(i));
+        }
+        List<Integer> listDiscount = new ArrayList<>();
+        double a = 0, b = 5;
+        for (int i = 1; i <= 5; i++) {
+            listDiscount.add(discountDetailService.getQuantityProductOfDiscount(a, b));
+            a += 5;
+            b += 5;
+            if (i == 3)
+                b = 25;
+            else if (i == 4)
+                b = 100;
+        }
+        filterOptionDTO.setListQuantityProductOfRating(listRating);
+        filterOptionDTO.setListQuantityProductOfDiscount(listDiscount);
 
+        return filterOptionDTO;
+    }
 //    @Override
 //    public Page<ProductModel> getProductForPage(Integer pageNumber, String categoryID, String brandID, String sortBy, String searchQuery) {
 //        Pageable pageable = null;

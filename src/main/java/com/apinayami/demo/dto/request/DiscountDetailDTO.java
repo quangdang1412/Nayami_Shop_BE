@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -16,6 +17,7 @@ public class DiscountDetailDTO implements Serializable {
     private long id;
 
     private double percentage;
-
+    private Date startDate;
+    private Date endDate;
     private List<Long> productID;
 }

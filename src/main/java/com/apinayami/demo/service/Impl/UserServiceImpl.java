@@ -99,4 +99,8 @@ public class UserServiceImpl implements IUserService {
         }
         return userMapper.toDetailDto(userModel);
     }
+    @Override
+    public UserDTO getUserByEmail(String email) {
+        return userMapper.toDetailDto(userRepository.findByEmail(email));
+    }
 }

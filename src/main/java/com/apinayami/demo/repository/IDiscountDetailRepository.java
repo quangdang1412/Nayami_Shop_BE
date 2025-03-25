@@ -13,4 +13,7 @@ public interface IDiscountDetailRepository extends JpaRepository<DiscountDetailM
     @Transactional
     @Query("DELETE FROM DiscountDetailModel o WHERE o.discountCampaignModel.id = :id")
     void deleteByDiscountCampaignModel(long id);
+
+    @Query("SELECT COUNT(d) FROM DiscountDetailModel d WHERE d.percentage >=:from and d.percentage<= :to")
+    Integer getQuantityProductOfDiscount(Double from, Double to);
 }

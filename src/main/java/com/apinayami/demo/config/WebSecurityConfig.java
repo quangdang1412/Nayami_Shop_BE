@@ -1,35 +1,15 @@
 package com.apinayami.demo.config;
 
-import com.apinayami.demo.util.Enum.Role;
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Configuration
@@ -119,8 +99,8 @@ public class WebSecurityConfig {
 //     }
 
     /*
-    * Những endpoint mà ai cũng có thể truy cập, trong trường hợp là là những unregistered customer, lúc gọi đến này không cần token
-    * */
+     * Những endpoint mà ai cũng có thể truy cập, trong trường hợp là là những unregistered customer, lúc gọi đến này không cần token
+     * */
     private final String[] PUBLIC_API = {
             "/api/users", // dùng để thêm user tại chưa có tính năng đăng ký
             "/api/login",
@@ -129,13 +109,17 @@ public class WebSecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-ui.html",
-            "/webjars/**"
+            "/webjars/**",
+            "/api/brands/**",
+            "/api/products/**",
+            "/api/categories/**",
+            "/api/**"
     };
 
     private final String[] ADMIN_API = {
-            "/api/brands/**",
-            "/api/products/**",
-            "/api/categories/**"
+//            "/api/brands/**",
+//            "/api/products/**",
+//            "/api/categories/**"
     };
 
     private final String[] CUSTOMER_API = {
@@ -146,6 +130,7 @@ public class WebSecurityConfig {
     private final String[] REFRESH_TOKEN = {
             "/api/refresh"
     };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -165,13 +150,12 @@ public class WebSecurityConfig {
     }
 
 
-
+    //
 //
-//
-     @Bean
-     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-     return config.getAuthenticationManager();
-     }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 
     //Ai cung co the truy cap
 

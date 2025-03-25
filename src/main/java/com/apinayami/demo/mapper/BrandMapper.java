@@ -28,6 +28,7 @@ public class BrandMapper {
             brand.setId(dto.getId());
         }
         brand.setBrandName(dto.getName());
+        brand.setActive(dto.isActive());
         return brand;
     }
 
