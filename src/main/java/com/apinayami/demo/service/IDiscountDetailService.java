@@ -5,4 +5,6 @@ import com.apinayami.demo.model.DiscountDetailModel;
 
 public interface IDiscountDetailService extends IBaseCRUD<DiscountDetailDTO> {
     DiscountDetailModel findDiscountDetailById(long id);
+
+    Integer getQuantityProductOfDiscount(Double from, Double to);
 }

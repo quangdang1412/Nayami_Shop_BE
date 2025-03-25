@@ -16,5 +16,6 @@ public class BrandDTO implements Serializable {
     @NotBlank(message = "Brand name must be not blank")
     private String name;
 
-//    private List<String> productNames;
+    //    private List<String> productNames;
+    private int quantityProduct;
 }
