@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.apinayami.demo.dto.request.AddressRequestDTO;
 import com.apinayami.demo.dto.response.AddressResponseDTO;
-import com.apinayami.demo.model.AddressModel;
 
 public interface IAddressService {
 
