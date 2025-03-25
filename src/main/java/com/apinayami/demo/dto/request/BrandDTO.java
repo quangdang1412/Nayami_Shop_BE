@@ -18,5 +18,5 @@ public class BrandDTO implements Serializable {
     
     private boolean active;
 
-
+    private int quantityProduct;
 }

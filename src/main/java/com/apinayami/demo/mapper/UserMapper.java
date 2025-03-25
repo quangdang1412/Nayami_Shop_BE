@@ -1,6 +1,7 @@
 package com.apinayami.demo.mapper;
 
 import com.apinayami.demo.dto.request.BrandDTO;
+import com.apinayami.demo.dto.request.SignupDTO;
 import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.model.ProductModel;
@@ -13,6 +14,19 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
+    public UserDTO convertSignupDtoToUserDto(SignupDTO signupDTO) {
+        if(signupDTO == null) {
+            return null;
+        }
+        return UserDTO.builder()
+                .type(Role.CUSTOMER.name())
+                .email(signupDTO.getEmail())
+                .active(true)
+                .phoneNumber(signupDTO.getPhoneNumber())
+                .password(signupDTO.getPassword())
+                .userName(signupDTO.getFullName())
+                .build();
+    }
     public UserDTO toDetailDto(UserModel user) {
         if (user == null) {
             return null;

@@ -2,6 +2,7 @@ package com.apinayami.demo.dto.request;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -9,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ConfigurationDTO {
+public class ConfigurationDTO implements Serializable {
     private long id;
     private long category;
     private List<OtherConfigurationDTO> listOtherConfigDTO;

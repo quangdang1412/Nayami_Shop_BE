@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IBillRepository extends JpaRepository<BillModel, Long> {
     List<BillModel> findByCustomerModel(UserModel user);
+
+    BillModel findByIdAndCustomerModel(Long billId, UserModel user);
 }

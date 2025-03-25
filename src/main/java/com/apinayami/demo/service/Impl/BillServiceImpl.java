@@ -45,6 +45,7 @@ import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IBillService;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
+import com.apinayami.demo.util.Enum.EPaymentStatus;
 import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
@@ -62,32 +63,32 @@ public class BillServiceImpl implements IBillService {
     private final IShippingRepository shippingRepository;
     private final ICouponRepository couponRepository;
     private final IPaymentRepository paymentRepository;
-    private final ICartItemRepository  cartItemRepository;
+    private final ICartItemRepository cartItemRepository;
     private final IAddressRepository addressRepository;
     private final BillMapper billMapper;
-    private final PaymentStrategyFactory  paymentStrategyFactory;
+    private final PaymentStrategyFactory paymentStrategyFactory;
     private final CartItemMapper cartItemMapper;
     private final AddressMapper addressMapper;
 
     @Transactional
-    public BillResponseDTO getBill(String email,CartPayment billRequestDTO){
+    public BillResponseDTO getBill(String email, CartPayment billRequestDTO) {
         UserModel customer = userRepository.getUserByEmail(email);
         if (customer == null) {
-                throw new ResourceNotFoundException("User is empty");
+            throw new ResourceNotFoundException("User is empty");
         }
         BillResponseDTO bill = new BillResponseDTO();
         List<CartItemModel> cartItems = billRequestDTO.getCartId().stream()
-            .map(id -> cartItemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + id)))
-            .collect(Collectors.toList());
+                .map(id -> cartItemRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + id)))
+                .collect(Collectors.toList());
         bill.setListCartItem(cartItems.stream()
-        .map(cartItemMapper::toCartItemDTO)
-        .collect(Collectors.toList()));
-       List<AddressModel> address = addressRepository.findByCustomerModel_IdAndActiveTrue(customer.getId());
-        
+                .map(cartItemMapper::toCartItemDTO)
+                .collect(Collectors.toList()));
+        List<AddressModel> address = addressRepository.findByCustomerModel_IdAndActiveTrue(customer.getId());
+
         bill.setListAddress(address.stream()
-        .map(addressMapper::toResponseDTO)
-        .collect(Collectors.toList()));
+                .map(addressMapper::toResponseDTO)
+                .collect(Collectors.toList()));
 
         bill.setCoupon(billRequestDTO.getCouponId());
         bill.setDiscount(null);
@@ -95,23 +96,25 @@ public class BillServiceImpl implements IBillService {
 
     }
 
-    
     @Transactional
-    public Object createBill(String email,BillRequestDTO request) {
-       
+    public Object createBill(String email, BillRequestDTO request) {
+
         UserModel customer = userRepository.getUserByEmail(email);
         if (customer == null) {
-                throw new ResourceNotFoundException("User is empty");
+            throw new ResourceNotFoundException("User is empty");
         }
-        
+
         AddressModel address = addressRepository.findById(request.getAddressId())
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + request.getAddressId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Address not found with id: " + request.getAddressId()));
         ShippingModel shipping = ShippingModel.builder()
                 .shippingFee(request.getShippingFee())
                 .addressModel(address)
                 .build();
         shipping = shippingRepository.save(shipping);
-        CouponModel coupon = request.getCouponId() != null ? couponRepository.findById(request.getCouponId()).orElse(null) : null;
+        CouponModel coupon = request.getCouponId() != null
+                ? couponRepository.findById(request.getCouponId()).orElse(null)
+                : null;
 
         PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(request.getPaymentMethod().name());
         PaymentModel payment = paymentRepository.save(paymentStrategy.processPayment(request));
@@ -129,45 +132,46 @@ public class BillServiceImpl implements IBillService {
         if (cartItem.isEmpty()) {
             throw new ResourceNotFoundException("Cart is empty");
         }
-        Double totalPrice=0.0;
+        Double totalPrice = 0.0;
         for (CartItemModel item : cartItem) {
             totalPrice += item.getUnitPrice() * item.getQuantity();
         }
         List<LineItemModel> items = cartItem.stream()
-        .map((CartItemModel item) -> { 
-            ProductModel product = item.getProductModel();
-            if (product == null) {
-                throw new ResourceNotFoundException("ProductModel is null for CartItem: " + item.getId());
-            }
-            return LineItemModel.builder()
-                    .productModel(product)
-                    .billModel(bill)
-                    .quantity(item.getQuantity())
-                    .unitPrice(product.getUnitPrice())
-                    .build();
-            
-        })
-        .collect(Collectors.toList());
+                .map((CartItemModel item) -> {
+                    ProductModel product = item.getProductModel();
+                    if (product == null) {
+                        throw new ResourceNotFoundException("ProductModel is null for CartItem: " + item.getId());
+                    }
+                    return LineItemModel.builder()
+                            .productModel(product)
+                            .billModel(bill)
+                            .quantity(item.getQuantity())
+                            .unitPrice(product.getUnitPrice())
+                            .build();
+
+                })
+                .collect(Collectors.toList());
         bill.setItems(items);
         cartItemRepository.deleteByCustomerModel(customer);
         bill.setTotalPrice(totalPrice);
         BillModel savedBill = billRepository.save(bill);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
-                String returnUrl = "/api/bills";
-                String cancelUrl = "/api/bills";
-                
-                String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategy)
-                        .createCheckout(totalPrice.intValue(), savedBill.getId().toString(), returnUrl, cancelUrl);
+            String returnUrl = "http://localhost:5173/checkout";
+            String cancelUrl = "http://localhost:5173/checkout";
 
-                return paymentUrl; 
+            String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategy)
+                    .createCheckout(totalPrice.intValue(), savedBill.getId(), returnUrl, cancelUrl);
+
+            return paymentUrl;
         }
         return billMapper.toResponseDTO(savedBill);
     }
+
     @Transactional
     public List<HistoryOrderDTO> getBillHistory(String email) {
-         if (email == null) {
+        if (email == null) {
             throw new ResourceNotFoundException("Vui lòng đăng nhập ");
-        } 
+        }
         UserModel customer = userRepository.getUserByEmail(email);
         if (customer == null) {
             throw new ResourceNotFoundException("User not found");
@@ -177,5 +181,48 @@ public class BillServiceImpl implements IBillService {
 
         return dtos;
     }
-}
 
+    @Transactional
+    public void cancelBill(String email, Long billId) {
+        if (email == null) {
+            throw new ResourceNotFoundException("Vui lòng đăng nhập");
+        }
+        UserModel customer = userRepository.getUserByEmail(email);
+        if (customer == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        BillModel bill = billRepository.findByIdAndCustomerModel(billId, customer);
+        if (bill == null) {
+            throw new ResourceNotFoundException("Bill not found with id: " + billId);
+
+        }
+        bill.setStatus(EBillStatus.CANCELED);
+        PaymentModel payment = bill.getPaymentModel();
+        if (payment == null) {
+            throw new ResourceNotFoundException("Payment not found for Bill: " + billId);
+        }
+        payment.setPaymentStatus(EPaymentStatus.CANCELED);
+        billRepository.save(bill);
+    }
+
+    @Transactional
+    public void confirmBill(String email, Long billId) {
+        if (email == null) {
+            throw new ResourceNotFoundException("Vui lòng đăng nhập");
+        }
+        UserModel customer = userRepository.getUserByEmail(email);
+        if (customer == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        BillModel bill = billRepository.findByIdAndCustomerModel(billId, customer);
+        if (bill == null) {
+            throw new ResourceNotFoundException("Bill not found with id: " + billId);
+
+        }
+        if (bill.getPaymentModel().getPaymentMethod() != EPaymentMethod.ONLINE_BANKING) {
+            throw new ResourceNotFoundException("Bill not found with id: " + billId);
+        }
+        bill.setPaymentModel(PaymentModel.builder().paymentStatus(EPaymentStatus.COMPLETED).build());
+        billRepository.save(bill);
+    }
+}

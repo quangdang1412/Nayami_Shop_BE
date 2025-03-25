@@ -19,6 +19,7 @@ import java.util.List;
 public class ProductModel extends AbstractEntity<Long> {
 
     private String productName;
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
     private boolean displayStatus;
     private Integer quantity;
