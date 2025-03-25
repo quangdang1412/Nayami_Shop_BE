@@ -10,6 +10,7 @@ import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.UserMapper;
 import com.apinayami.demo.service.IUserService;
+import com.apinayami.demo.service.Impl.LoginService;
 import com.apinayami.demo.util.SecurityUtil;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
@@ -40,22 +41,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final SecurityUtil securityUtil;
+    private final LoginService loginService;
     @PostMapping("/api/login")
     public ResponseData<ResLoginDTO> login(@RequestBody LoginDTO loginDTO) {
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(),loginDTO.getPassword());
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        String accessToken = securityUtil.createToken(authentication);
-        String refreshToken = securityUtil.createRefreshToken(authentication);
-
-
-        ResLoginDTO resLoginDTO = new ResLoginDTO(accessToken,refreshToken);
+        ResLoginDTO resLoginDTO = loginService.login(loginDTO);
         return new ResponseData<>(HttpStatus.CREATED.value(), "Login Successfully",resLoginDTO);
     }
-
 
     private final IUserService userService;
     private final UserMapper userMapper;
@@ -77,6 +68,7 @@ public class AuthController {
     }
 
     private final JwtConfig jwtConfig;
+    private final SecurityUtil securityUtil;
     @PostMapping("/api/refresh")
     public ResponseData<String> refreshToken(@RequestHeader("Authorization") String authHeader) {
         try {
