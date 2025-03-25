@@ -13,4 +13,6 @@ public interface IBillService {
     Object createBill(String email,BillRequestDTO billRequest);
     BillResponseDTO getBill(String email,CartPayment request);
     List<HistoryOrderDTO> getBillHistory(String email); ;
+    void cancelBill(String email,Long billId);
+    void confirmBill(String email,Long billId);
 } 

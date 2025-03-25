@@ -33,20 +33,19 @@ public class OnlineBankingPaymentStrategy implements PaymentStrategy {
                 .build();
     }
 
-    public String createCheckout(Integer finalTotal, String orderId, String returnUrl, String cancelUrl) {
+    public String createCheckout(Integer finalTotal, Long orderId, String returnUrl, String cancelUrl) {
         try {
             if (finalTotal == null || finalTotal <= 0) {
                 throw new IllegalArgumentException("Số tiền thanh toán không hợp lệ!");
             }
-            if (orderId == null || orderId.isBlank()) {
+            if (orderId == null ) {
                 throw new IllegalArgumentException("Mã đơn hàng không hợp lệ!");
             }
 
             PayOS payos = new PayOS(clientId, apiKey, checksumKey);
-            Long orderCode = System.currentTimeMillis() / 1000;
 
             PaymentData paymentData = PaymentData.builder()
-                    .orderCode(orderCode)
+                    .orderCode(orderId)
                     .description("Đơn hàng: " + orderId)
                     .amount(finalTotal)
                     .returnUrl(returnUrl)
