@@ -176,7 +176,7 @@ public class BillServiceImpl implements IBillService {
         if (customer == null) {
             throw new ResourceNotFoundException("User not found");
         }
-        List<BillModel> billPage = billRepository.findByCustomerModel(customer);
+        List<BillModel> billPage = billRepository.findByCustomerModelOrderByCreatedAtDesc(customer);
         List<HistoryOrderDTO> dtos = billMapper.toDTOList(billPage);
 
         return dtos;
@@ -196,16 +196,10 @@ public class BillServiceImpl implements IBillService {
             throw new ResourceNotFoundException("Bill not found with id: " + billId);
 
         }
-        if (bill.getStatus() == EBillStatus.CANCELED) {
-            throw new ResourceNotFoundException("Bill is already canceled");
+        if (bill.getStatus() == EBillStatus.CANCELLED) {
+            throw new ResourceNotFoundException("Bill is already cancelled");
         }
-        bill.setStatus(EBillStatus.CANCELED);
-        PaymentModel payment = bill.getPaymentModel();
-        if (payment == null) {
-            throw new ResourceNotFoundException("Payment not found for Bill: " + billId);
-        }
-        payment.setPaymentStatus(EPaymentStatus.CANCELED);
-        billRepository.save(bill);
+        
     }
 
     @Transactional

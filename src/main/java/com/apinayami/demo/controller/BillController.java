@@ -90,12 +90,14 @@ public class BillController {
         }
         if ("CANCELLED".equalsIgnoreCase(status) || "true".equalsIgnoreCase(cancel)) {
             billService.cancelBill(email,orderID);
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Xử lý thanh toán thất bại");
         }
 
         if ("SUCCESS".equalsIgnoreCase(status)) {
             billService.confirmBill(email,orderID);
-
+            return new ResponseData<>(HttpStatus.OK.value(), "Xử lý thanh toán thành công");
         }
-        return new ResponseData<>(HttpStatus.OK.value(), "Xử lý thanh toán thành công");
+        return new ResponseData<>(HttpStatus.OK.value(), "Trạng thái thanh toán không hợp lệ");
+
     }
 }
