@@ -2,11 +2,14 @@ package com.apinayami.demo.TestDB;
 
 import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.model.CategoryModel;
+import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.repository.*;
+import com.apinayami.demo.util.Enum.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 
@@ -20,6 +23,7 @@ public class DataInitializer {
     private final IBrandRepository brandRepository;
     private final IOtherConfigurationRepository otherConfigurationRepository;
     private final IConfigurationRepository configurationRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public CommandLineRunner initData() {
@@ -31,20 +35,37 @@ public class DataInitializer {
 //            }
 
 //            // ✅ Tạo Brand
-            BrandModel brandApple = BrandModel.builder().brandName("Apple").build();
-            BrandModel brandSamsung = BrandModel.builder().brandName("Samsung").build();
-            brandRepository.saveAll(Arrays.asList(brandApple, brandSamsung));
-
-            // ✅ Tạo Category
+//            BrandModel brandApple = BrandModel.builder().brandName("Apple").build();
+//            BrandModel brandSamsung = BrandModel.builder().brandName("Samsung").build();
+//            brandRepository.saveAll(Arrays.asList(brandApple, brandSamsung));
+//
+//            // ✅ Tạo Category
             CategoryModel categoryPhone = CategoryModel.builder().categoryName("Phone").build();
             CategoryModel categoryLaptop = CategoryModel.builder().categoryName("Laptop").build();
             categoryRepository.saveAll(Arrays.asList(categoryPhone, categoryLaptop));
+            // ✅ Tạo Promotion
+//            CategoryModel categoryPhone = CategoryModel.builder().categoryName("Phone").build();
+//            CategoryModel categoryLaptop = CategoryModel.builder().categoryName("Laptop").build();
+//            categoryRepository.saveAll(Arrays.asList(categoryPhone, categoryLaptop));
 
 //            // ✅ Tạo Configuration cho Category
 //            ConfigurationModel configurationPhone = ConfigurationModel.builder()
 //                    .categoryModel(categoryPhone)
 //                    .build();
 //            configurationRepository.save(configurationPhone);
+            // ✅ Tạo Admin
+            UserModel userModel = UserModel.builder()
+                    .userName("user")
+                    .email("demotranbao111@gmail.com")
+                    .password("baooa4477")
+                    .type(Role.ADMIN)
+                    .active(true)
+                    .phoneNumber(null)
+                    .build();
+            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
+            userModel.setPassword(hashedPassword);
+            userModel.setActive(true);
+            userRepository.save(userModel);
 //
 //            // ✅ Tạo Product
 //            ProductModel productSamsung = ProductModel.builder()
