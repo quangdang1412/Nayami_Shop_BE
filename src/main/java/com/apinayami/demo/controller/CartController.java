@@ -29,9 +29,9 @@ public class CartController {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return null;
         }
-        String token = authHeader.substring(7); // Bỏ "Bearer " để lấy token
+        String token = authHeader.substring(7); 
         Jwt decodedToken = jwtConfig.decodeToken(token);
-        return decodedToken.getSubject(); // Lấy email từ token
+        return decodedToken.getSubject(); 
     }
 
     @GetMapping
