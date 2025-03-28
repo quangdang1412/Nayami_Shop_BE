@@ -52,9 +52,7 @@ public class BrandController {
     public ResponseData<String> createBrand(@Valid @RequestBody BrandDTO brandDTO) {
         try {
             log.info("Request add brand: {}", brandDTO.getName());
-            BrandModel brandModel = new BrandModel();
-            brandModel.setBrandName(brandDTO.getName());
-            brandService.create(brandModel);
+            brandService.create(brandDTO);
             return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + brandDTO.getName());
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
@@ -69,12 +67,8 @@ public class BrandController {
     public ResponseData<?> updateBrand(@PathVariable Long id, @Valid @RequestBody BrandDTO brandDTO) {
         try {
             log.info("Request update brand: {}", brandDTO.getName());
-            BrandModel existingBrand = brandService.findBrandById(id);
-            if (existingBrand == null) {
-                return new ResponseError(HttpStatus.NOT_FOUND.value(), "Brand not found");
-            }
-            existingBrand.setBrandName(brandDTO.getName());
-            brandService.update(existingBrand);
+
+            brandService.update(brandDTO);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + brandDTO.getName());
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
@@ -88,13 +82,9 @@ public class BrandController {
     @DeleteMapping("/{id}")
     public ResponseData<?> deleteBrand(@PathVariable Long id) {
         try {
-            BrandModel brand = brandService.findBrandById(id);
-            if (brand == null) {
-                return new ResponseError(HttpStatus.NOT_FOUND.value(), "Brand not found");
-            }
-            brandService.delete(brand);
+            brandService.delete(id);
             return new ResponseData<>(HttpStatus.OK.value(), "Success",
-                    "Thay đổi trạng thái thành công " + brand.getBrandName());
+                    "Thay đổi trạng thái thành công " );
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
             if (e instanceof CustomException)

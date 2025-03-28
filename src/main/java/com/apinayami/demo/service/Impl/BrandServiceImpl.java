@@ -33,32 +33,19 @@ public class BrandServiceImpl implements IBrandService {
     }
 
     @Override
-    public String create(BrandModel a) {
+    public String create(BrandDTO a) {
         try {
-            log.info("Saving brand: {}", a.getBrandName());
-            if (brandRepository.existsByBrandName(a.getBrandName())) {
+            log.info("Saving brand: {}", a.getName());
+            if (brandRepository.existsByBrandName(a.getName())) {
                 throw new CustomException("Brand already exists");
 
             }
-            brandRepository.save(a);
-            return "Thêm thành công " + a.getBrandName();
+            BrandModel brandModel = new BrandModel();
+            brandModel.setBrandName(a.getName());
 
-        } catch (Exception e) {
-            log.error("Error: {}", e.getMessage());
-            throw new CustomException( e.getMessage());
-        }
-    }
+            brandRepository.save(brandModel);
+            return "Thêm thành công " + a.getName();
 
-    @Override
-    public String update(BrandModel a) {
-        try {
-            log.info("Updating brand: {}", a.getBrandName());
-            if (brandRepository.existsByBrandName(a.getBrandName())) {
-                throw new CustomException("Brand already exists");
-
-            }
-            brandRepository.save(a);
-            return "Cập nhật thành công " + a.getBrandName();
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
             throw new CustomException(e.getMessage());
@@ -66,12 +53,38 @@ public class BrandServiceImpl implements IBrandService {
     }
 
     @Override
-    public String delete(BrandModel a) {
+    public String update(BrandDTO a) {
         try {
-            log.info("Deleting brand: {}", a.getBrandName());
-            a.setActive(false);
-            brandRepository.save(a);
-            return "Thay đổi trạng thái thành công " + a.getBrandName();
+            log.info("Updating brand: {}", a.getName());
+            if (brandRepository.existsByBrandName(a.getName())) {
+                throw new CustomException("Brand already exists");
+
+            }
+            BrandModel brandModel = brandRepository.findBrandById(a.getId());
+            if (brandModel == null) {
+                throw new CustomException("Brand not found");
+            }
+            brandModel.setBrandName(a.getName());
+            brandModel.setActive(a.isActive());
+            brandRepository.save(brandModel);
+            return "Cập nhật thành công " + a.getName();
+        } catch (Exception e) {
+            log.error("Error: {}", e.getMessage());
+            throw new CustomException(e.getMessage());
+        }
+    }
+
+    @Override
+    public String delete(Long a) {
+        try {
+            BrandModel brandModel = brandRepository.findBrandById(a);
+            if (brandModel == null) {
+                throw new CustomException("Brand not found");
+            }
+            log.info("Deleting brand: {}", brandModel.getBrandName());
+            brandModel.setActive(false);
+            brandRepository.save(brandModel);
+            return "Thay đổi trạng thái thành công " + brandModel.getBrandName();
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
             throw new CustomException(e.getMessage());
