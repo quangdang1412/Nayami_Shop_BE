@@ -91,7 +91,7 @@ public class BillServiceImpl implements IBillService {
                 .collect(Collectors.toList()));
 
         bill.setCoupon(billRequestDTO.getCouponId());
-        bill.setDiscount(null);
+        bill.setDiscount(billRequestDTO.getDiscount());
         return bill;
 
     }
