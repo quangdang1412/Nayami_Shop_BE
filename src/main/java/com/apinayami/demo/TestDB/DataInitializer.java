@@ -54,18 +54,18 @@ public class DataInitializer {
 //                    .build();
 //            configurationRepository.save(configurationPhone);
             // ✅ Tạo Admin
-            UserModel userModel = UserModel.builder()
-                    .userName("user")
-                    .email("demotranbao111@gmail.com")
-                    .password("baooa4477")
-                    .type(Role.ADMIN)
-                    .active(true)
-                    .phoneNumber(null)
-                    .build();
-            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
-            userModel.setPassword(hashedPassword);
-            userModel.setActive(true);
-            userRepository.save(userModel);
+//            UserModel userModel = UserModel.builder()
+//                    .userName("user")
+//                    .email("demotranbao111@gmail.com")
+//                    .password("baooa4477")
+//                    .type(Role.ADMIN)
+//                    .active(true)
+//                    .phoneNumber(null)
+//                    .build();
+//            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
+//            userModel.setPassword(hashedPassword);
+//            userModel.setActive(true);
+//            userRepository.save(userModel);
 //
 //            // ✅ Tạo Product
 //            ProductModel productSamsung = ProductModel.builder()
