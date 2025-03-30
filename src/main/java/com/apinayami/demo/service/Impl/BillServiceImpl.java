@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartItemDTO;
-import com.apinayami.demo.dto.request.CartPayment;
+import com.apinayami.demo.dto.request.CartPaymentDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
 import com.apinayami.demo.dto.response.PageResponseDTO;
@@ -71,7 +71,7 @@ public class BillServiceImpl implements IBillService {
     private final AddressMapper addressMapper;
 
     @Transactional
-    public BillResponseDTO getBill(String email, CartPayment billRequestDTO) {
+    public BillResponseDTO getBill(String email, CartPaymentDTO billRequestDTO) {
         UserModel customer = userRepository.getUserByEmail(email);
         if (customer == null) {
             throw new ResourceNotFoundException("User is empty");
@@ -91,7 +91,7 @@ public class BillServiceImpl implements IBillService {
                 .collect(Collectors.toList()));
 
         bill.setCoupon(billRequestDTO.getCouponId());
-        bill.setDiscount(null);
+        bill.setDiscount(billRequestDTO.getDiscount());
         return bill;
 
     }

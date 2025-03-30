@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 import com.apinayami.demo.config.JwtConfig;
 import com.apinayami.demo.dto.request.BillRequestDTO;
-import com.apinayami.demo.dto.request.CartPayment;
+import com.apinayami.demo.dto.request.CartPaymentDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
 import com.apinayami.demo.dto.response.ResponseData;
@@ -38,7 +38,7 @@ public class BillController {
     @PostMapping("/checkout")
     public ResponseData<?> getBill(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody CartPayment cartPayment) {
+            @RequestBody CartPaymentDTO cartPayment) {
 
         String email = extractUserEmail(authHeader);
         if (email == null) {
