@@ -68,7 +68,7 @@ public class BrandController {
         try {
             log.info("Request update brand: {}", brandDTO.getName());
 
-            brandService.update(brandDTO);
+            brandService.update(brandDTO,id);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + brandDTO.getName());
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
