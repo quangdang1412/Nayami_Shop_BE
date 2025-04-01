@@ -53,14 +53,14 @@ public class BrandServiceImpl implements IBrandService {
     }
 
     @Override
-    public String update(BrandDTO a) {
+    public String update(BrandDTO a,Long id) {
         try {
             log.info("Updating brand: {}", a.getName());
             if (brandRepository.existsByBrandName(a.getName())) {
                 throw new CustomException("Brand already exists");
 
             }
-            BrandModel brandModel = brandRepository.findBrandById(a.getId());
+            BrandModel brandModel = brandRepository.findBrandById(id);
             if (brandModel == null) {
                 throw new CustomException("Brand not found");
             }

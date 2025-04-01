@@ -10,7 +10,7 @@ public interface IBrandService {
 
     BrandModel findBrandById(Long id);
     String create (BrandDTO a);
-    String update (BrandDTO a);
+    String update (BrandDTO a,Long id);
     String delete (Long a);
 
 }
