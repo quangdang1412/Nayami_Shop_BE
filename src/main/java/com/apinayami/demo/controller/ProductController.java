@@ -37,7 +37,7 @@ public class ProductController {
             ProductDTO productDTO = objectMapper.readValue(productDTOJson, ProductDTO.class);
             log.info("Request add product: {}", productDTO.getName());
             String productName = productService.saveProduct(productDTO, files);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", productName);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", productName);  
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
             if (e instanceof CustomException)

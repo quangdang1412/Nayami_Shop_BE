@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,27 +23,27 @@ public class PromotionServiceImpl implements IPromotionService {
     private final PromotionMapper promotionMapper;
     private final IImageRepository imageRepository;
 
-    public List<PromotionModel> getAllPromotions() {
-        return promotionRepository.findAll();
+    public List<PromotionDTO> getAllPromotions() {
+        return promotionRepository.findAll().stream().map(promotionMapper::toPromotionDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public PromotionModel getPromotionById(long id) {
-        return promotionRepository.findById(id).isPresent() ? promotionRepository.findById(id).get() : null;
+    public PromotionDTO getPromotionById(long id) {
+        return promotionRepository.findById(id).isPresent() ? PromotionMapper.INSTANCE.toPromotionDTO(promotionRepository.findById(id).get()) : null;
     }
 
     @Override
-    public String create(PromotionModel promotionModel) {
+    public String create(PromotionDTO promotionDTO) {
         try{
-//        PromotionModel promotionModel = promotionMapper.toPromotionModel(promotionDTO);
-        PromotionModel tempPromotionModel = promotionRepository.save(promotionModel);
-        if(!promotionModel.getPromotionImages().isEmpty()){
-            for (ImageModel image : promotionModel.getPromotionImages()) {
-                image.setPromotionModel(tempPromotionModel);
-                imageRepository.save(image);
+            PromotionModel tempPromotionModel = promotionRepository.save(PromotionMapper.INSTANCE.toPromotionModel(promotionDTO));
+            if(!promotionDTO.getPromotionImages().isEmpty()){
+                for (ImageModel image : promotionDTO.getPromotionImages()) {
+                    image.setPromotionModel(tempPromotionModel);
+                    imageRepository.save(image);
             }
         }
-        return "Thêm thành công" + promotionModel.getTitle();
+            return "Thêm thành công" + promotionDTO.getTitle();
         }
         catch (Exception e){
             log.error("Error: {}", e.getMessage());
@@ -51,10 +52,17 @@ public class PromotionServiceImpl implements IPromotionService {
     }
 
     @Override
-    public String update(PromotionModel a) {
+    public String update(PromotionDTO promotionDTO) {
         try {
-            promotionRepository.save(a);
-            return "Cập nhật thành công " + a.getTitle();
+            PromotionModel updated_model = promotionRepository.findById(promotionDTO.getId()).orElse(null);
+            assert updated_model != null;
+            updated_model.setTitle(promotionDTO.getTitle());
+            updated_model.setDescription(promotionDTO.getDescription());
+            updated_model.setStartDate(promotionDTO.getStartDate());
+            updated_model.setEndDate(promotionDTO.getEndDate());
+            updated_model.setDisplayStatus(promotionDTO.isDisplayStatus());
+            promotionRepository.save(updated_model);
+            return "Cập nhật thành công " + promotionDTO.getTitle();
 
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
@@ -63,9 +71,9 @@ public class PromotionServiceImpl implements IPromotionService {
     }
 
     @Override
-    public String delete(PromotionModel a) {
+    public String delete(PromotionDTO promotionDTO) {
         try{
-            promotionRepository.delete(a);
+            promotionRepository.deleteById(promotionDTO.getId());
             return "Promotion has been deleted";
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());

@@ -11,8 +11,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @Entity
 @SuperBuilder
 @NoArgsConstructor

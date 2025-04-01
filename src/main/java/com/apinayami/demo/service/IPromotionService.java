@@ -5,7 +5,7 @@ import com.apinayami.demo.model.PromotionModel;
 
 import java.util.List;
 
-public interface IPromotionService extends IBaseCRUD<PromotionModel>{
-    List<PromotionModel> getAllPromotions();
-    PromotionModel getPromotionById(long id);
+public interface IPromotionService extends IBaseCRUD<PromotionDTO>{
+    List<PromotionDTO> getAllPromotions();
+    PromotionDTO getPromotionById(long id);
 }

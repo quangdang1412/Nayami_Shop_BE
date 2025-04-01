@@ -23,25 +23,32 @@ import java.util.List;
 public class PromotionController {
     private final IPromotionService promotionService;
     @PostMapping
-    public ResponseData<String> addPromotion(@RequestBody @Valid PromotionModel promotionModel) {
+    public ResponseData<String> addPromotion(@RequestBody @Valid PromotionDTO promotionDTO) {
         try {
-            promotionService.create(promotionModel);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + promotionModel.getTitle());
+            promotionService.create(promotionDTO);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + promotionDTO.getTitle());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
         }
     }
     @GetMapping
-    public ResponseData<List<PromotionModel>> getAllPromotions() {
-        List<PromotionModel> promotions = promotionService.getAllPromotions();
-
+    public ResponseData<List<PromotionDTO>> getAllPromotions() {
+        List<PromotionDTO> promotions = promotionService.getAllPromotions();
         return new ResponseData<>(HttpStatus.OK.value(), "Success", promotions);
     }
+
+    @GetMapping("/{id}")
+    public ResponseData<?> getPromotionById(@PathVariable long id) {
+        PromotionDTO promotion = promotionService.getPromotionById(id);
+
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", promotion);
+    }
     @DeleteMapping("/{id}")
-    public ResponseData<String> deleteCategory(@PathVariable long id) {
+    public ResponseData<String> deletePromotion(@PathVariable long id) {
         try {
-            PromotionModel deleted_promotion = promotionService.getPromotionById(id);
+            PromotionDTO deleted_promotion = promotionService.getPromotionById(id);
+            System.out.println(deleted_promotion.toString());
             promotionService.delete(deleted_promotion);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Xóa thành công ");
         } catch (Exception e) {
@@ -50,15 +57,16 @@ public class PromotionController {
         }
     }
     @PutMapping("/{id}")
-    public ResponseData<String> updateCategory(@PathVariable long id, @RequestBody @Valid PromotionModel promotionModel) {
+    public ResponseData<String> updatePromotion(@PathVariable long id, @RequestBody @Valid PromotionDTO promotionDTO) {
         try {
-            PromotionModel updated_category = promotionService.getPromotionById(id);
-            updated_category.setTitle(promotionModel.getTitle());
-            updated_category.setDescription(promotionModel.getDescription());
-            updated_category.setStartDate(promotionModel.getStartDate());
-            updated_category.setEndDate(promotionModel.getEndDate());
-            promotionService.update(updated_category);
-            return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + updated_category.getTitle());
+            PromotionDTO update_promotion = promotionService.getPromotionById(id);
+            update_promotion.setTitle(promotionDTO.getTitle());
+            update_promotion.setDescription(promotionDTO.getDescription());
+            update_promotion.setStartDate(promotionDTO.getStartDate());
+            update_promotion.setEndDate(promotionDTO.getEndDate());
+            update_promotion.setDisplayStatus(promotionDTO.isDisplayStatus());
+            promotionService.update(update_promotion);
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + promotionDTO.getTitle());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");

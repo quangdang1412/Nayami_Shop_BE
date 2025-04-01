@@ -40,9 +40,9 @@ public class DataInitializer {
 //            brandRepository.saveAll(Arrays.asList(brandApple, brandSamsung));
 //
 //            // ✅ Tạo Category
-            CategoryModel categoryPhone = CategoryModel.builder().categoryName("Phone").build();
-            CategoryModel categoryLaptop = CategoryModel.builder().categoryName("Laptop").build();
-            categoryRepository.saveAll(Arrays.asList(categoryPhone, categoryLaptop));
+//            CategoryModel categoryPhone = CategoryModel.builder().categoryName("Phone").build();
+//            CategoryModel categoryLaptop = CategoryModel.builder().categoryName("Laptop").build();
+//            categoryRepository.saveAll(Arrays.asList(categoryPhone, categoryLaptop));
             // ✅ Tạo Promotion
 //            CategoryModel categoryPhone = CategoryModel.builder().categoryName("Phone").build();
 //            CategoryModel categoryLaptop = CategoryModel.builder().categoryName("Laptop").build();

@@ -5,6 +5,7 @@ import com.apinayami.demo.dto.request.OtherConfigurationDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
+import com.apinayami.demo.mapper.CategoryMapper;
 import com.apinayami.demo.mapper.ProductMapper;
 import com.apinayami.demo.model.ConfigurationModel;
 import com.apinayami.demo.model.ImageModel;
@@ -64,7 +65,7 @@ public class ProductServiceImpl implements IProductService {
             configurationModel = ConfigurationModel.builder().build();
         }
 
-        configurationModel.setCategoryModel(categoryService.findCategoryById(productRequestDTO.getConfigDTO().getCategory()));
+        configurationModel.setCategoryModel(CategoryMapper.INSTANCE.toCategoryModel(categoryService.findCategoryById(productRequestDTO.getConfigDTO().getCategory())));
         configurationModel.setOtherConfigurationModelList(otherConfigurationModelList);
 
         for (OtherConfigurationModel otherConfig : otherConfigurationModelList) {
@@ -80,7 +81,7 @@ public class ProductServiceImpl implements IProductService {
         ProductModel productModel = ProductModel.builder()
                 .productName(productRequestDTO.getName())
                 .brandModel(brandService.findBrandById(productRequestDTO.getBrandDTO().getId()))
-                .categoryModel(categoryService.findCategoryById(productRequestDTO.getCategoryDTO().getId()))
+                .categoryModel(CategoryMapper.INSTANCE.toCategoryModel(categoryService.findCategoryById(productRequestDTO.getCategoryDTO().getId())))
                 .description(productRequestDTO.getDescription())
                 .discountDetailModel(productRequestDTO.getDiscountDTO() == null ? null : discountDetailService.findDiscountDetailById(productRequestDTO.getDiscountDTO().getId()))
                 .quantity(productRequestDTO.getQuantity())

@@ -10,6 +10,7 @@ import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.UserMapper;
 import com.apinayami.demo.service.IUserService;
+import com.apinayami.demo.service.Impl.UserServiceImpl;
 import com.apinayami.demo.util.SecurityUtil;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +52,8 @@ public class AuthController {
         String accessToken = securityUtil.createToken(authentication);
         String refreshToken = securityUtil.createRefreshToken(authentication);
 
-
-        ResLoginDTO resLoginDTO = new ResLoginDTO(accessToken,refreshToken);
+//        Thêm ID để test nhớ xóa
+        ResLoginDTO resLoginDTO = new ResLoginDTO(4,accessToken,refreshToken);
         return new ResponseData<>(HttpStatus.CREATED.value(), "Login Successfully",resLoginDTO);
     }
 
