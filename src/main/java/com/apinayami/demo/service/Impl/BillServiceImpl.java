@@ -1,47 +1,16 @@
 package com.apinayami.demo.service.Impl;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.sound.sampled.Line;
-
-import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
 import com.apinayami.demo.dto.request.BillRequestDTO;
-import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.request.CartPaymentDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
-import com.apinayami.demo.dto.response.PageResponseDTO;
-import com.apinayami.demo.dto.response.ResponseData;
+import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.AddressMapper;
 import com.apinayami.demo.mapper.BillMapper;
 import com.apinayami.demo.mapper.CartItemMapper;
-import com.apinayami.demo.model.AddressModel;
-import com.apinayami.demo.model.BillModel;
-import com.apinayami.demo.model.CartItemModel;
-import com.apinayami.demo.model.CouponModel;
-import com.apinayami.demo.model.LineItemModel;
-import com.apinayami.demo.model.PaymentModel;
-import com.apinayami.demo.model.ProductModel;
-import com.apinayami.demo.model.ShippingModel;
-import com.apinayami.demo.model.UserModel;
-import com.apinayami.demo.repository.IAddressRepository;
-import com.apinayami.demo.repository.IBillRepository;
-import com.apinayami.demo.repository.ICartItemRepository;
-import com.apinayami.demo.repository.ICouponRepository;
-import com.apinayami.demo.repository.IPaymentRepository;
-import com.apinayami.demo.repository.IShippingRepository;
-import com.apinayami.demo.repository.IUserRepository;
+import com.apinayami.demo.model.*;
+import com.apinayami.demo.repository.*;
 import com.apinayami.demo.service.IBillService;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
@@ -49,10 +18,14 @@ import com.apinayami.demo.util.Enum.EPaymentStatus;
 import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -60,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BillServiceImpl implements IBillService {
     private final IBillRepository billRepository;
     private final IUserRepository userRepository;
+    private final IProductRepository productRepository;
     private final IShippingRepository shippingRepository;
     private final ICouponRepository couponRepository;
     private final IPaymentRepository paymentRepository;
@@ -128,29 +102,34 @@ public class BillServiceImpl implements IBillService {
                 .status(EBillStatus.PENDING)
                 .paymentModel(payment)
                 .build();
+        Double totalPrice = 0.0;
+        List<LineItemModel> items = new ArrayList<>();
         List<CartItemModel> cartItem = cartItemRepository.findByCustomerModel(customer);
         if (cartItem.isEmpty()) {
             throw new ResourceNotFoundException("Cart is empty");
-        }
-        Double totalPrice = 0.0;
-        for (CartItemModel item : cartItem) {
-            totalPrice += item.getUnitPrice() * item.getQuantity();
-        }
-        List<LineItemModel> items = cartItem.stream()
-                .map((CartItemModel item) -> {
-                    ProductModel product = item.getProductModel();
-                    if (product == null) {
-                        throw new ResourceNotFoundException("ProductModel is null for CartItem: " + item.getId());
-                    }
-                    return LineItemModel.builder()
-                            .productModel(product)
-                            .billModel(bill)
-                            .quantity(item.getQuantity())
-                            .unitPrice(product.getUnitPrice())
-                            .build();
+        } else {
+            for (CartItemModel item : cartItem) {
+                ProductModel productModel = productRepository.findById(item.getProductModel().getId())
+                        .orElseThrow(() -> new CustomException("Sản phẩm không tồn tại"));
+                if (productModel.getQuantity() < item.getQuantity()) {
+                    throw new CustomException("Sản phẩm " + productModel.getProductName() + " không đủ số lượng");
+                }
+                if (productModel.getDiscountDetailModel() != null) {
+                    totalPrice += productModel.getUnitPrice() * (100 - productModel.getDiscountDetailModel().getPercentage()) / 100 * item.getQuantity();
+                } else {
+                    totalPrice += productModel.getUnitPrice() * item.getQuantity();
+                }
+                productModel.setQuantity(productModel.getQuantity() - item.getQuantity());
+                productRepository.save(productModel);
+                items.add(LineItemModel.builder()
+                        .productModel(productModel)
+                        .billModel(bill)
+                        .quantity(item.getQuantity())
+                        .unitPrice(productModel.getUnitPrice())
+                        .build());
+            }
 
-                })
-                .collect(Collectors.toList());
+        }
         bill.setItems(items);
         cartItemRepository.deleteByCustomerModel(customer);
         bill.setTotalPrice(totalPrice);
@@ -199,7 +178,7 @@ public class BillServiceImpl implements IBillService {
         if (bill.getStatus() == EBillStatus.CANCELLED) {
             throw new ResourceNotFoundException("Bill is already cancelled");
         }
-        
+
     }
 
     @Transactional
@@ -221,5 +200,20 @@ public class BillServiceImpl implements IBillService {
         }
         bill.setPaymentModel(PaymentModel.builder().paymentStatus(EPaymentStatus.COMPLETED).build());
         billRepository.save(bill);
+    }
+
+    @Override
+    public Long countBillsByStatus(EBillStatus status) {
+        return billRepository.countBillsByStatus(status);
+    }
+
+    @Override
+    public Double totalRevenue(EBillStatus status) {
+        return billRepository.totalRevenue(status);
+    }
+
+    @Override
+    public Double totalProfit(EBillStatus status) {
+        return billRepository.totalProfit(status);
     }
 }

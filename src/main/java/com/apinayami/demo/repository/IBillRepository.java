@@ -2,13 +2,32 @@ package com.apinayami.demo.repository;
 
 import com.apinayami.demo.model.BillModel;
 import com.apinayami.demo.model.UserModel;
-
-import java.util.List;
-
+import com.apinayami.demo.util.Enum.EBillStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public interface IBillRepository extends JpaRepository<BillModel, Long> {
     List<BillModel> findByCustomerModelOrderByCreatedAtDesc(UserModel user);
 
     BillModel findByIdAndCustomerModel(Long billId, UserModel user);
+
+
+    @Query("SELECT COUNT(b) FROM BillModel b WHERE b.status = :status")
+    Long countBillsByStatus(@Param("status") EBillStatus status);
+
+    @Query("SELECT SUM(b.totalPrice) FROM BillModel b WHERE b.status = :status")
+    Double totalRevenue(@Param("status") EBillStatus status);
+
+    @Transactional
+    @Query("SELECT SUM(od.quantity * (od.unitPrice-p.originalPrice)) as Q FROM LineItemModel od JOIN od.productModel p JOIN od.billModel o WHERE  o.status = :status")
+    Double totalProfit(@Param("status") EBillStatus status);
+
+    @Transactional
+    @Query("SELECT sum(od.totalPrice) from BillModel od where od.createdAt >= ?1 and od.createdAt <= ?2 and od.status = :status")
+    Double revenueByTime(LocalDate startDate, LocalDate endDate, @Param("status") EBillStatus status);
 }
