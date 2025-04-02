@@ -170,6 +170,9 @@ public class BillServiceImpl implements IBillService {
             if(product.getDiscountDetailModel() != null && product.getDiscountDetailModel().getPercentage() != null) {
                 lineItem.setUnitPrice(unitPrice-unitPrice*(product.getDiscountDetailModel().getPercentage()/100));
             }
+            else {
+                lineItem.setUnitPrice(unitPrice);
+            }
             items.add(lineItem);
            
             
