@@ -1,5 +1,6 @@
 package com.apinayami.demo.service.Impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -144,6 +145,7 @@ public class BillServiceImpl implements IBillService {
         if (cartItem.isEmpty()) {
             throw new ResourceNotFoundException("Cart is empty");
         }
+        List<LineItemModel> items= new ArrayList<>();
         Double totalPrice = 0.0;
         for (CartItemModel item : cartItem) {
             double unitPrice = item.getProductModel().getUnitPrice();
@@ -155,31 +157,24 @@ public class BillServiceImpl implements IBillService {
             Integer quantity = item.getQuantity();
             totalPrice += unitPrice * quantity;
             ProductModel product = item.getProductModel();
-
             if (product.getQuantity() < item.getQuantity()) {
                 throw new ResourceNotFoundException("Not enough stock for product: " + product.getProductName());
             }
             product.setQuantity(product.getQuantity() - item.getQuantity());
             productRepository.save(product);
+            LineItemModel lineItem = LineItemModel.builder()
+                    .productModel(product)
+                    .billModel(bill)
+                    .quantity(item.getQuantity())
+                    .unitPrice(product.getUnitPrice())
+                    .build();
+            items.add(lineItem);
+           
+            
         }
         if(request.getDiscount() != null && coupon != null) {
             totalPrice -= request.getDiscount();
         }
-        List<LineItemModel> items = cartItem.stream()
-                .map((CartItemModel item) -> {
-                    ProductModel product = item.getProductModel();
-                    if (product == null) {
-                        throw new ResourceNotFoundException("ProductModel is null for CartItem: " + item.getId());
-                    }
-                    return LineItemModel.builder()
-                            .productModel(product)
-                            .billModel(bill)
-                            .quantity(item.getQuantity())
-                            .unitPrice(product.getUnitPrice())
-                            .build();
-
-                })
-                .collect(Collectors.toList());
         bill.setItems(items);
         bill.setTotalPrice(totalPrice);
         for (CartItemModel item : cartItem) {
