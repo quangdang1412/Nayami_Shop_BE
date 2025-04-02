@@ -39,6 +39,7 @@ import com.apinayami.demo.repository.IBillRepository;
 import com.apinayami.demo.repository.ICartItemRepository;
 import com.apinayami.demo.repository.ICouponRepository;
 import com.apinayami.demo.repository.IPaymentRepository;
+import com.apinayami.demo.repository.IProductRepository;
 import com.apinayami.demo.repository.IShippingRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IBillService;
@@ -77,7 +78,6 @@ public class BillServiceImpl implements IBillService {
     private final ICouponRepository couponRepository;
     private final IPaymentRepository paymentRepository;
     private final ICartItemRepository cartItemRepository;
-    private final IProductRepository productRepository;
     private final IAddressRepository addressRepository;
     private final BillMapper billMapper;
     private final PaymentStrategyFactory paymentStrategyFactory;
@@ -114,7 +114,7 @@ public class BillServiceImpl implements IBillService {
     public Object createBill(String email, BillRequestDTO request) {
 
         UserModel customer = userRepository.getUserByEmail(email);
-
+        
         if (customer == null) {
             throw new ResourceNotFoundException("User is empty");
         }
@@ -148,29 +148,49 @@ public class BillServiceImpl implements IBillService {
                 .status(EBillStatus.PENDING)
                 .paymentModel(payment)
                 .build();
-        List<CartItemModel> cartItem = cartItemRepository.findByCustomerModel(customer);
+        List<CartItemModel> cartItem = request.getCartId().stream()
+            .map(id -> cartItemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + id)))
+            .collect(Collectors.toList());
+
         if (cartItem.isEmpty()) {
             throw new ResourceNotFoundException("Cart is empty");
         }
+        List<LineItemModel> items= new ArrayList<>();
         Double totalPrice = 0.0;
         for (CartItemModel item : cartItem) {
-            totalPrice += item.getUnitPrice() * item.getQuantity();
+            double unitPrice = item.getProductModel().getUnitPrice();
+            if(item.getProductModel().getDiscountDetailModel() != null && item.getProductModel().getDiscountDetailModel().getPercentage() != null) {
+                double discountPercentage = item.getProductModel().getDiscountDetailModel().getPercentage();
+                double discountAmountPerUnit = unitPrice * (discountPercentage / 100);
+                unitPrice -= discountAmountPerUnit;  
+            }
+            Integer quantity = item.getQuantity();
+            totalPrice += unitPrice * quantity;
+            ProductModel product = item.getProductModel();
+            if (product.getQuantity() < item.getQuantity()) {
+                throw new ResourceNotFoundException("Not enough stock for product: " + product.getProductName());
+            }
+            product.setQuantity(product.getQuantity() - item.getQuantity());
+            productRepository.save(product);
+            LineItemModel lineItem = LineItemModel.builder()
+                    .productModel(product)
+                    .billModel(bill)
+                    .quantity(item.getQuantity())
+                    .build();
+            if(product.getDiscountDetailModel() != null && product.getDiscountDetailModel().getPercentage() != null) {
+                lineItem.setUnitPrice(unitPrice-unitPrice*(product.getDiscountDetailModel().getPercentage()/100));
+            }
+            else {
+                lineItem.setUnitPrice(unitPrice);
+            }
+            items.add(lineItem);
+           
+            
         }
-        List<LineItemModel> items = cartItem.stream()
-                .map((CartItemModel item) -> {
-                    ProductModel product = item.getProductModel();
-                    if (product == null) {
-                        throw new ResourceNotFoundException("ProductModel is null for CartItem: " + item.getId());
-                    }
-                    return LineItemModel.builder()
-                            .productModel(product)
-                            .billModel(bill)
-                            .quantity(item.getQuantity())
-                            .unitPrice(product.getUnitPrice())
-                            .build();
-
-                })
-                .collect(Collectors.toList());
+        if(request.getDiscount() != null && coupon != null) {
+            totalPrice -= request.getDiscount();
+        }
         bill.setItems(items);
         bill.setTotalPrice(totalPrice);
         for (CartItemModel item : cartItem) {
