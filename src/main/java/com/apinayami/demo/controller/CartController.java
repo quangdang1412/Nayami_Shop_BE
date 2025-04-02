@@ -35,7 +35,7 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseData<List<CartItemDTO>> getCart(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseData<?> getCart(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         String email = extractUserEmail(authHeader);
         if (email == null) {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xem giỏ hàng");

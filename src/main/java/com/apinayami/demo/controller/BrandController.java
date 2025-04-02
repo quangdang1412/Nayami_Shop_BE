@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -39,11 +40,13 @@ public class BrandController {
 
     @Operation(summary = "Get brand by ID", description = "Returns a specific brand by its ID")
     @GetMapping("/{id}")
-    public ResponseData<BrandDTO> getBrandById(@PathVariable Long id) {
-        BrandModel brand = brandService.findBrandById(id);
-        return brand != null
-                ? new ResponseData<>(HttpStatus.OK.value(), "Success", brandMapper.toDetailDto(brand))
-                : new ResponseData<>(HttpStatus.NOT_FOUND.value(), "Brand not found", null);
+    public ResponseData<?> getBrandById(@PathVariable Long id) {
+        log.info("Request get brand by id: {}", id.toString());
+        BrandDTO brand = brandService.findBrandByIdDTO(id);
+        if (brand == null) {
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), "Brand not found");
+        }
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", brand);
     }
 
     @Operation(summary = "Create new brand", description = "Creates a new brand with the provided information")
@@ -68,7 +71,7 @@ public class BrandController {
         try {
             log.info("Request update brand: {}", brandDTO.getName());
 
-            brandService.update(brandDTO);
+            brandService.update(brandDTO,id);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + brandDTO.getName());
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());

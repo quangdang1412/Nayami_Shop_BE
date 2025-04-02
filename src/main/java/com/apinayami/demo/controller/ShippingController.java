@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.apinayami.demo.dto.request.GHTKRequestDTO;
-import com.apinayami.demo.service.IGHTKSerivce;
+import com.apinayami.demo.service.IShippingSerivce;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -15,10 +15,10 @@ import reactor.core.publisher.Mono;
 @RequestMapping("api/ship")
 @RequiredArgsConstructor
 public class ShippingController {
-    private final IGHTKSerivce ghtkSerivce;
+    private final IShippingSerivce shippingSerivce;
 
     @PostMapping("/fee")
     public Mono<String> getShippingFee(@RequestBody GHTKRequestDTO request) {
-        return ghtkSerivce.getShippingFee(request);
+        return shippingSerivce.getShippingFee(request);
     }
 }
