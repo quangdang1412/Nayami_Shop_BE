@@ -3,9 +3,11 @@ package com.apinayami.demo.service;
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartPaymentDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
+import com.apinayami.demo.dto.response.DashBoardResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
 import com.apinayami.demo.util.Enum.EBillStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IBillService {
@@ -25,6 +27,9 @@ public interface IBillService {
 
     Double totalRevenue(EBillStatus status);
 
-
     Double totalProfit(EBillStatus status);
+
+    DashBoardResponseDTO getRevenueByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
+
+    DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
 } 

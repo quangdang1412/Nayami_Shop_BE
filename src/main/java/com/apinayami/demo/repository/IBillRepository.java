@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IBillRepository extends JpaRepository<BillModel, Long> {
@@ -28,6 +28,6 @@ public interface IBillRepository extends JpaRepository<BillModel, Long> {
     Double totalProfit(@Param("status") EBillStatus status);
 
     @Transactional
-    @Query("SELECT sum(od.totalPrice) from BillModel od where od.createdAt >= ?1 and od.createdAt <= ?2 and od.status = :status")
-    Double revenueByTime(LocalDate startDate, LocalDate endDate, @Param("status") EBillStatus status);
+    @Query("from BillModel od where od.createdAt >= ?1 and od.createdAt <= ?2 and od.status = :status order by od.createdAt ")
+    List<BillModel> revenueByTime(LocalDateTime startDate, LocalDateTime endDate, @Param("status") EBillStatus status);
 }
