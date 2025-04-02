@@ -100,6 +100,7 @@ public class BillServiceImpl implements IBillService {
     public Object createBill(String email, BillRequestDTO request) {
 
         UserModel customer = userRepository.getUserByEmail(email);
+        
         if (customer == null) {
             throw new ResourceNotFoundException("User is empty");
         }
@@ -111,7 +112,7 @@ public class BillServiceImpl implements IBillService {
                 .shippingFee(request.getShippingFee())
                 .addressModel(address)
                 .build();
-        shipping = shippingRepository.save(shipping);
+        shippingRepository.save(shipping);
         CouponModel coupon = request.getCouponId() != null
                 ? couponRepository.findById(request.getCouponId()).orElse(null)
                 : null;
@@ -152,9 +153,9 @@ public class BillServiceImpl implements IBillService {
                 })
                 .collect(Collectors.toList());
         bill.setItems(items);
-        cartItemRepository.deleteByCustomerModel(customer);
         bill.setTotalPrice(totalPrice);
         BillModel savedBill = billRepository.save(bill);
+        cartItemRepository.deleteByCustomerModel(customer);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
             String returnUrl = "http://localhost:5173/checkout";
             String cancelUrl = "http://localhost:5173/checkout";

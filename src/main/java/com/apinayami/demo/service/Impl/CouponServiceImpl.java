@@ -2,6 +2,7 @@ package com.apinayami.demo.service.Impl;
 
 import com.apinayami.demo.dto.request.CreateCouponRequest;
 import com.apinayami.demo.dto.response.CouponDto;
+import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.CouponMapper;
 import com.apinayami.demo.model.CouponModel;
 import com.apinayami.demo.model.UserModel;
@@ -9,7 +10,6 @@ import com.apinayami.demo.repository.ICouponRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.ICouponService;
 import com.apinayami.demo.util.Enum.ETypeCoupon;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,24 +32,24 @@ public class CouponServiceImpl implements ICouponService {
     public CouponDto getCouponById(String id) {
         return couponRepository.findById(id)
                 .map(couponMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
     }
     public CouponDto getIdIsActive(String id){
         return couponRepository.findByIdAndActiveTrue(id)
                 .map(couponMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
     }
 
     public List<CouponDto> getCouponsByCustomerId(Long customerId) {
         UserModel customer = userRepository.findById(customerId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + customerId));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
         
         return couponMapper.toDtoList(couponRepository.findByCustomerModel(customer));
     }
     
     public List<CouponDto> getActiveCouponsByCustomerId(Long customerId) {
         UserModel customer = userRepository.findById(customerId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + customerId));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
         
         return couponMapper.toDtoList(couponRepository.findByCustomerModelAndActive(customer, true));
     }
@@ -73,7 +73,7 @@ public class CouponServiceImpl implements ICouponService {
                 
         if (request.getCustomerId() != null) {
             UserModel customer = userRepository.findById(request.getCustomerId())
-                    .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + request.getCustomerId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + request.getCustomerId()));
             coupon.setCustomerModel(customer);
         }
         
@@ -84,7 +84,7 @@ public class CouponServiceImpl implements ICouponService {
     @Transactional
     public CouponDto updateCoupon(String id, CreateCouponRequest request) {
         CouponModel coupon = couponRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
         
         coupon.setContent(request.getContent());
         coupon.setValue(request.getValue());
@@ -96,7 +96,7 @@ public class CouponServiceImpl implements ICouponService {
         
         if (request.getCustomerId() != null) {
             UserModel customer = userRepository.findById(request.getCustomerId())
-                    .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + request.getCustomerId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + request.getCustomerId()));
             coupon.setCustomerModel(customer);
         }
         
@@ -106,11 +106,8 @@ public class CouponServiceImpl implements ICouponService {
     
     @Transactional
     public void deleteCoupon(String id) {
-        if (!couponRepository.existsById(id)) {
-            throw new EntityNotFoundException("Coupon not found with id: " + id);
-        }
         CouponModel coupon = couponRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
         coupon.setActive(false);
         couponRepository.save(coupon);
     }
