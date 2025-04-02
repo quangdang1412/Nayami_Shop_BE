@@ -100,6 +100,7 @@ public class BillServiceImpl implements IBillService {
     public Object createBill(String email, BillRequestDTO request) {
 
         UserModel customer = userRepository.getUserByEmail(email);
+        
         if (customer == null) {
             throw new ResourceNotFoundException("User is empty");
         }
