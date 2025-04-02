@@ -31,4 +31,6 @@ public interface IProductService {
     List<ProductDTO> findProductByBrandId(long id);
 
     List<ProductDTO> getProductOutOfStock();
+
+    Long getQuantityOfProduct();
 }

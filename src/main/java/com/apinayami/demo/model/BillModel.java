@@ -3,7 +3,6 @@ package com.apinayami.demo.model;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -27,10 +26,10 @@ public class BillModel extends AbstractEntity<Long> {
     private EBillStatus status;
 
     private String orderNumber;
-    //reference
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonIgnore  
+    @JsonIgnore
     private UserModel customerModel;
 
     @OneToOne

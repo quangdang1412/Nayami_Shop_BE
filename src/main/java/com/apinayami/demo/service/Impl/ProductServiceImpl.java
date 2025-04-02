@@ -47,6 +47,8 @@ public class ProductServiceImpl implements IProductService {
 
     public String saveProduct(ProductDTO productRequestDTO, List<MultipartFile> files) {
         List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
+        if (productRequestDTO.getConfigDTO() == null)
+            throw new CustomException("Configuration not be flank");
         for (OtherConfigurationDTO a : productRequestDTO.getConfigDTO().getListOtherConfigDTO()) {
             OtherConfigurationModel otherConfig = OtherConfigurationModel.builder()
                     .name(a.getName())
@@ -57,7 +59,7 @@ public class ProductServiceImpl implements IProductService {
         ConfigurationModel configurationModel;
         if (productRequestDTO.getConfigDTO().getId() != 0) {
             configurationModel = configurationRepository.findById(productRequestDTO.getConfigDTO().getId())
-                    .orElseThrow(() -> new RuntimeException("Configuration not found"));
+                    .orElseThrow(() -> new CustomException("Configuration not found"));
 
             otherConfigurationRepository.deleteByConfigurationModel(configurationModel.getId());
         } else {
@@ -146,12 +148,6 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<ProductDTO> getAllProduct() {
-//        for (ProductModel productModel : productRepository.findAll()) {
-//            if (productModel.getDiscountDetailModel() != null && productModel.getDiscount().getEndDate().toLocalDate().isBefore(LocalDate.now())) {
-//                productModel.setDiscount(null);
-//                productRepository.save(productModel);
-//            }
-//        }
         return productRepository.findAll().stream().map(productMapper::convertToDTO).toList();
     }
 
@@ -193,6 +189,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public Long getQuantityOfProduct() {
+        return productRepository.getQuantityOfProduct();
+    }
+
+    @Override
     public FilterOptionDTO getFilterOption() {
         FilterOptionDTO filterOptionDTO = new FilterOptionDTO();
         filterOptionDTO.setListBrandDTO(brandService.getAllBrand());
@@ -217,26 +218,5 @@ public class ProductServiceImpl implements IProductService {
 
         return filterOptionDTO;
     }
-//    @Override
-//    public Page<ProductModel> getProductForPage(Integer pageNumber, String categoryID, String brandID, String sortBy, String searchQuery) {
-//        Pageable pageable = null;
-//        if (sortBy == null)
-//            pageable = PageRequest.of(pageNumber - 1, 9);
-//
-//        else {
-//            if (sortBy.equalsIgnoreCase("asc")) {
-//                pageable = PageRequest.of(pageNumber - 1, 9, Sort.by(Sort.Direction.ASC, "unitPrice"));
-//            } else {
-//                pageable = PageRequest.of(pageNumber - 1, 9, Sort.by(Sort.Direction.DESC, "unitPrice"));
-//            }
-//        }
-//
-//        return productRepository.getProductForPage(
-//                categoryID != null ? "%" + categoryID + "%" : null,
-//                brandID != null ? "%" + brandID + "%" : null,
-//                searchQuery != null ? "%" + searchQuery + "%" : null,
-//                pageable
-//        );
-//    }
 
 }
