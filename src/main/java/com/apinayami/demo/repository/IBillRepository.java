@@ -30,4 +30,13 @@ public interface IBillRepository extends JpaRepository<BillModel, Long> {
     @Transactional
     @Query("from BillModel od where od.createdAt >= ?1 and od.createdAt <= ?2 and od.status = :status order by od.createdAt ")
     List<BillModel> revenueByTime(LocalDateTime startDate, LocalDateTime endDate, @Param("status") EBillStatus status);
+
+    @Query("SELECT p, SUM(od.quantity) as totalQuantity, COUNT(DISTINCT o.id) as totalOrders " +
+            "FROM LineItemModel od " +
+            "JOIN od.productModel p " +
+            "JOIN od.billModel o " +
+            "WHERE o.createdAt >= ?1 and o.createdAt <= ?2 and o.status = :status " +
+            "GROUP BY p.productName " +
+            "ORDER BY totalQuantity DESC")
+    List<Object[]> topSeller(LocalDateTime startDate, LocalDateTime endDate, @Param("status") EBillStatus status);
 }

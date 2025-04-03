@@ -5,6 +5,7 @@ import com.apinayami.demo.dto.request.CartPaymentDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.dto.response.DashBoardResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
+import com.apinayami.demo.dto.response.ProductBestSellingDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.AddressMapper;
@@ -228,7 +229,7 @@ public class BillServiceImpl implements IBillService {
     }
 
     @Override
-    public DashBoardResponseDTO getRevenueByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
+    public DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status, int a) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
@@ -255,6 +256,11 @@ public class BillServiceImpl implements IBillService {
                 orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("yyyy"));
             }
             double totalAmount = orderModel.getTotalPrice();
+            if (a == 1) {
+                for (LineItemModel item : orderModel.getItems()) {
+                    totalAmount -= item.getQuantity() * item.getProductModel().getOriginalPrice();
+                }
+            }
             totalRevenueByDate.put(orderDateStr, totalRevenueByDate.getOrDefault(orderDateStr, 0.0) + totalAmount);
         }
         List<String> time = new ArrayList<>(totalRevenueByDate.keySet());
@@ -269,46 +275,25 @@ public class BillServiceImpl implements IBillService {
     }
 
     @Override
-    public DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
+    public List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-        List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
-        Map<String, Double> totalRevenueByDate = new ArrayMap<>();
-        long numberDays = ChronoUnit.DAYS.between(startDate, endDate);
-        for (BillModel orderModel : listOrder) {
-            String orderDateStr;
-            LocalDate orderDate = orderModel.getCreatedAt()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-
-            if (numberDays <= 1) {
-                orderDateStr = orderModel.getCreatedAt()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            } else if (numberDays <= 30) {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            } else if (numberDays <= 92) {
-                int week = orderDate.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
-                orderDateStr = "Week " + week + ", " + orderDate.getYear();
-            } else if (numberDays <= 365 * 2) {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("MM-yyyy"));
-            } else {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("yyyy"));
+        List<ProductBestSellingDTO> data = new ArrayList<>();
+        List<Object[]> listProduct = billRepository.topSeller(startDateTime, endDateTime, EBillStatus.COMPLETED);
+        for (int i = 0; i < Math.min(5, listProduct.size()); i++) {
+            Object[] productInfo = listProduct.get(i);
+            if (productInfo != null && productInfo.length > 0) {
+                ProductModel productModel = (ProductModel) productInfo[0];
+                data.add(ProductBestSellingDTO.builder()
+                        .url(productModel.getListImage().getFirst().getUrl())
+                        .name(productModel.getProductName())
+                        .unitPrice(productModel.getUnitPrice())
+                        .quantity(productModel.getQuantity())
+                        .quantitySold(((Long) productInfo[1]).intValue())
+                        .build());
             }
-            double totalAmount = orderModel.getTotalPrice();
-            for (LineItemModel item : orderModel.getItems()) {
-                totalAmount -= item.getQuantity() * item.getProductModel().getOriginalPrice();
-            }
-            totalRevenueByDate.put(orderDateStr, totalRevenueByDate.getOrDefault(orderDateStr, 0.0) + totalAmount);
         }
-        List<String> time = new ArrayList<>(totalRevenueByDate.keySet());
-        List<String> data = totalRevenueByDate.values().stream()
-                .map(String::valueOf)
-                .collect(Collectors.toList());
-
-        return DashBoardResponseDTO.builder()
-                .time(time)
-                .data(data)
-                .build();
+        return data;
     }
+
 }

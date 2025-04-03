@@ -5,6 +5,7 @@ import com.apinayami.demo.dto.request.CartPaymentDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.dto.response.DashBoardResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
+import com.apinayami.demo.dto.response.ProductBestSellingDTO;
 import com.apinayami.demo.util.Enum.EBillStatus;
 
 import java.time.LocalDate;
@@ -29,7 +30,7 @@ public interface IBillService {
 
     Double totalProfit(EBillStatus status);
 
-    DashBoardResponseDTO getRevenueByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
+    DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status, int i);
 
-    DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
+    List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
 } 
