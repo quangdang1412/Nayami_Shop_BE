@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.apinayami.demo.config.JwtConfig;
 import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.response.ResponseData;
+import com.apinayami.demo.service.ICartItemService;
 import com.apinayami.demo.service.Impl.CartItemServiceImpl;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -22,7 +23,7 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth") 
 public class CartController {
 
-    private final CartItemServiceImpl cartItemService;
+    private final ICartItemService cartItemService;
     private final JwtConfig jwtConfig;
 
     private String extractUserEmail(String authHeader) {
@@ -86,16 +87,5 @@ public class CartController {
 
         cartItemService.removeFromCart(email, id);
         return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "Xóa sản phẩm khỏi giỏ hàng thành công");
-    }
-
-    @DeleteMapping
-    public ResponseData<Void> clearCart(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        String email = extractUserEmail(authHeader);
-        if (email == null) {
-            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xóa giỏ hàng");
-        }
-
-        cartItemService.clearCart(email);
-        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "Đã xóa toàn bộ giỏ hàng");
     }
 }

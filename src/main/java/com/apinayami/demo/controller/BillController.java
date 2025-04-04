@@ -88,7 +88,6 @@ public class BillController {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập");
         }
         if ("CANCELLED".equalsIgnoreCase(status) || "true".equalsIgnoreCase(cancel)) {
-            billService.cancelBill(email, orderID);
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Xử lý thanh toán thất bại");
         }
 

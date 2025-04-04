@@ -104,17 +104,6 @@ public class CartItemServiceImpl implements ICartItemService {
 
         cartItemRepository.delete(cartItem);
     }
-
-    @Transactional
-    public void clearCart(String email) {
-        UserModel user = userRepository.getUserByEmail(email);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found");
-        }        cartItemRepository.deleteByCustomerModel(user);
-    }
-
-    
-
     private ProductModel getProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
