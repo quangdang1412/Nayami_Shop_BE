@@ -29,7 +29,19 @@ public class BrandServiceImpl implements IBrandService {
 
     @Override
     public BrandModel findBrandById(Long id) {
-        return brandRepository.findBrandById(id);
+       return brandRepository.findBrandById(id);
+    }
+    @Override
+    public BrandDTO findBrandByIdDTO(Long id) {
+        log.info("Finding brand by ID: {}", id);
+        if (id == null) {
+            throw new CustomException("ID must be not null");
+        }
+        BrandModel brandModel = brandRepository.findBrandById(id);
+        if (brandModel == null) {
+            throw new CustomException("Brand not found");
+        }
+        return brandMapper.toDetailDto(brandModel);
     }
 
     @Override

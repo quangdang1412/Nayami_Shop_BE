@@ -10,17 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.apinayami.demo.dto.request.GHTKRequestDTO;
-import com.apinayami.demo.service.IGHTKSerivce;
+import com.apinayami.demo.service.IShippingSerivce;
 
 
 import reactor.core.publisher.Mono;
 
 @Service
-public class GHTKServiceImpl implements IGHTKSerivce {
+public class ShippingServiceImpl implements IShippingSerivce {
     private final WebClient webClient;
     private final String apiKey;
 
-    public GHTKServiceImpl(@Value("${GHTK_KEY}") String apiKey) {
+    public ShippingServiceImpl(@Value("${GHTK_KEY}") String apiKey) {
         this.apiKey = apiKey;
         this.webClient = WebClient.builder()
                 .baseUrl("https://services.giaohangtietkiem.vn/services/shipment")

@@ -5,7 +5,6 @@ import com.apinayami.demo.dto.request.CreateCouponRequest;
 import com.apinayami.demo.dto.response.CouponDto;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.service.ICouponService;
-import com.apinayami.demo.util.Enum.ETypeCoupon;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

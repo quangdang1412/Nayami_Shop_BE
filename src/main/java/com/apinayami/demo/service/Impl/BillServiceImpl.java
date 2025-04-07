@@ -16,12 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.apinayami.demo.dto.request.BillRequestDTO;
-import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.request.CartPaymentDTO;
 import com.apinayami.demo.dto.response.BillResponseDTO;
+import com.apinayami.demo.dto.response.DashBoardResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
-import com.apinayami.demo.dto.response.PageResponseDTO;
-import com.apinayami.demo.dto.response.ResponseData;
+import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.AddressMapper;
 import com.apinayami.demo.mapper.BillMapper;
@@ -40,6 +39,7 @@ import com.apinayami.demo.repository.IBillRepository;
 import com.apinayami.demo.repository.ICartItemRepository;
 import com.apinayami.demo.repository.ICouponRepository;
 import com.apinayami.demo.repository.IPaymentRepository;
+import com.apinayami.demo.repository.IProductRepository;
 import com.apinayami.demo.repository.IShippingRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IBillService;
@@ -49,10 +49,23 @@ import com.apinayami.demo.util.Enum.EPaymentStatus;
 import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
-
+import com.google.api.client.util.ArrayMap;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -60,6 +73,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BillServiceImpl implements IBillService {
     private final IBillRepository billRepository;
     private final IUserRepository userRepository;
+    private final IProductRepository productRepository;
     private final IShippingRepository shippingRepository;
     private final ICouponRepository couponRepository;
     private final IPaymentRepository paymentRepository;
@@ -100,6 +114,7 @@ public class BillServiceImpl implements IBillService {
     public Object createBill(String email, BillRequestDTO request) {
 
         UserModel customer = userRepository.getUserByEmail(email);
+        
         if (customer == null) {
             throw new ResourceNotFoundException("User is empty");
         }
@@ -111,11 +126,16 @@ public class BillServiceImpl implements IBillService {
                 .shippingFee(request.getShippingFee())
                 .addressModel(address)
                 .build();
-        shipping = shippingRepository.save(shipping);
-        CouponModel coupon = request.getCouponId() != null
-                ? couponRepository.findById(request.getCouponId()).orElse(null)
-                : null;
-
+        shippingRepository.save(shipping);
+      
+        CouponModel coupon = null;
+        if(request.getCouponId() != null) {
+            coupon = couponRepository.findByIdAndActiveTrue(request.getCouponId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + request.getCouponId()));
+            coupon.setActive(false);
+            couponRepository.save(coupon);
+        }
+       
         PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(request.getPaymentMethod().name());
         PaymentModel payment = paymentRepository.save(paymentStrategy.processPayment(request));
         BillModel bill = BillModel.builder()
@@ -128,32 +148,55 @@ public class BillServiceImpl implements IBillService {
                 .status(EBillStatus.PENDING)
                 .paymentModel(payment)
                 .build();
-        List<CartItemModel> cartItem = cartItemRepository.findByCustomerModel(customer);
+        List<CartItemModel> cartItem = request.getCartId().stream()
+            .map(id -> cartItemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + id)))
+            .collect(Collectors.toList());
+
         if (cartItem.isEmpty()) {
             throw new ResourceNotFoundException("Cart is empty");
         }
+        List<LineItemModel> items= new ArrayList<>();
         Double totalPrice = 0.0;
         for (CartItemModel item : cartItem) {
-            totalPrice += item.getUnitPrice() * item.getQuantity();
+            double unitPrice = item.getProductModel().getUnitPrice();
+            if(item.getProductModel().getDiscountDetailModel() != null && item.getProductModel().getDiscountDetailModel().getPercentage() != null) {
+                double discountPercentage = item.getProductModel().getDiscountDetailModel().getPercentage();
+                double discountAmountPerUnit = unitPrice * (discountPercentage / 100);
+                unitPrice -= discountAmountPerUnit;  
+            }
+            Integer quantity = item.getQuantity();
+            totalPrice += unitPrice * quantity;
+            ProductModel product = item.getProductModel();
+            if (product.getQuantity() < item.getQuantity()) {
+                throw new ResourceNotFoundException("Not enough stock for product: " + product.getProductName());
+            }
+            product.setQuantity(product.getQuantity() - item.getQuantity());
+            productRepository.save(product);
+            LineItemModel lineItem = LineItemModel.builder()
+                    .productModel(product)
+                    .billModel(bill)
+                    .quantity(item.getQuantity())
+                    .build();
+            if(product.getDiscountDetailModel() != null && product.getDiscountDetailModel().getPercentage() != null) {
+                lineItem.setUnitPrice(unitPrice-unitPrice*(product.getDiscountDetailModel().getPercentage()/100));
+            }
+            else {
+                lineItem.setUnitPrice(unitPrice);
+            }
+            items.add(lineItem);
+           
+            
         }
-        List<LineItemModel> items = cartItem.stream()
-                .map((CartItemModel item) -> {
-                    ProductModel product = item.getProductModel();
-                    if (product == null) {
-                        throw new ResourceNotFoundException("ProductModel is null for CartItem: " + item.getId());
-                    }
-                    return LineItemModel.builder()
-                            .productModel(product)
-                            .billModel(bill)
-                            .quantity(item.getQuantity())
-                            .unitPrice(product.getUnitPrice())
-                            .build();
-
-                })
-                .collect(Collectors.toList());
+        if(request.getDiscount() != null && coupon != null) {
+            totalPrice -= request.getDiscount();
+        }
         bill.setItems(items);
-        cartItemRepository.deleteByCustomerModel(customer);
         bill.setTotalPrice(totalPrice);
+        for (CartItemModel item : cartItem) {
+            cartItemRepository.delete(item);
+        }
+        
         BillModel savedBill = billRepository.save(bill);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
             String returnUrl = "http://localhost:5173/checkout";
@@ -199,7 +242,7 @@ public class BillServiceImpl implements IBillService {
         if (bill.getStatus() == EBillStatus.CANCELLED) {
             throw new ResourceNotFoundException("Bill is already cancelled");
         }
-        
+
     }
 
     @Transactional
@@ -221,5 +264,105 @@ public class BillServiceImpl implements IBillService {
         }
         bill.setPaymentModel(PaymentModel.builder().paymentStatus(EPaymentStatus.COMPLETED).build());
         billRepository.save(bill);
+    }
+
+    @Override
+    public Long countBillsByStatus(EBillStatus status) {
+        return billRepository.countBillsByStatus(status);
+    }
+
+    @Override
+    public Double totalRevenue(EBillStatus status) {
+        return billRepository.totalRevenue(status);
+    }
+
+    @Override
+    public Double totalProfit(EBillStatus status) {
+        return billRepository.totalProfit(status);
+    }
+
+    @Override
+    public DashBoardResponseDTO getRevenueByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+        List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
+        Map<String, Double> totalRevenueByDate = new ArrayMap<>();
+        long numberDays = ChronoUnit.DAYS.between(startDate, endDate);
+        for (BillModel orderModel : listOrder) {
+            String orderDateStr;
+            LocalDate orderDate = orderModel.getCreatedAt()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+
+            if (numberDays <= 1) {
+                orderDateStr = orderModel.getCreatedAt()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            } else if (numberDays <= 30) {
+                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            } else if (numberDays <= 92) {
+                int week = orderDate.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
+                orderDateStr = "Week " + week + ", " + orderDate.getYear();
+            } else if (numberDays <= 365 * 2) {
+                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("MM-yyyy"));
+            } else {
+                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("yyyy"));
+            }
+            double totalAmount = orderModel.getTotalPrice();
+            totalRevenueByDate.put(orderDateStr, totalRevenueByDate.getOrDefault(orderDateStr, 0.0) + totalAmount);
+        }
+        List<String> time = new ArrayList<>(totalRevenueByDate.keySet());
+        List<String> data = totalRevenueByDate.values().stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+
+        return DashBoardResponseDTO.builder()
+                .time(time)
+                .data(data)
+                .build();
+    }
+
+    @Override
+    public DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+        List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
+        Map<String, Double> totalRevenueByDate = new ArrayMap<>();
+        long numberDays = ChronoUnit.DAYS.between(startDate, endDate);
+        for (BillModel orderModel : listOrder) {
+            String orderDateStr;
+            LocalDate orderDate = orderModel.getCreatedAt()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+
+            if (numberDays <= 1) {
+                orderDateStr = orderModel.getCreatedAt()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            } else if (numberDays <= 30) {
+                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            } else if (numberDays <= 92) {
+                int week = orderDate.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
+                orderDateStr = "Week " + week + ", " + orderDate.getYear();
+            } else if (numberDays <= 365 * 2) {
+                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("MM-yyyy"));
+            } else {
+                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("yyyy"));
+            }
+            double totalAmount = orderModel.getTotalPrice();
+            for (LineItemModel item : orderModel.getItems()) {
+                totalAmount -= item.getQuantity() * item.getProductModel().getOriginalPrice();
+            }
+            totalRevenueByDate.put(orderDateStr, totalRevenueByDate.getOrDefault(orderDateStr, 0.0) + totalAmount);
+        }
+        List<String> time = new ArrayList<>(totalRevenueByDate.keySet());
+        List<String> data = totalRevenueByDate.values().stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+
+        return DashBoardResponseDTO.builder()
+                .time(time)
+                .data(data)
+                .build();
     }
 }
