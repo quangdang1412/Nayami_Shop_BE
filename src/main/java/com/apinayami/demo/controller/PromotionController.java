@@ -25,17 +25,17 @@ public class PromotionController {
     @PostMapping
     public ResponseData<String> addPromotion(@RequestBody @Valid PromotionDTO promotionDTO) {
         try {
-            promotionService.create(promotionDTO);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + promotionDTO.getTitle());
+            String result = promotionService.create(promotionDTO);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", result);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
         }
     }
     @GetMapping
-    public ResponseData<List<PromotionDTO>> getAllPromotions() {
-        List<PromotionDTO> promotions = promotionService.getAllPromotions();
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", promotions);
+    public ResponseData<?> getAllPromotions() {
+        List<PromotionDTO> promotionList = promotionService.getAllPromotions();
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", promotionList);
     }
 
     @GetMapping("/{id}")
@@ -49,8 +49,8 @@ public class PromotionController {
         try {
             PromotionDTO deleted_promotion = promotionService.getPromotionById(id);
             System.out.println(deleted_promotion.toString());
-            promotionService.delete(deleted_promotion);
-            return new ResponseData<>(HttpStatus.OK.value(), "Success", "Xóa thành công ");
+            String result = promotionService.delete(deleted_promotion);
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", result);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
@@ -65,8 +65,8 @@ public class PromotionController {
             update_promotion.setStartDate(promotionDTO.getStartDate());
             update_promotion.setEndDate(promotionDTO.getEndDate());
             update_promotion.setDisplayStatus(promotionDTO.isDisplayStatus());
-            promotionService.update(update_promotion);
-            return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + promotionDTO.getTitle());
+            String result = promotionService.update(update_promotion);
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", result);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");

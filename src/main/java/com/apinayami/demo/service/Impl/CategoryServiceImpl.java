@@ -60,19 +60,24 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public List<CategoryDTO> getAll() {
-        return categoryRepository.findAll().stream().map(categoryMapper::toCategoryDTO)
+        List<CategoryModel> categoryModelList = categoryRepository.findAll();
+        return categoryModelList.stream().map(categoryMapper::toCategoryDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public String create(CategoryDTO a) {
         try {
-            categoryRepository.save(CategoryMapper.INSTANCE.toCategoryModel(a));
-            return "Thêm thành công " + a.getCategoryName();
+            boolean checkExists = categoryRepository.existsByCategoryName(a.getCategoryName());
+            if(checkExists){
+                throw new CustomException("Category has existed");
+            }
+            CategoryModel savedCategory = categoryRepository.save(CategoryMapper.INSTANCE.toCategoryModel(a));
+            return "Thêm thành công " + savedCategory.getCategoryName();
 
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
-            throw new CustomException("Category has existed");
+            throw new CustomException("Error occurs");
         }
     }
 

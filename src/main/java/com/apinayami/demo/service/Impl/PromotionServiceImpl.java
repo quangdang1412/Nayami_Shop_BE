@@ -24,7 +24,8 @@ public class PromotionServiceImpl implements IPromotionService {
     private final IImageRepository imageRepository;
 
     public List<PromotionDTO> getAllPromotions() {
-        return promotionRepository.findAll().stream().map(promotionMapper::toPromotionDTO)
+        List<PromotionModel> promotionModelList = promotionRepository.findAll();
+        return promotionModelList.stream().map(promotionMapper::toPromotionDTO)
                 .collect(Collectors.toList());
     }
 
@@ -36,14 +37,14 @@ public class PromotionServiceImpl implements IPromotionService {
     @Override
     public String create(PromotionDTO promotionDTO) {
         try{
-            PromotionModel tempPromotionModel = promotionRepository.save(PromotionMapper.INSTANCE.toPromotionModel(promotionDTO));
+            PromotionModel savedPromotion = promotionRepository.save(PromotionMapper.INSTANCE.toPromotionModel(promotionDTO));
             if(!promotionDTO.getPromotionImages().isEmpty()){
                 for (ImageModel image : promotionDTO.getPromotionImages()) {
-                    image.setPromotionModel(tempPromotionModel);
+                    image.setPromotionModel(savedPromotion);
                     imageRepository.save(image);
             }
         }
-            return "Thêm thành công" + promotionDTO.getTitle();
+            return "Thêm thành công" + savedPromotion.getTitle();
         }
         catch (Exception e){
             log.error("Error: {}", e.getMessage());

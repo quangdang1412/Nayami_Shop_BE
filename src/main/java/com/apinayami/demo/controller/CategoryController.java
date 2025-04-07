@@ -4,8 +4,6 @@ import com.apinayami.demo.dto.request.CategoryDTO;
 import com.apinayami.demo.dto.request.CategoryWithBrandsDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
-import com.apinayami.demo.mapper.CategoryMapper;
-import com.apinayami.demo.model.CategoryModel;
 import com.apinayami.demo.service.ICategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,12 +22,12 @@ import java.util.List;
 @RequestMapping("/api/categories")
 @Validated
 public class CategoryController {
-    @Autowired
     private final ICategoryService categoryService;
 
     @GetMapping
     public ResponseData<?> getAllCategories() {
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", categoryService.getAll());
+        List<CategoryDTO> categoryList = categoryService.getAll();
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", categoryList);
     }
 
     @Operation(summary = "Get category by ID", description = "Get a category by its ID")
@@ -49,8 +47,8 @@ public class CategoryController {
     @PostMapping
     public ResponseData<?> addCategory(@RequestBody @Valid CategoryDTO category) {
         try {
-            categoryService.create(category);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + category.getCategoryName());
+            String result = categoryService.create(category);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", result);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");

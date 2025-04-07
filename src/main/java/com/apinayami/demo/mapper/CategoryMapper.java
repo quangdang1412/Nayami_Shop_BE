@@ -14,6 +14,8 @@ public interface CategoryMapper {
     @Mapping(target = "id", ignore = true)
     CategoryModel toCategoryModel(CategoryDTO dto);
 
+    CategoryModel toCategoryModelWithID(CategoryDTO dto);
+
     CategoryDTO toCategoryDTO(CategoryModel model);
 }
 //@Component
