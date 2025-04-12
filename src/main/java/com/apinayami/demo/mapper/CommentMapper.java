@@ -11,9 +11,11 @@ public interface CommentMapper {
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     CommentModel ToCommentModel(CommentDTO commentDTO);
 
     @Mapping(source = "customerModel.email", target = "userEmail")
+    @Mapping(source = "customerModel.username", target = "userName")
     @Mapping(source = "productModel.id", target = "productId")
     CommentDTO ToCommentDTO(CommentModel commentModel);
 

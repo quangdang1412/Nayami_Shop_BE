@@ -46,8 +46,7 @@ public class CommentServiceImpl implements ICommentService {
     public String create(CommentDTO commentDTO) {
         try{
             UserModel userModel = userRepository.findByEmail(commentDTO.getUserEmail());
-            ProductModel productModel = productRepository.findById(commentDTO.getProductId()).orElse(null);
-            assert productModel != null;
+            ProductModel productModel = productRepository.findById(commentDTO.getProductId()).get();
             CommentModel commentModel = commentMapper.ToCommentModel(commentDTO);
             commentModel.setCustomerModel(userModel);
             commentModel.setProductModel(productModel);

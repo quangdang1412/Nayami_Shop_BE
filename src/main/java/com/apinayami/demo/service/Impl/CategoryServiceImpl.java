@@ -87,6 +87,7 @@ public class CategoryServiceImpl implements ICategoryService {
             CategoryModel found_category = categoryRepository.findById(a.getId()).orElse(null);
             assert found_category != null;
             found_category.setCategoryName(a.getCategoryName());
+            found_category.setActive(a.isActive());
             categoryRepository.save(found_category);
             return "Cập nhật thành công " + a.getCategoryName();
 

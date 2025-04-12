@@ -1,9 +1,6 @@
 package com.apinayami.demo.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -18,6 +15,8 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, exclude = {"listProduct", "listConfiguration"})
 public class CategoryModel extends AbstractEntity<Long> {
     private String categoryName;
+    @Column(columnDefinition = "BOOLEAN default true")
+    private boolean active;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "categoryModel", cascade = CascadeType.ALL)
     Set<ProductModel> listProduct;

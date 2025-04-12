@@ -59,8 +59,10 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseData<?> updateCategory(@PathVariable long id, @RequestBody @Valid CategoryDTO category) {
         try {
+            System.out.println(category.isActive());
             CategoryDTO updated_category = categoryService.findCategoryById(id);
             updated_category.setCategoryName(category.getCategoryName());
+            updated_category.setActive(category.isActive());
             categoryService.update(updated_category);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + category.getCategoryName());
         } catch (Exception e) {
@@ -88,5 +90,6 @@ public class CategoryController {
         List<CategoryWithBrandsDTO> categories = categoryService.getAllCategoriesWithBrands();
         return new ResponseData<>(HttpStatus.OK.value(), "Success", categories);
     }
+
 }
 
