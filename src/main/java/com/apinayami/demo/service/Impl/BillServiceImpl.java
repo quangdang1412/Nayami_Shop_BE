@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.apinayami.demo.dto.request.BillRequestDTO;
@@ -36,6 +37,7 @@ import com.apinayami.demo.repository.IAddressRepository;
 import com.apinayami.demo.repository.IBillRepository;
 import com.apinayami.demo.repository.ICartItemRepository;
 import com.apinayami.demo.repository.ICouponRepository;
+import com.apinayami.demo.repository.ILineItemRepository;
 import com.apinayami.demo.repository.IPaymentRepository;
 import com.apinayami.demo.repository.IProductRepository;
 import com.apinayami.demo.repository.IShippingRepository;
@@ -44,6 +46,7 @@ import com.apinayami.demo.service.IBillService;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
 import com.apinayami.demo.util.Enum.EPaymentStatus;
+import com.apinayami.demo.util.Enum.ETypeCoupon;
 import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
@@ -77,6 +80,7 @@ public class BillServiceImpl implements IBillService {
     private final IPaymentRepository paymentRepository;
     private final ICartItemRepository cartItemRepository;
     private final IAddressRepository addressRepository;
+    private final ILineItemRepository lineItemRepository;
     private final BillMapper billMapper;
     private final PaymentStrategyFactory paymentStrategyFactory;
     private final CartItemMapper cartItemMapper;
@@ -182,12 +186,23 @@ public class BillServiceImpl implements IBillService {
             else {
                 lineItem.setUnitPrice(unitPrice);
             }
+            lineItemRepository.save(lineItem);
             items.add(lineItem);
            
             
         }
-        if(request.getDiscount() != null && coupon != null) {
-            totalPrice -= request.getDiscount();
+        if(coupon != null) {
+            if (coupon.getConstraintMoney() != null && totalPrice < coupon.getConstraintMoney()) {
+                throw new CustomException("Đơn hàng không đủ điều kiện sử dụng mã giảm giá này");
+            }
+            if (coupon.getValue() != null && coupon.getValue() > 0) {
+                if (coupon.getType() == ETypeCoupon.PERCENT) {
+                    totalPrice -= totalPrice * (coupon.getValue() / 100);
+                } else if (coupon.getType() == ETypeCoupon.MONEY) {
+                    totalPrice -= coupon.getValue();
+                    
+                }
+            }
         }
         bill.setItems(items);
         bill.setTotalPrice(totalPrice);
@@ -391,6 +406,53 @@ public class BillServiceImpl implements IBillService {
                 .time(time)
                 .data(data)
                 .build();
+    }
+    @Scheduled(cron = "0 */10 * * * *")
+    @Transactional
+    public void cancelUnpaidOrders() {
+        log.info("Running scheduled task to cancel unpaid orders");
+        
+        LocalDateTime cutoffTime = LocalDateTime.now().minus(24, ChronoUnit.HOURS);
+        
+        List<BillModel> unpaidBills = billRepository.findByPaymentModel_PaymentStatusAndCreatedAtBefore(EPaymentStatus.PENDING, cutoffTime);
+            
+        if (!unpaidBills.isEmpty()) {
+            log.info("Found {} unpaid bills to cancel", unpaidBills.size());
+            
+            for (BillModel bill : unpaidBills) {
+                bill.getPaymentModel().setPaymentStatus(EPaymentStatus.CANCELLED);
+                bill.setStatus(EBillStatus.CANCELLED);
+                log.info("Cancelling unpaid bill ID: {}", bill.getId());
+            }
+            
+            billRepository.saveAll(unpaidBills);
+            log.info("Successfully cancelled {} unpaid bills", unpaidBills.size());
+        } else {
+            log.info("No unpaid bills to cancel");
+        }
+    }
+    @Scheduled(cron = "0 */10 * * * *")
+    @Transactional
+    public void completeDeliveredOrders() {
+        log.info("Running scheduled task to auto-complete delivered orders after 7 days");
+        
+        LocalDateTime cutoffTime = LocalDateTime.now().minus(7, ChronoUnit.DAYS);
+        
+        List<BillModel> deliveredBills = billRepository.findByStatusAndUpdatedAtBefore(EBillStatus.SHIPPED, cutoffTime);
+            
+        if (!deliveredBills.isEmpty()) {
+            log.info("Found {} delivered bills to auto-complete", deliveredBills.size());
+            
+            for (BillModel bill : deliveredBills) {
+                bill.setStatus(EBillStatus.COMPLETED);
+                log.info("Auto-completing bill ID: {} after 7 days in delivered status", bill.getId());
+            }
+            
+            billRepository.saveAll(deliveredBills);
+            log.info("Successfully auto-completed {} bills", deliveredBills.size());
+        } else {
+            log.info("No delivered bills to auto-complete");
+        }
     }
 
     @Override
