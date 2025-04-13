@@ -5,11 +5,9 @@ import com.apinayami.demo.dto.request.OtherConfigurationDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
+import com.apinayami.demo.mapper.CategoryMapper;
 import com.apinayami.demo.mapper.ProductMapper;
-import com.apinayami.demo.model.ConfigurationModel;
-import com.apinayami.demo.model.ImageModel;
-import com.apinayami.demo.model.OtherConfigurationModel;
-import com.apinayami.demo.model.ProductModel;
+import com.apinayami.demo.model.*;
 import com.apinayami.demo.repository.IConfigurationRepository;
 import com.apinayami.demo.repository.IOtherConfigurationRepository;
 import com.apinayami.demo.repository.IProductRepository;
@@ -66,7 +64,7 @@ public class ProductServiceImpl implements IProductService {
             configurationModel = ConfigurationModel.builder().build();
         }
 
-        configurationModel.setCategoryModel(categoryService.findCategoryById(productRequestDTO.getConfigDTO().getCategory()));
+        configurationModel.setCategoryModel(CategoryMapper.INSTANCE.toCategoryModelWithID(categoryService.findCategoryById(productRequestDTO.getConfigDTO().getCategory())));
         configurationModel.setOtherConfigurationModelList(otherConfigurationModelList);
 
         for (OtherConfigurationModel otherConfig : otherConfigurationModelList) {
@@ -79,10 +77,14 @@ public class ProductServiceImpl implements IProductService {
         configurationModel = configurationRepository.save(configurationModel);
         otherConfigurationRepository.saveAll(otherConfigurationModelList);
 
+        CategoryModel categoryModel = CategoryMapper.INSTANCE.toCategoryModelWithID(categoryService.findCategoryById(productRequestDTO.getCategoryDTO().getId()));
+        System.out.println(categoryModel);
+
+
         ProductModel productModel = ProductModel.builder()
                 .productName(productRequestDTO.getName())
                 .brandModel(brandService.findBrandById(productRequestDTO.getBrandDTO().getId()))
-                .categoryModel(categoryService.findCategoryById(productRequestDTO.getCategoryDTO().getId()))
+                .categoryModel(categoryModel)
                 .description(productRequestDTO.getDescription())
                 .discountDetailModel(productRequestDTO.getDiscountDTO() == null ? null : discountDetailService.findDiscountDetailById(productRequestDTO.getDiscountDTO().getId()))
                 .quantity(productRequestDTO.getQuantity())

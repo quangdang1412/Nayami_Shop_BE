@@ -1,5 +1,6 @@
 package com.apinayami.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,8 +11,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @Entity
 @SuperBuilder
 @NoArgsConstructor
@@ -25,5 +25,6 @@ public class PromotionModel extends AbstractEntity<Long> {
     private boolean displayStatus;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "promotionModel", cascade = CascadeType.ALL)
-    private List<PromotionDetailModel> listPromotionDetail;
+    @JsonManagedReference
+    private List<ImageModel> promotionImages;
 }

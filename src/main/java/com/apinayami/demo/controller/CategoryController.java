@@ -1,16 +1,16 @@
 package com.apinayami.demo.controller;
 
+import com.apinayami.demo.dto.request.CategoryDTO;
 import com.apinayami.demo.dto.request.CategoryWithBrandsDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
-import com.apinayami.demo.mapper.CategoryMapper;
-import com.apinayami.demo.model.CategoryModel;
 import com.apinayami.demo.service.ICategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +23,11 @@ import java.util.List;
 @Validated
 public class CategoryController {
     private final ICategoryService categoryService;
-    private final CategoryMapper categoryMapper;
 
     @GetMapping
     public ResponseData<?> getAllCategories() {
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", categoryService.getAll());
+        List<CategoryDTO> categoryList = categoryService.getAll();
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", categoryList);
     }
 
     @Operation(summary = "Get category by ID", description = "Get a category by its ID")
@@ -37,18 +37,18 @@ public class CategoryController {
     })
     @GetMapping("/{id}")
     public ResponseData<?> getCategoryById(@PathVariable Long id) {
-        CategoryModel category = categoryService.findCategoryById(id);
+        CategoryDTO category = categoryService.findCategoryById(id);
         return category != null
-                ? new ResponseData<>(HttpStatus.OK.value(), "Success", categoryMapper.toCategoryDTO(category))
+                ? new ResponseData<>(HttpStatus.OK.value(), "Success", category)
                 : new ResponseData<>(HttpStatus.NOT_FOUND.value(), "Category not found", null);
     }
 
     @Operation(summary = "Create a new category", description = "Creates a new category")
     @PostMapping
-    public ResponseData<?> addCategory(@RequestBody @Valid CategoryModel category) {
+    public ResponseData<?> addCategory(@RequestBody @Valid CategoryDTO category) {
         try {
-            categoryService.create(category);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + category.getCategoryName());
+            String result = categoryService.create(category);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", result);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
@@ -57,10 +57,12 @@ public class CategoryController {
 
     @Operation(summary = "Update a category", description = "Updates an existing category by ID")
     @PutMapping("/{id}")
-    public ResponseData<?> updateCategory(@PathVariable long id, @RequestBody @Valid CategoryModel category) {
+    public ResponseData<?> updateCategory(@PathVariable long id, @RequestBody @Valid CategoryDTO category) {
         try {
-            CategoryModel updated_category = categoryService.findCategoryById(id);
+            System.out.println(category.isActive());
+            CategoryDTO updated_category = categoryService.findCategoryById(id);
             updated_category.setCategoryName(category.getCategoryName());
+            updated_category.setActive(category.isActive());
             categoryService.update(updated_category);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + category.getCategoryName());
         } catch (Exception e) {
@@ -73,7 +75,7 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ResponseData<?> deleteCategory(@PathVariable long id) {
         try {
-            CategoryModel updated_category = categoryService.findCategoryById(id);
+            CategoryDTO updated_category = categoryService.findCategoryById(id);
             categoryService.delete(updated_category);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Xóa thành công ");
         } catch (Exception e) {
@@ -88,5 +90,6 @@ public class CategoryController {
         List<CategoryWithBrandsDTO> categories = categoryService.getAllCategoriesWithBrands();
         return new ResponseData<>(HttpStatus.OK.value(), "Success", categories);
     }
+
 }
 
