@@ -1,5 +1,6 @@
 package com.apinayami.demo.util;
 
+import com.apinayami.demo.model.CustomUserDetail;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class SecurityUtil {
     private final JwtEncoder jwtEncoder;
     public static MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
-    private final long JWR_EXPIRATION_ACCESSTOKEN = 30;
+    private final long JWR_EXPIRATION_ACCESSTOKEN = 10;
     private final long JWR_EXPIRATION_REFRESHTOKEN = 7*24*60*60;
 
 
@@ -36,10 +37,15 @@ public class SecurityUtil {
         var role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
+        CustomUserDetail currentUserDetail = (CustomUserDetail) authentication.getPrincipal();
+
+
         JwtClaimsSet claims = JwtClaimsSet.builder().
                 issuedAt(now).
                 expiresAt(validity).
                 claim("roles",role).
+                claim("fullName",currentUserDetail.getFullName()).
+                claim("email",currentUserDetail.getUsername()).
                 subject(authentication.getName())
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
@@ -59,6 +65,18 @@ public class SecurityUtil {
                 .subject(authentication.getName())
                 .build();
 
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+    public String createResetPasswordToken(String email) {
+        Instant now = Instant.now();
+        Instant validity = now.plus(JWR_EXPIRATION_REFRESHTOKEN, ChronoUnit.SECONDS);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .claim("roles","REFRESH_PASSWORD_TOKEN")
+                .subject(email)
+                .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }

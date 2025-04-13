@@ -54,7 +54,6 @@ public class BrandController {
             log.info("Request add brand: {}", brandDTO.getName());
             BrandModel brandModel = new BrandModel();
             brandModel.setBrandName(brandDTO.getName());
-
             brandService.create(brandModel);
             return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + brandDTO.getName());
         } catch (Exception e) {

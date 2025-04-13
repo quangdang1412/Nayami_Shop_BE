@@ -1,5 +1,6 @@
 package com.apinayami.demo.service.Impl;
 
+import com.apinayami.demo.dto.request.ResetPasswordDTO;
 import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,7 +61,9 @@ public class UserServiceImpl implements IUserService {
     public String update(UserDTO userDTO) {
         try {
             UserModel userModel = userMapper.toDetailModel(userDTO);
-
+            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
+            userModel.setPassword(hashedPassword);
+            userModel.setActive(true);
             if(userModel != null){
                 userRepository.save(userModel);
             }
@@ -98,5 +103,49 @@ public class UserServiceImpl implements IUserService {
             return null;
         }
         return userMapper.toDetailDto(userModel);
+    }
+
+    @Override
+    public boolean checkUserExistByEmail(String email) {
+        UserModel userExist = userRepository.findByEmail(email);
+        return userExist != null;
+    }
+
+    @Override
+    public boolean updateUserPassword(ResetPasswordDTO resetPasswordDTO,String authHeader) {
+        String email = getEmailFromToken(authHeader);
+        if(email != "") {
+            try{
+                UserModel userModel = userRepository.findByEmail(email);
+                userModel.setPassword(resetPasswordDTO.getNewPassword());
+                UserDTO userDTO = userMapper.toDetailDto(userModel);
+                update(userDTO);
+                return true;
+            }catch(Exception e){
+                log.error("Error: {}", e.getMessage());
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private final JwtDecoder jwtDecoder;
+    private String getEmailFromToken(String authHeader){
+        try {
+            String token = authHeader.replace("Bearer ", "");
+
+            Jwt decodedJwt = jwtDecoder.decode(token);
+
+            String tokenEmail = decodedJwt.getSubject();
+            String role = decodedJwt.getClaimAsString("roles");
+
+            if (!"REFRESH_PASSWORD_TOKEN".equals(role)) {
+                return "";
+            }
+            return tokenEmail;
+        }catch (Exception e){
+            log.error("Error: {}", e.getMessage());
+            return "";
+        }
     }
 }

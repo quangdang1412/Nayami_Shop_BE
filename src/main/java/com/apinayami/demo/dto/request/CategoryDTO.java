@@ -15,5 +15,4 @@ public class CategoryDTO implements Serializable {
     private long id;
     private String categoryName;
     private int quantityProduct;
-
 }

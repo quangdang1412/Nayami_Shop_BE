@@ -58,11 +58,11 @@ public class CategoryServiceImpl implements ICategoryService {
         return categoryWithBrandsDTOList;
     }
 
-    @Override
-    public List<CategoryDTO> getAll() {
-        return categoryRepository.findAll().stream().map(categoryMapper::toCategoryDTO)
-                .collect(Collectors.toList());
-    }
+        @Override
+        public List<CategoryDTO> getAll() {
+            return categoryRepository.findAll().stream().map(categoryMapper::toCategoryDTO)
+                    .collect(Collectors.toList());
+        }
 
     @Override
     public String create(CategoryModel a) {

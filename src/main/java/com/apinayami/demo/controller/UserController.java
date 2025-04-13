@@ -34,7 +34,7 @@ public class UserController implements Serializable {
     private final IUserService userService;
     private final UserMapper userMapper;
 
-    @GetMapping
+    @GetMapping("/get-all-users")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
@@ -45,7 +45,7 @@ public class UserController implements Serializable {
         UserDTO user = userService.getUserById(id);
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
-    @PostMapping
+    @PostMapping("/create")
     public ResponseData<String> createUser(@Valid @RequestBody UserDTO userDTO) {
         try {
             userService.create(userDTO);
@@ -59,7 +59,7 @@ public class UserController implements Serializable {
     }
 //
 //    @SuppressWarnings("unchecked")
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseData<String> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
         try {
             log.info("Request update brand: {}",userDTO.getUserName());
@@ -80,7 +80,7 @@ public class UserController implements Serializable {
     }
 //
 //    @SuppressWarnings("unchecked")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseData<String> deleteUser(@PathVariable Long id) {
         try {
             UserDTO user = userService.getUserById(id);

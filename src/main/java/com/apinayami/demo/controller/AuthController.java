@@ -11,6 +11,8 @@ import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.UserMapper;
 import com.apinayami.demo.service.IUserService;
 import com.apinayami.demo.service.Impl.LoginService;
+import com.apinayami.demo.service.Impl.RefreshTokenService;
+import com.apinayami.demo.service.Impl.SignupService;
 import com.apinayami.demo.util.SecurityUtil;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
@@ -48,45 +50,28 @@ public class AuthController {
         return new ResponseData<>(HttpStatus.CREATED.value(), "Login Successfully",resLoginDTO);
     }
 
-    private final IUserService userService;
-    private final UserMapper userMapper;
+    private final SignupService signupService;
     @PostMapping("/api/signup")
     public ResponseData<Void> signup(@RequestBody SignupDTO signupDTO) {
-
-        try {
-            if(signupDTO == null){
-                return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Vui lòng điền đầy đủ thông tin");
+        try{
+            boolean isRegistered = signupService.register(signupDTO);
+            if(isRegistered) {
+                return new ResponseData<>(HttpStatus.CREATED.value(), "Đăng ký thành công");
+            }else{
+                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Đăng ký không thành công");
             }
-            UserDTO userDTO = userMapper.convertSignupDtoToUserDto(signupDTO);
-            userService.create(userDTO);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Đăng ký thành công");
         } catch (Exception e) {
             if (e instanceof CustomException)
                 return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Đăng ký thất bại");
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Đăng ký không thành công");
         }
     }
 
-    private final JwtConfig jwtConfig;
-    private final SecurityUtil securityUtil;
+    private final RefreshTokenService refreshTokenService;
     @PostMapping("/api/refresh")
     public ResponseData<String> refreshToken(@RequestHeader("Authorization") String authHeader) {
         try {
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Missing or invalid Authorization header");
-            }
-
-            String refreshToken = authHeader.substring(7);
-
-            Jwt decodedToken = jwtConfig.decodeToken(refreshToken);
-            String email = decodedToken.getSubject();
-            List<String> roles = decodedToken.getClaim("role_of_user");
-            Collection<GrantedAuthority> authorities = roles.stream()
-                    .map(role -> role)
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-            Authentication authentication = new UsernamePasswordAuthenticationToken(email,null,authorities);
-            String newAccessToken = securityUtil.createToken(authentication);
+            String newAccessToken = refreshTokenService.createNewAccessToken(authHeader);
             return new ResponseData<>(HttpStatus.CREATED.value(), "New access token",newAccessToken);
         } catch (Exception e) {
             System.out.println(e.getMessage());
