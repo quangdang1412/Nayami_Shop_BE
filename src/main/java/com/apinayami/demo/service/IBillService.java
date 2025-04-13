@@ -32,4 +32,6 @@ public interface IBillService {
     DashBoardResponseDTO getRevenueByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
 
     DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
+
+    
 } 

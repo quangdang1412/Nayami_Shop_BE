@@ -32,7 +32,7 @@ public class DashboardController {
             return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully",
                     ChartCardDTO.builder()
                             .quantityProduct(productService.getQuantityOfProduct())
-                            .quantityBillNeedToProcess(billService.countBillsByStatus(EBillStatus.PENDING) + billService.countBillsByStatus(EBillStatus.CONFIRMED))
+                            .quantityBillNeedToProcess(billService.countBillsByStatus(EBillStatus.PENDING) + billService.countBillsByStatus(EBillStatus.SHIPPING))
                             .totalProfit(billService.totalProfit(EBillStatus.COMPLETED))
                             .totalRevenue(billService.totalRevenue(EBillStatus.COMPLETED))
                             .build());

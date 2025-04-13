@@ -100,8 +100,7 @@ public class CouponServiceImpl implements ICouponService {
             coupon.setCustomerModel(customer);
         }
         
-        CouponModel savedCoupon = couponRepository.save(coupon);
-        return couponMapper.toDto(savedCoupon);
+        return couponMapper.toDto(couponRepository.save(coupon));
     }
     
     @Transactional
