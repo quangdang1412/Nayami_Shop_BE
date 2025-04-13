@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.sound.sampled.Line;
 
+import com.apinayami.demo.dto.response.*;
 import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,9 +18,6 @@ import org.springframework.stereotype.Service;
 
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartPaymentDTO;
-import com.apinayami.demo.dto.response.BillResponseDTO;
-import com.apinayami.demo.dto.response.DashBoardResponseDTO;
-import com.apinayami.demo.dto.response.HistoryOrderDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.AddressMapper;
@@ -225,24 +223,53 @@ public class BillServiceImpl implements IBillService {
         return dtos;
     }
 
+    @Override
+    public List<BillDTO> getAllBills() {
+        List<BillModel> billModelList = billRepository.findAll();
+        return billModelList.stream().map(billMapper::toBillDTOFull).collect(Collectors.toList());
+    }
+
     @Transactional
-    public void cancelBill(String email, Long billId) {
-        if (email == null) {
-            throw new ResourceNotFoundException("Vui lòng đăng nhập");
+    public String cancelBill(String email, Long billId) {
+        try{
+            if (email == null) {
+                throw new ResourceNotFoundException("Vui lòng đăng nhập");
+            }
+            UserModel customer = userRepository.getUserByEmail(email);
+            if (customer == null) {
+                throw new ResourceNotFoundException("User not found");
+            }
+            BillModel bill = billRepository.findByIdAndCustomerModel(billId, customer);
+            if (bill == null) {
+                throw new ResourceNotFoundException("Bill not found with id: " + billId);
+
+            }
+            if (bill.getStatus() == EBillStatus.CANCELLED) {
+                throw new ResourceNotFoundException("Bill is already cancelled");
+            }
+            if(bill.getStatus() == EBillStatus.PENDING) {
+                bill.setStatus(EBillStatus.CANCELLED);
+                billRepository.save(bill);
+                return "Đơn hàng hủy thành công";
+            }
+            return "Lỗi hủy đơn hàng";
         }
+        catch (Exception e){
+            throw new CustomException("Lỗi hủy đơn hàng");
+        }
+    }
+
+    @Override
+    public void updateBill(String email, Long billId, String status) {
         UserModel customer = userRepository.getUserByEmail(email);
-        if (customer == null) {
-            throw new ResourceNotFoundException("User not found");
-        }
         BillModel bill = billRepository.findByIdAndCustomerModel(billId, customer);
-        if (bill == null) {
-            throw new ResourceNotFoundException("Bill not found with id: " + billId);
-
+        for (EBillStatus billStatus : EBillStatus.values()) {
+            if (billStatus.name().equalsIgnoreCase(status)) {
+                bill.setStatus(billStatus);
+                billRepository.save(bill);
+                break;
+            }
         }
-        if (bill.getStatus() == EBillStatus.CANCELLED) {
-            throw new ResourceNotFoundException("Bill is already cancelled");
-        }
-
     }
 
     @Transactional
@@ -365,4 +392,10 @@ public class BillServiceImpl implements IBillService {
                 .data(data)
                 .build();
     }
+
+    @Override
+    public BillDetailDTO getBillByID(Long id) {
+        return billMapper.toBillDetailDTO(billRepository.findById(id).orElse(null));
+    }
+
 }

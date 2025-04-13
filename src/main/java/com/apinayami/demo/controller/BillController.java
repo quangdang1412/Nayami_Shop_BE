@@ -3,9 +3,7 @@ package com.apinayami.demo.controller;
 import com.apinayami.demo.config.JwtConfig;
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartPaymentDTO;
-import com.apinayami.demo.dto.response.BillResponseDTO;
-import com.apinayami.demo.dto.response.HistoryOrderDTO;
-import com.apinayami.demo.dto.response.ResponseData;
+import com.apinayami.demo.dto.response.*;
 import com.apinayami.demo.service.IBillService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -99,4 +97,47 @@ public class BillController {
         return new ResponseData<>(HttpStatus.OK.value(), "Trạng thái thanh toán không hợp lệ");
 
     }
+    @PostMapping("/cancel")
+    public ResponseData<?> cancelBill(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                      @RequestBody Map<String, Object> billID){
+        String email = extractUserEmail(authHeader);
+        try{
+            System.out.println("Received billID: " + billID.get("billID"));
+            billService.cancelBill(email, Long.parseLong(billID.get("billID").toString()));
+            return new ResponseData<>(HttpStatus.OK.value(), "Hủy đơn hàng thành công");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        }
+    }
+
+    @PostMapping("/status")
+    public ResponseData<?> updateStatus(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                      @RequestBody Map<String, Object> billUpdate){
+        String email = extractUserEmail(authHeader);
+        try{
+            System.out.println("Received billID: " + billUpdate.get("billID"));
+            billService.updateBill(email, Long.parseLong(billUpdate.get("billID").toString()), billUpdate.get("status").toString());
+            return new ResponseData<>(HttpStatus.OK.value(), "Cập nhật đơn hàng thành công");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        }
+    }
+
+    @GetMapping()
+    public ResponseData<?> getAllBill(){
+//        try{
+            List<BillDTO> billDTOList = billService.getAllBills();
+            return new ResponseData<>(HttpStatus.OK.value(), "Danh sách đơn hàng", billDTOList);
+//        }
+//        catch (Exception e) {
+//            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+//        }
+    }
+    @GetMapping("/{id}")
+    public ResponseData<?> getBillById(@PathVariable("id") Long id){
+        BillDetailDTO billDetail = billService.getBillByID(id);
+        return new ResponseData<>(HttpStatus.OK.value(), "Đơn hàng", billDetail);
+    }
+
+
 }
