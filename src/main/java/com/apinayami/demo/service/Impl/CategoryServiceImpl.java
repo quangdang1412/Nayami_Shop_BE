@@ -34,8 +34,8 @@ public class CategoryServiceImpl implements ICategoryService {
     private final BrandMapper brandMapper;
 
     @Override
-    public CategoryModel findCategoryById(long id) {
-        return categoryRepository.findById(id).isPresent() ? categoryRepository.findById(id).get() : null;
+    public CategoryDTO findCategoryById(long id) {
+        return categoryRepository.findById(id).isPresent() ? CategoryMapper.INSTANCE.toCategoryDTO(categoryRepository.findById(id).get()) : null;
     }
 
     @Override
@@ -58,28 +58,37 @@ public class CategoryServiceImpl implements ICategoryService {
         return categoryWithBrandsDTOList;
     }
 
-        @Override
-        public List<CategoryDTO> getAll() {
-            return categoryRepository.findAll().stream().map(categoryMapper::toCategoryDTO)
-                    .collect(Collectors.toList());
-        }
+    @Override
+    public List<CategoryDTO> getAll() {
+        List<CategoryModel> categoryModelList = categoryRepository.findAll();
+        return categoryModelList.stream().map(categoryMapper::toCategoryDTO)
+                .collect(Collectors.toList());
+    }
 
     @Override
-    public String create(CategoryModel a) {
+    public String create(CategoryDTO a) {
         try {
-            categoryRepository.save(a);
-            return "Thêm thành công " + a.getCategoryName();
+            boolean checkExists = categoryRepository.existsByCategoryName(a.getCategoryName());
+            if(checkExists){
+                throw new CustomException("Category has existed");
+            }
+            CategoryModel savedCategory = categoryRepository.save(CategoryMapper.INSTANCE.toCategoryModel(a));
+            return "Thêm thành công " + savedCategory.getCategoryName();
 
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
-            throw new CustomException("Category has existed");
+            throw new CustomException("Error occurs");
         }
     }
 
     @Override
-    public String update(CategoryModel a) {
+    public String update(CategoryDTO a) {
         try {
-            categoryRepository.save(a);
+            CategoryModel found_category = categoryRepository.findById(a.getId()).orElse(null);
+            assert found_category != null;
+            found_category.setCategoryName(a.getCategoryName());
+            found_category.setActive(a.isActive());
+            categoryRepository.save(found_category);
             return "Cập nhật thành công " + a.getCategoryName();
 
         } catch (Exception e) {
@@ -89,9 +98,11 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public String delete(CategoryModel a) {
+    public String delete(CategoryDTO a) {
         try {
-            categoryRepository.delete(a);
+            CategoryModel found_category = categoryRepository.findById(a.getId()).orElse(null);
+            assert found_category != null;
+            categoryRepository.delete(found_category);
             return "Xoá thành công " + a.getCategoryName();
 
         } catch (Exception e) {

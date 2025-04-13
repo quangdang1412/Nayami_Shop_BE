@@ -6,8 +6,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-@Getter
-@Setter
+@Data
 @Entity
 @SuperBuilder
 @NoArgsConstructor
@@ -24,6 +23,4 @@ public class CommentModel extends AbstractEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private UserModel customerModel;
-
-
 }

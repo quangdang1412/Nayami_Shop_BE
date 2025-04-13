@@ -1,0 +1,2 @@
+ghtk:
+  key: ${GHTK_KEY:}

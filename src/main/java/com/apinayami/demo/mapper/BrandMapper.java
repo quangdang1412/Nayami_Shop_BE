@@ -15,7 +15,7 @@ public class BrandMapper {
         return BrandDTO.builder()
                 .id(brand.getId())
                 .name(brand.getBrandName())
-                .quantityProduct(brand.getListProduct().size())
+                .active(brand.isActive())
                 .build();
     }
 
@@ -29,6 +29,7 @@ public class BrandMapper {
             brand.setId(dto.getId());
         }
         brand.setBrandName(dto.getName());
+        brand.setActive(dto.isActive());
         return brand;
     }
 

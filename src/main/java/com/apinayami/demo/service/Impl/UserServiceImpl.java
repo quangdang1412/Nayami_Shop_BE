@@ -61,9 +61,7 @@ public class UserServiceImpl implements IUserService {
     public String update(UserDTO userDTO) {
         try {
             UserModel userModel = userMapper.toDetailModel(userDTO);
-            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
-            userModel.setPassword(hashedPassword);
-            userModel.setActive(true);
+
             if(userModel != null){
                 userRepository.save(userModel);
             }
@@ -104,6 +102,10 @@ public class UserServiceImpl implements IUserService {
         }
         return userMapper.toDetailDto(userModel);
     }
+    @Override
+    public UserDTO getUserByEmail(String email) {
+        return userMapper.toDetailDto(userRepository.findByEmail(email));
+    }
 
     @Override
     public boolean checkUserExistByEmail(String email) {
@@ -112,7 +114,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public boolean updateUserPassword(ResetPasswordDTO resetPasswordDTO,String authHeader) {
+    public boolean updateUserPassword(ResetPasswordDTO resetPasswordDTO, String authHeader) {
         String email = getEmailFromToken(authHeader);
         if(email != "") {
             try{

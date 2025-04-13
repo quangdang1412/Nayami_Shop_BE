@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -33,17 +34,19 @@ public class BrandController {
     @GetMapping
     public ResponseData<List<BrandDTO>> getAllBrands() {
         List<BrandDTO> brands = brandService.getAllBrand();
-    
+
         return new ResponseData<>(HttpStatus.OK.value(), "Success", brands);
     }
 
     @Operation(summary = "Get brand by ID", description = "Returns a specific brand by its ID")
     @GetMapping("/{id}")
-    public ResponseData<BrandDTO> getBrandById(@PathVariable Long id) {
-        BrandModel brand = brandService.findBrandById(id);
-        return brand != null 
-            ? new ResponseData<>(HttpStatus.OK.value(), "Success", brandMapper.toDetailDto(brand)) 
-            : new ResponseData<>(HttpStatus.NOT_FOUND.value(), "Brand not found", null);
+    public ResponseData<?> getBrandById(@PathVariable Long id) {
+        log.info("Request get brand by id: {}", id.toString());
+        BrandDTO brand = brandService.findBrandByIdDTO(id);
+        if (brand == null) {
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), "Brand not found");
+        }
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", brand);
     }
 
     @Operation(summary = "Create new brand", description = "Creates a new brand with the provided information")
@@ -52,9 +55,7 @@ public class BrandController {
     public ResponseData<String> createBrand(@Valid @RequestBody BrandDTO brandDTO) {
         try {
             log.info("Request add brand: {}", brandDTO.getName());
-            BrandModel brandModel = new BrandModel();
-            brandModel.setBrandName(brandDTO.getName());
-            brandService.create(brandModel);
+            brandService.create(brandDTO);
             return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + brandDTO.getName());
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
@@ -65,19 +66,12 @@ public class BrandController {
     }
 
     @Operation(summary = "Update brand", description = "Updates an existing brand with the provided information")
-    @SuppressWarnings("unchecked")
     @PutMapping("/{id}")
-    public ResponseData<String> updateBrand(@PathVariable Long id, @Valid @RequestBody BrandDTO brandDTO) {
+    public ResponseData<?> updateBrand(@PathVariable Long id, @Valid @RequestBody BrandDTO brandDTO) {
         try {
             log.info("Request update brand: {}", brandDTO.getName());
-            BrandModel existingBrand = brandService.findBrandById(id);
-            if (existingBrand == null) {
-                return new ResponseError(HttpStatus.NOT_FOUND.value(), "Brand not found");
-            }
 
-            existingBrand.setBrandName(brandDTO.getName());
-
-            brandService.update(existingBrand);
+            brandService.update(brandDTO,id);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + brandDTO.getName());
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
@@ -87,17 +81,13 @@ public class BrandController {
         }
     }
 
-    @Operation(summary = "Delete brand", description = "Deletes a brand by its ID")
-    @SuppressWarnings("unchecked")
+    @Operation(summary = "Change status brand", description = "Deletes a brand by its ID")
     @DeleteMapping("/{id}")
-    public ResponseData<String> deleteBrand(@PathVariable Long id) {
+    public ResponseData<?> deleteBrand(@PathVariable Long id) {
         try {
-            BrandModel brand = brandService.findBrandById(id);
-            if (brand == null) {
-                return new ResponseError(HttpStatus.NOT_FOUND.value(), "Brand not found");
-            }
-            brandService.delete(brand);
-            return new ResponseData<>(HttpStatus.OK.value(), "Success", "Xóa thành công " + brand.getBrandName());
+            brandService.delete(id);
+            return new ResponseData<>(HttpStatus.OK.value(), "Success",
+                    "Thay đổi trạng thái thành công " );
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
             if (e instanceof CustomException)

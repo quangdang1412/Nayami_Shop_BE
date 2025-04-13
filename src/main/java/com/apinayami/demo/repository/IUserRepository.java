@@ -13,4 +13,6 @@ public interface IUserRepository extends JpaRepository<UserModel,Long> {
     List<UserModel> getAllByType(Role role);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
+    UserModel getUserByEmail(String email);
+    
 }

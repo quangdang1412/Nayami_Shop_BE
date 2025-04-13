@@ -15,7 +15,6 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class CartItemModel extends AbstractEntity<Long> {
     private Integer quantity;
-    private Double unitPrice;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

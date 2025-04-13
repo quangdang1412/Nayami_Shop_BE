@@ -5,8 +5,14 @@ import com.apinayami.demo.model.BrandModel;
 
 import java.util.List;
 
-public interface IBrandService extends IBaseCRUD<BrandModel> {
+public interface IBrandService {
     List<BrandDTO> getAllBrand();
 
+    BrandDTO findBrandByIdDTO(Long id);
     BrandModel findBrandById(Long id);
+
+    String create (BrandDTO a);
+    String update (BrandDTO a,Long id);
+    String delete (Long a);
+
 }
