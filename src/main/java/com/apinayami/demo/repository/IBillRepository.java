@@ -36,4 +36,6 @@ public interface IBillRepository extends JpaRepository<BillModel, Long> {
     List<BillModel> findByPaymentModel_PaymentStatusAndCreatedAtBefore(EPaymentStatus pending,LocalDateTime cutoffTime);
 
     List<BillModel> findByStatusAndUpdatedAtBefore(EBillStatus shipped, LocalDateTime cutoffTime);
+    
+    List<BillModel> findAllByOrderByCreatedAtDesc();
 }
