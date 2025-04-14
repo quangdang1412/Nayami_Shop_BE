@@ -459,5 +459,26 @@ public class BillServiceImpl implements IBillService {
     public BillDetailDTO getBillByID(Long id) {
         return billMapper.toBillDetailDTO(billRepository.findById(id).orElse(null));
     }
+    @Transactional
+    public String RequestGuarantee(String email, Long billId){
+        if (email == null) {
+            throw new ResourceNotFoundException("Vui lòng đăng nhập");
+        }
+        UserModel customer = userRepository.getUserByEmail(email);
+        if (customer == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        BillModel bill = billRepository.findByIdAndCustomerModel(billId, customer);
+        if (bill == null) {
+            throw new ResourceNotFoundException("Bill not found with id: " + billId);
+
+        }
+        if (bill.getStatus() != EBillStatus.SHIPPED) {
+            throw new ResourceNotFoundException("Bill is not completed yet");
+        }
+        bill.setStatus(EBillStatus.GUARANTEE);
+        billRepository.save(bill);
+        return "Đơn hàng đã được yêu cầu bảo hành";
+    }
 
 }

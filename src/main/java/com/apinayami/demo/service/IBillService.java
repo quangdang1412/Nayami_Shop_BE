@@ -32,4 +32,6 @@ public interface IBillService {
     DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
 
     BillDetailDTO getBillByID(Long id);
+
+    String RequestGuarantee(String email, Long billId);
 } 
