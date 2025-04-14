@@ -240,7 +240,7 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public List<BillDTO> getAllBills() {
-        List<BillModel> billModelList = billRepository.findAll();
+        List<BillModel> billModelList = billRepository.findAllByOrderByCreatedAtDesc();
         return billModelList.stream().map(billMapper::toBillDTOFull).collect(Collectors.toList());
     }
 
