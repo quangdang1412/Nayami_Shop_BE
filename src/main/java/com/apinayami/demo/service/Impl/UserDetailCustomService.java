@@ -1,5 +1,7 @@
 package com.apinayami.demo.service.Impl;
 
+import com.apinayami.demo.exception.CustomException;
+import com.apinayami.demo.model.CustomUserDetail;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.util.Enum.Role;
@@ -25,12 +27,15 @@ public class UserDetailCustomService implements UserDetailsService {
         UserModel userModel = userRepository.findByEmail(email);
 
         if(userModel == null) {
-            throw new UsernameNotFoundException(email);
+            System.out.println("User not found");
+            throw new UsernameNotFoundException("User not found");
         }
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userModel.getType().name());
-        return User.builder().
-                username(userModel.getEmail()).
-                password(userModel.getPassword()).
-                authorities(authority.getAuthority()).build();
+        return new CustomUserDetail(
+                userModel.getEmail(),
+                userModel.getPassword(),
+                Collections.singletonList(authority),
+                userModel.getUsername()
+        );
     }
 }

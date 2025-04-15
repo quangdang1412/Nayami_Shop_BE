@@ -100,15 +100,19 @@ public class CouponServiceImpl implements ICouponService {
             coupon.setCustomerModel(customer);
         }
         
-        CouponModel savedCoupon = couponRepository.save(coupon);
-        return couponMapper.toDto(savedCoupon);
+        return couponMapper.toDto(couponRepository.save(coupon));
     }
     
     @Transactional
     public void deleteCoupon(String id) {
         CouponModel coupon = couponRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
-        coupon.setActive(false);
+        if (coupon.isActive()) {
+            coupon.setActive(false);
+        } else {
+            coupon.setActive(true);
+            
+        }
         couponRepository.save(coupon);
     }
     

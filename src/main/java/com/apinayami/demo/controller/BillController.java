@@ -3,22 +3,25 @@ package com.apinayami.demo.controller;
 import com.apinayami.demo.config.JwtConfig;
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartPaymentDTO;
-import com.apinayami.demo.dto.response.BillResponseDTO;
-import com.apinayami.demo.dto.response.HistoryOrderDTO;
-import com.apinayami.demo.dto.response.ResponseData;
+import com.apinayami.demo.dto.response.*;
 import com.apinayami.demo.service.IBillService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/bills")
+
 @SecurityRequirement(name = "bearerAuth")
 public class BillController {
     private final IBillService billService;
@@ -88,7 +91,6 @@ public class BillController {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập");
         }
         if ("CANCELLED".equalsIgnoreCase(status) || "true".equalsIgnoreCase(cancel)) {
-            billService.cancelBill(email, orderID);
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Xử lý thanh toán thất bại");
         }
 
@@ -99,4 +101,60 @@ public class BillController {
         return new ResponseData<>(HttpStatus.OK.value(), "Trạng thái thanh toán không hợp lệ");
 
     }
+    @PostMapping("/cancel")
+    public ResponseData<?> cancelBill(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                      @RequestBody Map<String, Object> billID){
+        String email = extractUserEmail(authHeader);
+        try{
+            System.out.println("Received billID: " + billID.get("billID"));
+            billService.cancelBill(email, Long.parseLong(billID.get("billID").toString()));
+            return new ResponseData<>(HttpStatus.OK.value(), "Hủy đơn hàng thành công");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        }
+    }
+
+    @PostMapping("/status")
+    public ResponseData<?> updateStatus(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                      @RequestBody Map<String, Object> billUpdate){
+        String email = extractUserEmail(authHeader);
+        try{
+            System.out.println("Received billID: " + billUpdate.get("billID"));
+            billService.updateBill(email, Long.parseLong(billUpdate.get("billID").toString()), billUpdate.get("status").toString());
+            return new ResponseData<>(HttpStatus.OK.value(), "Cập nhật đơn hàng thành công");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        }
+    }
+
+    @GetMapping()
+    public ResponseData<?> getAllBill(){
+//        try{
+            List<BillDTO> billDTOList = billService.getAllBills();
+            return new ResponseData<>(HttpStatus.OK.value(), "Danh sách đơn hàng", billDTOList);
+//        }
+//        catch (Exception e) {
+//            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+//        }
+    }
+    @GetMapping("/{id}")
+    public ResponseData<?> getBillById(@PathVariable("id") Long id){
+        BillDetailDTO billDetail = billService.getBillByID(id);
+        return new ResponseData<>(HttpStatus.OK.value(), "Đơn hàng", billDetail);
+    }
+    @PostMapping("/guarantee")
+    public ResponseData<?> RequestGuarantee(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                            @RequestBody Map<String, Object> billID) {
+        String email = extractUserEmail(authHeader);
+        try {
+            log.info("Received billID: " + billID.get("billID"));
+            billService.RequestGuarantee(email, Long.parseLong(billID.get("billID").toString()));
+            return new ResponseData<>(HttpStatus.OK.value(), "Yêu cầu bảo hành thành công");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        }
+    }
+    
+
+
 }

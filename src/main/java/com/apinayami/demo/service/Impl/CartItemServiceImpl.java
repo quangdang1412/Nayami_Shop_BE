@@ -47,7 +47,8 @@ public class CartItemServiceImpl implements ICartItemService {
         UserModel user = userRepository.getUserByEmail(email);
         if (user == null) {
             throw new ResourceNotFoundException("User not found");
-        }        ProductModel product = getProductById(request.getProductId());
+        }        
+        ProductModel product = getProductById(request.getProductId());
 
         CartItemModel cartItem = cartItemRepository
                 .findByCustomerModelAndProductModel(user, product)
@@ -57,7 +58,6 @@ public class CartItemServiceImpl implements ICartItemService {
             cartItem = cartItemMapper.toCartItemModel(request);
             cartItem.setCustomerModel(user);
             cartItem.setProductModel(product);
-            cartItem.setUnitPrice(product.getUnitPrice());
         } else {
             cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
         }
@@ -71,7 +71,8 @@ public class CartItemServiceImpl implements ICartItemService {
         UserModel user = userRepository.getUserByEmail(email);
         if (user == null) {
             throw new ResourceNotFoundException("User not found");
-        }        CartItemModel cartItem = cartItemRepository.findById(cartItemId)
+        }        
+        CartItemModel cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
         
         if (!cartItem.getCustomerModel().getId().equals(user.getId())) {
@@ -93,7 +94,8 @@ public class CartItemServiceImpl implements ICartItemService {
         UserModel user = userRepository.getUserByEmail(email);
         if (user == null) {
             throw new ResourceNotFoundException("User not found");
-        }        CartItemModel cartItem = cartItemRepository.findById(cartItemId)
+        }        
+        CartItemModel cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
 
         if (!cartItem.getCustomerModel().getId().equals(user.getId())) {
@@ -102,17 +104,6 @@ public class CartItemServiceImpl implements ICartItemService {
 
         cartItemRepository.delete(cartItem);
     }
-
-    @Transactional
-    public void clearCart(String email) {
-        UserModel user = userRepository.getUserByEmail(email);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found");
-        }        cartItemRepository.deleteByCustomerModel(user);
-    }
-
-    
-
     private ProductModel getProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));

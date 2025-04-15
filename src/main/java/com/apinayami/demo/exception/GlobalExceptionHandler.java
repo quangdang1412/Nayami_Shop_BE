@@ -5,6 +5,9 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,7 +21,7 @@ import java.util.Date;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class,
-            IllegalArgumentException.class, PropertyReferenceException.class,})
+            IllegalArgumentException.class, PropertyReferenceException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlerValidationException(Exception e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -60,6 +63,26 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNotFoundException(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)  // Hoặc HttpStatus.NOT_FOUND tùy vào cách bạn xử lý
+    public ErrorResponse handleUsernameNotFoundException(UsernameNotFoundException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setError("Unauthorized");
+        errorResponse.setMessage(ex.getMessage());
+        return errorResponse;
+    }
+//    @ExceptionHandler(JwtValidationException.class)
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    public ErrorResponse handleJwtException(JwtValidationException ex) {
+//        ErrorResponse errorResponse = new ErrorResponse();
+//        errorResponse.setTimestamp(new Date());
+//        errorResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+//        errorResponse.setError("Bad credentials");
+//        errorResponse.setMessage(ex.getMessage());
+//        return errorResponse;
+//    }
 
 
 }

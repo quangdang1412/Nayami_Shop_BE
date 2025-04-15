@@ -6,11 +6,11 @@ import com.apinayami.demo.model.CategoryModel;
 
 import java.util.List;
 
-public interface ICategoryService extends IBaseCRUD<CategoryModel> {
+public interface ICategoryService extends IBaseCRUD<CategoryDTO> {
 
     List<CategoryDTO> getAll();
 
-    CategoryModel findCategoryById(long id);
+    CategoryDTO findCategoryById(long id);
 
     List<CategoryWithBrandsDTO> getAllCategoriesWithBrands();
 

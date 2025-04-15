@@ -14,6 +14,7 @@ public interface LineItemMapper {
 
     @Mapping(source = "productModel.productName", target = "productName")
     @Mapping(source = "productModel.listImage", target = "productImage", qualifiedByName = "getFirstImage")
+    @Mapping(source = "productModel.id", target = "productId")
     LineItemReponseDTO toDto(LineItemModel lineItem);
 
     List<LineItemReponseDTO> toDtoList(List<LineItemModel> lineItems);

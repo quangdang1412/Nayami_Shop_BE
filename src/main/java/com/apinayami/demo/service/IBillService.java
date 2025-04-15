@@ -2,6 +2,7 @@ package com.apinayami.demo.service;
 
 import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.dto.request.CartPaymentDTO;
+import com.apinayami.demo.dto.response.*;
 import com.apinayami.demo.dto.response.BillResponseDTO;
 import com.apinayami.demo.dto.response.DashBoardResponseDTO;
 import com.apinayami.demo.dto.response.HistoryOrderDTO;
@@ -17,10 +18,10 @@ public interface IBillService {
     BillResponseDTO getBill(String email, CartPaymentDTO request);
 
     List<HistoryOrderDTO> getBillHistory(String email);
+    List<BillDTO> getAllBills();
 
-    ;
-
-    void cancelBill(String email, Long billId);
+    String cancelBill(String email, Long billId);
+    void updateBill(String email, Long billId, String status);
 
     void confirmBill(String email, Long billId);
 
@@ -30,7 +31,12 @@ public interface IBillService {
 
     Double totalProfit(EBillStatus status);
 
-    DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status, int i);
+    DashBoardResponseDTO getRevenueByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
 
+    DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
+
+    BillDetailDTO getBillByID(Long id);
+
+    String RequestGuarantee(String email, Long billId);
     List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
-} 
+}

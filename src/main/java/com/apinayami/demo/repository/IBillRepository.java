@@ -39,4 +39,10 @@ public interface IBillRepository extends JpaRepository<BillModel, Long> {
             "GROUP BY p.productName " +
             "ORDER BY totalQuantity DESC")
     List<Object[]> topSeller(LocalDateTime startDate, LocalDateTime endDate, @Param("status") EBillStatus status);
+
+    List<BillModel> findByPaymentModel_PaymentStatusAndCreatedAtBefore(EPaymentStatus pending,LocalDateTime cutoffTime);
+
+    List<BillModel> findByStatusAndUpdatedAtBefore(EBillStatus shipped, LocalDateTime cutoffTime);
+
+    List<BillModel> findAllByOrderByCreatedAtDesc();
 }

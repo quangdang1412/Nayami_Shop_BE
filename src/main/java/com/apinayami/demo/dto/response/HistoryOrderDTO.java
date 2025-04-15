@@ -1,6 +1,6 @@
 package com.apinayami.demo.dto.response;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.apinayami.demo.util.Enum.EBillStatus;
@@ -18,6 +18,6 @@ public class HistoryOrderDTO  {
     private EPaymentMethod paymentMethod;
     private EBillStatus status;
     private String orderNumber;
-    private Date createdAt;
+    private LocalDateTime createdAt;
     private EPaymentStatus paymentStatus;
 }

@@ -55,7 +55,6 @@ public class DiscountCampaignController {
         try {
             log.info("Request update active : {}", proID);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", discountCampaignService.delete(proID));
-
         } catch (Exception e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
