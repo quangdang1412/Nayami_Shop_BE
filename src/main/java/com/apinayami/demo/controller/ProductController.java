@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -74,10 +75,22 @@ public class ProductController {
 
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     @GetMapping()
     public ResponseData<?> getAllProduct() {
         try {
             return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getAllProduct());
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
+    @GetMapping("/displayStatus/1")
+    public ResponseData<?> getAllProductDisplayStatusTrue() {
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getAllProductDisplayStatusTrue());
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());

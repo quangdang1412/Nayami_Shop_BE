@@ -22,6 +22,8 @@ public interface IProductService {
 
     List<ProductDTO> getAllProduct();
 
+    List<ProductDTO> getAllProductDisplayStatusTrue();
+
     PagedModel<?> getProductFilter(int pageNo, int pageSize, String sortByList, List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery, List<Integer> price);
 
     List<ProductDTO> getProductsHaveDiscount();
