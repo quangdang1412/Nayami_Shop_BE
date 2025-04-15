@@ -262,12 +262,9 @@ public class BillServiceImpl implements IBillService {
             if (bill.getStatus() == EBillStatus.CANCELLED) {
                 throw new ResourceNotFoundException("Bill is already cancelled");
             }
-            if(bill.getStatus() == EBillStatus.PENDING) {
-                bill.setStatus(EBillStatus.CANCELLED);
-                billRepository.save(bill);
-                return "Đơn hàng hủy thành công";
-            }
-            return "Lỗi hủy đơn hàng";
+            bill.setStatus(EBillStatus.CANCELLED);
+            billRepository.save(bill);
+            return "Đơn hàng hủy thành công";
         }
         catch (Exception e){
             throw new CustomException("Lỗi hủy đơn hàng");

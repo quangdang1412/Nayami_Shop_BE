@@ -101,9 +101,8 @@ public class BillController {
                                       @RequestBody Map<String, Object> billID){
         String email = extractUserEmail(authHeader);
         try{
-            System.out.println("Received billID: " + billID.get("billID"));
-            billService.cancelBill(email, Long.parseLong(billID.get("billID").toString()));
-            return new ResponseData<>(HttpStatus.OK.value(), "Hủy đơn hàng thành công");
+            String result = billService.cancelBill(email, Long.parseLong(billID.get("billID").toString()));
+            return new ResponseData<>(HttpStatus.OK.value(), result);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
@@ -112,7 +111,7 @@ public class BillController {
     @PostMapping("/status")
     public ResponseData<?> updateStatus(@RequestHeader(value = "Authorization", required = false) String authHeader,
                                       @RequestBody Map<String, Object> billUpdate){
-        String email = extractUserEmail(authHeader);
+        String email = billUpdate.get("email").toString();
         try{
             System.out.println("Received billID: " + billUpdate.get("billID"));
             billService.updateBill(email, Long.parseLong(billUpdate.get("billID").toString()), billUpdate.get("status").toString());
