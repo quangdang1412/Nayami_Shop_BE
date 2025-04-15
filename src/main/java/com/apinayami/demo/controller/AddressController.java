@@ -4,7 +4,6 @@ import com.apinayami.demo.config.JwtConfig;
 import com.apinayami.demo.dto.request.AddressRequestDTO;
 import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResponseData;
-import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.service.IAddressService;
 import com.apinayami.demo.service.IUserService;
 
@@ -38,8 +37,12 @@ public class AddressController {
         if (email == null) {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xem danh sách địa chỉ");
         }
+        UserDTO user = userService.getUserByEmail(email);
+        if (user == null) {
+            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Người dùng không tồn tại");
+        }
 
-        return new ResponseData<>(HttpStatus.OK.value(), "Lấy dữ liệu thành công", addressService.getAllAddresses());
+        return new ResponseData<>(HttpStatus.OK.value(), "Lấy dữ liệu thành công", addressService.getAddressByCustomerId(user.getUserId()));
     }
 
     @GetMapping("/{id}")
