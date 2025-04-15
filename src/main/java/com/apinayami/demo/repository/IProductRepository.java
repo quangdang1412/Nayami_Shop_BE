@@ -25,4 +25,6 @@ public interface IProductRepository extends JpaRepository<ProductModel, Long>, J
 
     @Query("SELECT COUNT(d) FROM ProductModel d")
     Long getQuantityOfProduct();
+
+    List<ProductModel> findProductModelsByDisplayStatusIsTrue();
 }

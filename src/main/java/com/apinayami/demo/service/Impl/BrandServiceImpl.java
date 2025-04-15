@@ -94,7 +94,12 @@ public class BrandServiceImpl implements IBrandService {
                 throw new CustomException("Brand not found");
             }
             log.info("Deleting brand: {}", brandModel.getBrandName());
-            brandModel.setActive(false);
+            if (brandModel.isActive()) {
+                brandModel.setActive(false);
+            } else {
+                brandModel.setActive(true);
+                
+            }
             brandRepository.save(brandModel);
             return "Thay đổi trạng thái thành công " + brandModel.getBrandName();
         } catch (Exception e) {

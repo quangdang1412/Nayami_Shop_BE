@@ -8,6 +8,7 @@ import com.apinayami.demo.util.Enum.EPaymentMethod;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -20,6 +21,7 @@ public class BillDTO implements Serializable {
     private EPaymentMethod paymentMethod;
     private EBillStatus status;
     private String orderNumber;
+    private LocalDate createdAt;
 
     private String customerName;
     private String city;

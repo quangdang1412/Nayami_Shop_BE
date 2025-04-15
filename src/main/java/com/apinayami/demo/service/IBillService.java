@@ -14,9 +14,11 @@ public interface IBillService {
     BillResponseDTO getBill(String email, CartPaymentDTO request);
 
     List<HistoryOrderDTO> getBillHistory(String email);
+
     List<BillDTO> getAllBills();
 
     String cancelBill(String email, Long billId);
+
     void updateBill(String email, Long billId, String status);
 
     void confirmBill(String email, Long billId);
@@ -32,4 +34,10 @@ public interface IBillService {
     DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
 
     BillDetailDTO getBillByID(Long id);
-} 
+
+    String RequestGuarantee(String email, Long billId);
+
+    List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
+
+    DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status, int a);
+}

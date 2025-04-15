@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,7 +32,7 @@ public class WebSecurityConfig {
             "/api/check-email-exist",
             "/api/reset-password",
             "/api/categories/**",
-            "/api/products",
+
             //Swagger
             "/swagger-ui/**",
             "/v3/api-docs/**",
@@ -57,10 +58,12 @@ public class WebSecurityConfig {
 
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(PUBLIC_API).permitAll()
                         .requestMatchers(ADMIN_API).hasAuthority("ADMIN")
                         .requestMatchers(CUSTOMER_API).hasAuthority("CUSTOMER")
