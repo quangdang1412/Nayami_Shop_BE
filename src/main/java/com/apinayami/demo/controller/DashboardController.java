@@ -32,7 +32,7 @@ public class DashboardController {
             return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully",
                     ChartCardDTO.builder()
                             .quantityProduct(productService.getQuantityOfProduct())
-                            .quantityBillNeedToProcess(billService.countBillsByStatus(EBillStatus.PENDING) + billService.countBillsByStatus(EBillStatus.SHIPPING))
+                            .quantityBillNeedToProcess(billService.countBillsByStatus(EBillStatus.PENDING) + billService.countBillsByStatus(EBillStatus.CONFIRMED))
                             .totalProfit(billService.totalProfit(EBillStatus.COMPLETED))
                             .totalRevenue(billService.totalRevenue(EBillStatus.COMPLETED))
                             .build());
@@ -47,7 +47,7 @@ public class DashboardController {
         try {
             LocalDate startDate = dashboardDateDTO.getStartDate();
             LocalDate endDate = dashboardDateDTO.getEndDate();
-            DashBoardResponseDTO dashboardResponse = billService.getRevenueByTime(startDate, endDate, EBillStatus.COMPLETED);
+            DashBoardResponseDTO dashboardResponse = billService.getRevenueOrProfitByTime(startDate, endDate, EBillStatus.COMPLETED, 0);
             return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", dashboardResponse);
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
@@ -60,7 +60,7 @@ public class DashboardController {
         try {
             LocalDate startDate = dashboardDateDTO.getStartDate();
             LocalDate endDate = dashboardDateDTO.getEndDate();
-            DashBoardResponseDTO dashboardResponse = billService.getProfitByTime(startDate, endDate, EBillStatus.COMPLETED);
+            DashBoardResponseDTO dashboardResponse = billService.getRevenueOrProfitByTime(startDate, endDate, EBillStatus.COMPLETED, 1);
             return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", dashboardResponse);
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
@@ -72,6 +72,18 @@ public class DashboardController {
     public ResponseData<?> getProductOutOfStock() {
         try {
             return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getProductOutOfStock());
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+    }
+
+    @PostMapping("/productBestSelling")
+    public ResponseData<?> getProductBestSelling(@RequestBody DashBoardDateDTO dashboardDateDTO) {
+        try {
+            LocalDate startDate = dashboardDateDTO.getStartDate();
+            LocalDate endDate = dashboardDateDTO.getEndDate();
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", billService.getProductBestSellingByTime(startDate, endDate, EBillStatus.COMPLETED));
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());

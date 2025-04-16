@@ -1,42 +1,33 @@
 package com.apinayami.demo.service.Impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.apinayami.demo.dto.request.GHTKRequestDTO;
+import com.apinayami.demo.service.IShippingSerivce;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import com.apinayami.demo.dto.request.GHTKRequestDTO;
-import com.apinayami.demo.service.IShippingSerivce;
-
-
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
+@RequiredArgsConstructor
 public class ShippingServiceImpl implements IShippingSerivce {
     private final WebClient webClient;
-    private final String apiKey;
+    @Value("${GHTK_KEY}")
+    private String apiKey;
 
-    public ShippingServiceImpl(@Value("${GHTK_KEY}") String apiKey) {
-        this.apiKey = apiKey;
+    public ShippingServiceImpl() {
         this.webClient = WebClient.builder()
                 .baseUrl("https://services.giaohangtietkiem.vn/services/shipment")
-                .defaultHeader("Token", this.apiKey)              
+                .defaultHeader("Token", this.apiKey)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
-
-    // public GHTKServiceImpl(@Value("${GHTK_KEY}") String apiKey) {
-    //     this.webClient = WebClient.builder()
-    //             .baseUrl("https://services.giaohangtietkiem.vn/services/shipment")
-    //             .defaultHeader(HttpHeaders.AUTHORIZATION, apiKey)
-    //             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-    //             .build();
-    // }
- 
+    
     public Mono<String> getShippingFee(GHTKRequestDTO request) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("pick_province", "Đồng Nai");
@@ -44,9 +35,9 @@ public class ShippingServiceImpl implements IShippingSerivce {
         requestBody.put("pick_ward", "Phường Long Bình Tân");
         requestBody.put("pick_address", "175 tổ 7 KP3A");
 
-        requestBody.put("province", request.getProvince());  
-        requestBody.put("district", request.getDistrict());  
-        requestBody.put("address", request.getAddress());   
+        requestBody.put("province", request.getProvince());
+        requestBody.put("district", request.getDistrict());
+        requestBody.put("address", request.getAddress());
 
         requestBody.put("customer_tel", "0915416485");
         requestBody.put("weight", 500);
@@ -73,5 +64,5 @@ public class ShippingServiceImpl implements IShippingSerivce {
                 .bodyToMono(String.class);
     }
 
-    
+
 }

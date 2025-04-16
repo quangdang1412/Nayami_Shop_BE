@@ -24,11 +24,10 @@ public class DiscountCampaignController {
 
     @Operation(method = "POST", summary = "Add new discountCampaign", description = "Send a request via this API to create new discountCampaign")
     @PostMapping()
-    public ResponseData<String> addDiscountCampaign(@Valid @RequestBody DiscountCampaignDTO discountCampaignDTO) {
+    public ResponseData<?> addDiscountCampaign(@Valid @RequestBody DiscountCampaignDTO discountCampaignDTO) {
         try {
             log.info("Request add discountCampaign: {}", discountCampaignDTO.getName());
-            String discountCampaignName = discountCampaignService.create(discountCampaignDTO);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", discountCampaignName);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", discountCampaignService.create(discountCampaignDTO));
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
             if (e instanceof CustomException)
@@ -39,11 +38,10 @@ public class DiscountCampaignController {
 
     @Operation(method = "PUT", summary = "Update discountCampaign", description = "Send a request via this API to update discountCampaign")
     @PutMapping()
-    public ResponseData<String> updateDiscountCampaign(@Valid @RequestBody DiscountCampaignDTO discountCampaignDTO) {
+    public ResponseData<?> updateDiscountCampaign(@Valid @RequestBody DiscountCampaignDTO discountCampaignDTO) {
         try {
             log.info("Request add discountCampaign: {}", discountCampaignDTO.getName());
-            String discountCampaignName = discountCampaignService.create(discountCampaignDTO);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", discountCampaignName);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", discountCampaignService.create(discountCampaignDTO));
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
             if (e instanceof CustomException)

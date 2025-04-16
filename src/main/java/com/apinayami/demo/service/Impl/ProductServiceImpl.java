@@ -154,6 +154,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public List<ProductDTO> getAllProductDisplayStatusTrue() {
+        return productRepository.findProductModelsByDisplayStatusIsTrue().stream().map(productMapper::convertToDTO).toList();
+    }
+
+    @Override
     public PagedModel<?> getProductFilter(int pageNo, int pageSize, String sortBy, List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery, List<Integer> price) {
         Sort sort = Sort.unsorted();
         if (sortBy != null) {
@@ -171,18 +176,18 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<ProductDTO> getProductsHaveDiscount() {
-        return productRepository.getProductModelsHaveDiscountModel().stream().map(productMapper::convertToDTO).toList();
+        return productRepository.getProductModelsHaveDiscountModel().stream().filter(ProductModel::isDisplayStatus).map(productMapper::convertToDTO).toList();
     }
 
 
     @Override
     public List<ProductDTO> findProductByCategoryId(long id) {
-        return productRepository.getProductModelsByCategoryModel_Id(id).stream().map(productMapper::convertToDTO).toList();
+        return productRepository.getProductModelsByCategoryModel_Id(id).stream().filter(ProductModel::isDisplayStatus).map(productMapper::convertToDTO).toList();
     }
 
     @Override
     public List<ProductDTO> findProductByBrandId(long id) {
-        return productRepository.getProductModelsByBrandModelId(id).stream().map(productMapper::convertToDTO).toList();
+        return productRepository.getProductModelsByBrandModelId(id).stream().filter(ProductModel::isDisplayStatus).map(productMapper::convertToDTO).toList();
     }
 
     @Override

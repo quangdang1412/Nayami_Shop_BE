@@ -7,16 +7,21 @@ import com.apinayami.demo.dto.response.*;
 import com.apinayami.demo.service.IBillService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/bills")
+
 @SecurityRequirement(name = "bearerAuth")
 public class BillController {
     private final IBillService billService;
@@ -137,6 +142,19 @@ public class BillController {
         BillDetailDTO billDetail = billService.getBillByID(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Đơn hàng", billDetail);
     }
+    @PostMapping("/guarantee")
+    public ResponseData<?> RequestGuarantee(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                            @RequestBody Map<String, Object> billID) {
+        String email = extractUserEmail(authHeader);
+        try {
+            log.info("Received billID: " + billID.get("billID"));
+            billService.RequestGuarantee(email, Long.parseLong(billID.get("billID").toString()));
+            return new ResponseData<>(HttpStatus.OK.value(), "Yêu cầu bảo hành thành công");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        }
+    }
+    
 
 
 }
