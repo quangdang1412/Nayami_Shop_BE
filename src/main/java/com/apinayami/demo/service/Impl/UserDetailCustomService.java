@@ -35,7 +35,7 @@ public class UserDetailCustomService implements UserDetailsService {
                 userModel.getEmail(),
                 userModel.getPassword(),
                 Collections.singletonList(authority),
-                userModel.getUserName()
+                userModel.getUsername()
         );
     }
 }

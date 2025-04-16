@@ -65,6 +65,9 @@ public class UserServiceImpl implements IUserService {
             if(userModel != null){
                 userRepository.save(userModel);
             }
+            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
+            userModel.setPassword(hashedPassword);
+            userRepository.save(userModel);
             return "Cập nhật thành công " +userDTO.getUserName();
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
