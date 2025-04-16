@@ -18,7 +18,12 @@ public class ProductSpecification {
             if (searchQuery == null || searchQuery.trim().isEmpty()) {
                 return null;
             }
-            return cb.like(cb.lower(root.get("productName")), "%" + searchQuery.toLowerCase() + "%");
+            String searchPattern = "%" + searchQuery.toLowerCase() + "%";
+            return cb.or(
+                    cb.like(cb.lower(root.get("productName")), searchPattern),
+                    cb.like(cb.lower(root.get("brandModel").get("brandName")), searchPattern),
+                    cb.like(cb.lower(root.get("categoryModel").get("categoryName")), searchPattern)
+            );
         };
     }
 
@@ -77,13 +82,18 @@ public class ProductSpecification {
         };
     }
 
+    public static Specification<ProductModel> isActive() {
+        return (root, query, cb) -> cb.isTrue(root.get("displayStatus"));
+    }
+
     public static Specification<ProductModel> filterProducts(List<String> brands, List<String> categories, List<Integer> rating, List<Integer> discount, String searchQuery, List<Integer> price) {
         return Specification.where(hasSearchQuery(searchQuery))
                 .and(hasPrice(price))
                 .and(hasBrands(brands))
                 .and(hasCategories(categories))
                 .and(hasMinRating(rating))
-                .and(hasDiscount(discount));
+                .and(hasDiscount(discount))
+                .and(isActive());
     }
 }
 
