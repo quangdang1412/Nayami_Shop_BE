@@ -71,13 +71,4 @@ public class AddressServiceImpl implements IAddressService  {
     }
 
 
-    @Override
-    public List<AddressResponseDTO> getAllAddresses() {
-        log.info("Fetching all addresses");
-        List<AddressModel> addresses = addressRepository.findAll();
-        return addresses.stream()
-                .map(addressMapper::toResponseDTO)
-                .toList();
-    }
-
 }
