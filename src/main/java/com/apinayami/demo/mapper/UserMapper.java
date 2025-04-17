@@ -41,6 +41,19 @@ public class UserMapper {
                 .userName(user.getUsername())
                 .build();
     }
+    public UserDTO toDetailDtoWithoutPassword(UserModel user) {
+        if (user == null) {
+            return null;
+        }
+        return UserDTO.builder()
+                .userId(user.getId())
+                .type(user.getType().toString())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .active(user.isActive())
+                .userName(user.getUsername())
+                .build();
+    }
     public UserModel toDetailModel(UserDTO user) {
         if (user == null) {
             return null;

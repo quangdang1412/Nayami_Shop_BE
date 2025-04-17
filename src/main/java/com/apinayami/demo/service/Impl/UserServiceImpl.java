@@ -10,6 +10,7 @@ import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.repository.IBrandRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.IUserService;
+import com.apinayami.demo.util.Enum.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -61,17 +62,33 @@ public class UserServiceImpl implements IUserService {
     public String update(UserDTO userDTO) {
         try {
             UserModel userModel = userMapper.toDetailModel(userDTO);
+            // Lấy user hiện tại trong DB
+            UserModel existingUser = userRepository.findById(userDTO.getUserId())
+                    .orElseThrow(() -> new CustomException("User không tồn tại"));
 
-            if(userModel != null){
-                userRepository.save(userModel);
+            // Kiểm tra trùng email (ngoại trừ chính người dùng hiện tại)
+            if(userRepository.existsByEmailAndIdNot(userModel.getEmail(), userDTO.getUserId())) {
+                throw new CustomException("Email đã tồn tại");
             }
-            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
-            userModel.setPassword(hashedPassword);
+
+            // Kiểm tra trùng số điện thoại (ngoại trừ chính người dùng hiện tại)
+            if(userRepository.existsByPhoneNumberAndIdNot(userModel.getPhoneNumber(), userDTO.getUserId())) {
+                throw new CustomException("Số điện thoại đã tồn tại");
+            }
+            if(userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+                String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
+                userModel.setPassword(hashedPassword);
+            } else {
+                // Giữ lại password cũ nếu không update
+                userModel.setPassword(existingUser.getPassword());
+            }
             userRepository.save(userModel);
             return "Cập nhật thành công " +userDTO.getUserName();
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
-            return "Lỗi khi cập nhật " + userDTO.getUserName();
+            if (e instanceof CustomException)
+                throw new CustomException(e.getMessage());
+            throw new CustomException("Update user failed");
         }
     }
 
@@ -92,18 +109,25 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().stream()
+        List<UserDTO> allUser = userRepository.findAll().stream()
                 .map(userMapper::toDetailDto)
                 .collect(Collectors.toList());
+        return allUser;
+    }
+    public List<UserDTO> getAllUsersWithoutPassword() {
+        List<UserDTO> allUser = userRepository.getAllByType(Role.CUSTOMER).stream()
+                .map(userMapper::toDetailDtoWithoutPassword)
+                .collect(Collectors.toList());
+        return allUser;
     }
 
     @Override
     public UserDTO getUserById(Long id) {
-        UserModel userModel = userRepository.findById(id).orElse(null);
+        UserModel userModel = userRepository.findByIdAndType(id,Role.CUSTOMER);
         if(userModel == null) {
             return null;
         }
-        return userMapper.toDetailDto(userModel);
+        return userMapper.toDetailDtoWithoutPassword(userModel);
     }
     @Override
     public UserDTO getUserByEmail(String email) {

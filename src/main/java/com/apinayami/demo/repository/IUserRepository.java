@@ -9,10 +9,13 @@ import java.util.List;
 public interface IUserRepository extends JpaRepository<UserModel,Long> {
     List<UserModel> findByType(Role role);
     UserModel findById(long id);
+    UserModel findByIdAndType(long id, Role role);
     UserModel findByEmail(String email);
     List<UserModel> getAllByType(Role role);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
     UserModel getUserByEmail(String email);
+    boolean existsByEmailAndIdNot(String email, long id);
+    boolean existsByPhoneNumberAndIdNot(String phoneNumber, long id);
     
 }
