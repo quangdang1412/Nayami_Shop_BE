@@ -12,6 +12,7 @@ import com.apinayami.demo.util.Enum.EBillStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 @Validated
 @Slf4j
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 public class DashboardController {
     private final IProductService productService;
     private final IBillService billService;
