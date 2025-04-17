@@ -23,7 +23,7 @@ public class LoginService {
 
         String accessToken = securityUtil.createToken(authentication);
         String refreshToken = securityUtil.createRefreshToken(authentication);
-        ResLoginDTO resLoginDTO = new ResLoginDTO(1, accessToken,refreshToken);
+        ResLoginDTO resLoginDTO = new ResLoginDTO(accessToken,refreshToken);
         return resLoginDTO;
     }
 }
