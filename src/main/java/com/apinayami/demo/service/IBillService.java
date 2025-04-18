@@ -28,11 +28,7 @@ public interface IBillService {
     Double totalRevenue(EBillStatus status);
 
     Double totalProfit(EBillStatus status);
-
-    DashBoardResponseDTO getRevenueByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
-
-    DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
-
+    
     BillDetailDTO getBillByID(Long id);
 
     String RequestGuarantee(String email, Long billId);
