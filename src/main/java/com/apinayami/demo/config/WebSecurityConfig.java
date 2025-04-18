@@ -32,7 +32,7 @@ public class WebSecurityConfig {
             "/api/check-email-exist",
             "/api/reset-password",
             "/api/categories/**",
-
+            "/api/ship/**",
             //Swagger
             "/swagger-ui/**",
             "/v3/api-docs/**",

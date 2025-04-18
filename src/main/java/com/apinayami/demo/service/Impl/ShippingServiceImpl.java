@@ -2,7 +2,6 @@ package com.apinayami.demo.service.Impl;
 
 import com.apinayami.demo.dto.request.GHTKRequestDTO;
 import com.apinayami.demo.service.IShippingSerivce;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,20 +13,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class ShippingServiceImpl implements IShippingSerivce {
     private final WebClient webClient;
-    @Value("${GHTK_KEY}")
-    private String apiKey;
+    private final String apiKey;
 
-    public ShippingServiceImpl() {
+    public ShippingServiceImpl(@Value("${GHTK_KEY}") String apiKey) {
+        this.apiKey = apiKey;
         this.webClient = WebClient.builder()
                 .baseUrl("https://services.giaohangtietkiem.vn/services/shipment")
                 .defaultHeader("Token", this.apiKey)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
-    
+
+    // public GHTKServiceImpl(@Value("${GHTK_KEY}") String apiKey) {
+    //     this.webClient = WebClient.builder()
+    //             .baseUrl("https://services.giaohangtietkiem.vn/services/shipment")
+    //             .defaultHeader(HttpHeaders.AUTHORIZATION, apiKey)
+    //             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+    //             .build();
+    // }
+
     public Mono<String> getShippingFee(GHTKRequestDTO request) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("pick_province", "Đồng Nai");
