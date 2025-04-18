@@ -11,6 +11,10 @@ import com.apinayami.demo.mapper.CartItemMapper;
 import com.apinayami.demo.model.*;
 import com.apinayami.demo.repository.*;
 import com.apinayami.demo.service.IBillService;
+import com.apinayami.demo.util.Decorator.CouponMoneyCalculator;
+import com.apinayami.demo.util.Decorator.CouponPercentCalculator;
+import com.apinayami.demo.util.Decorator.IPriceCalculator;
+import com.apinayami.demo.util.Decorator.NoCouponCalculator;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
 import com.apinayami.demo.util.Enum.EPaymentStatus;
@@ -163,14 +167,17 @@ public class BillServiceImpl implements IBillService {
             if (coupon.getConstraintMoney() != null && totalPrice < coupon.getConstraintMoney()) {
                 throw new CustomException("Đơn hàng không đủ điều kiện sử dụng mã giảm giá này");
             }
+
+            IPriceCalculator priceCalculator = new NoCouponCalculator();
             if (coupon.getValue() != null && coupon.getValue() > 0) {
                 if (coupon.getType() == ETypeCoupon.PERCENT) {
-                    totalPrice -= totalPrice * (coupon.getValue() / 100);
+                   priceCalculator=new CouponPercentCalculator(priceCalculator,coupon.getValue());
                 } else if (coupon.getType() == ETypeCoupon.MONEY) {
-                    totalPrice -= coupon.getValue();
+                    priceCalculator=new CouponMoneyCalculator(priceCalculator,coupon.getValue());
 
                 }
             }
+            totalPrice= priceCalculator.caculatePrice(totalPrice);
         }
         bill.setItems(items);
         bill.setTotalPrice(totalPrice);
