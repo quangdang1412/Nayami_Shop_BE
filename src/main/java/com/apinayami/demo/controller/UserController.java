@@ -69,7 +69,7 @@ public class UserController implements Serializable {
     }
 //    @SuppressWarnings("unchecked")
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CUSTOMER')")
     public ResponseData<String> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
         try {
             log.info("Request update user: {}",userDTO.getUserName());
