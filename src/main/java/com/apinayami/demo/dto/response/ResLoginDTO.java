@@ -7,8 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResLoginDTO {
-//    Test id user
-    private long id;
     private String accessToken;
     private String refreshToken;
 }
