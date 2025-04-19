@@ -10,12 +10,14 @@ import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.service.IBrandService;
 import com.apinayami.demo.service.IUserService;
+import com.apinayami.demo.service.Impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +33,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController implements Serializable {
 
-    private final IUserService userService;
+    private final UserServiceImpl userService;
     private final UserMapper userMapper;
 
     @GetMapping("/get-all-users")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+        List<UserDTO> users = userService.getAllUsersWithoutPassword();
         return ResponseEntity.ok(users);
     }
 
@@ -57,18 +59,11 @@ public class UserController implements Serializable {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Add user failed");
         }
     }
-//
 //    @SuppressWarnings("unchecked")
     @PutMapping("/update/{id}")
     public ResponseData<String> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
         try {
-            log.info("Request update brand: {}",userDTO.getUserName());
-
-            //check
-            UserDTO userExistWithId = userService.getUserById(id);
-            if (userExistWithId == null) {
-                return new ResponseError(HttpStatus.NOT_FOUND.value(), "User not found");
-            }
+            log.info("Request update user: {}",userDTO.getUserName());
              userService.update(userDTO);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "update successfully");
         } catch (Exception e) {

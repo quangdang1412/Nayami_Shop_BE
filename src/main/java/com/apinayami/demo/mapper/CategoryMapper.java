@@ -5,7 +5,6 @@ import com.apinayami.demo.model.CategoryModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
@@ -16,7 +15,19 @@ public interface CategoryMapper {
 
     CategoryModel toCategoryModelWithID(CategoryDTO dto);
 
-    CategoryDTO toCategoryDTO(CategoryModel model);
+
+    default CategoryDTO toCategoryDTO(CategoryModel categoryModel) {
+        if (categoryModel == null) {
+            return null;
+        }
+
+        return CategoryDTO.builder()
+                .id(categoryModel.getId())
+                .categoryName(categoryModel.getCategoryName())
+                .active(categoryModel.isActive())
+                .quantityProduct(categoryModel.getListProduct().size())
+                .build();
+    }
 }
 //@Component
 //public abstract class CategoryMapper {

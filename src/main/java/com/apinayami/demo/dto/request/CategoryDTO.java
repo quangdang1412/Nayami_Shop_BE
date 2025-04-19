@@ -1,11 +1,6 @@
 package com.apinayami.demo.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -19,5 +14,5 @@ public class CategoryDTO implements Serializable {
     private long id;
     private String categoryName;
     private boolean active;
-
+    private int quantityProduct;
 }

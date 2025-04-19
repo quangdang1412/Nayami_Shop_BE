@@ -17,6 +17,6 @@ public interface IAddressService {
 
     List<AddressResponseDTO> getAddressByCustomerId(Long id);
 
-    List<AddressResponseDTO> getAllAddresses();
+
     
 }

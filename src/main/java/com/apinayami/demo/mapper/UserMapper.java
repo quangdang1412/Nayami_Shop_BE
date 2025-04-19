@@ -7,6 +7,8 @@ import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.util.Enum.Role;
+
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,6 +29,7 @@ public class UserMapper {
                 .userName(signupDTO.getFullName())
                 .build();
     }
+    @Named("userWithPassword")
     public UserDTO toDetailDto(UserModel user) {
         if (user == null) {
             return null;
@@ -38,6 +41,20 @@ public class UserMapper {
                 .phoneNumber(user.getPhoneNumber())
                 .active(user.isActive())
                 .password(user.getPassword())
+                .userName(user.getUsername())
+                .build();
+    }
+    @Named("userWithoutPassword")
+    public UserDTO toDetailDtoWithoutPassword(UserModel user) {
+        if (user == null) {
+            return null;
+        }
+        return UserDTO.builder()
+                .userId(user.getId())
+                .type(user.getType().toString())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .active(user.isActive())
                 .userName(user.getUsername())
                 .build();
     }
