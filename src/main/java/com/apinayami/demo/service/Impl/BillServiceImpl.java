@@ -10,11 +10,11 @@ import com.apinayami.demo.mapper.BillMapper;
 import com.apinayami.demo.mapper.CartItemMapper;
 import com.apinayami.demo.model.*;
 import com.apinayami.demo.repository.*;
+import com.apinayami.demo.service.CouponDecorator;
 import com.apinayami.demo.service.IBillService;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
 import com.apinayami.demo.util.Enum.EPaymentStatus;
-import com.apinayami.demo.util.Enum.ETypeCoupon;
 import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
@@ -159,21 +159,12 @@ public class BillServiceImpl implements IBillService {
 
 
         }
+        bill.setTotalPrice(totalPrice);
         if (coupon != null) {
-            if (coupon.getConstraintMoney() != null && totalPrice < coupon.getConstraintMoney()) {
-                throw new CustomException("Đơn hàng không đủ điều kiện sử dụng mã giảm giá này");
-            }
-            if (coupon.getValue() != null && coupon.getValue() > 0) {
-                if (coupon.getType() == ETypeCoupon.PERCENT) {
-                    totalPrice -= totalPrice * (coupon.getValue() / 100);
-                } else if (coupon.getType() == ETypeCoupon.MONEY) {
-                    totalPrice -= coupon.getValue();
-
-                }
-            }
+            CouponDecorator couponDecorator = new CouponDecorator(bill, coupon);
+            bill = couponDecorator.getBillModel();
         }
         bill.setItems(items);
-        bill.setTotalPrice(totalPrice);
         for (CartItemModel item : cartItem) {
             cartItemRepository.delete(item);
         }
@@ -288,91 +279,6 @@ public class BillServiceImpl implements IBillService {
     @Override
     public Double totalProfit(EBillStatus status) {
         return billRepository.totalProfit(status);
-    }
-
-    @Override
-    public DashBoardResponseDTO getRevenueByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-        List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
-        Map<String, Double> totalRevenueByDate = new ArrayMap<>();
-        long numberDays = ChronoUnit.DAYS.between(startDate, endDate);
-        for (BillModel orderModel : listOrder) {
-            String orderDateStr;
-            LocalDate orderDate = orderModel.getCreatedAt()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-
-            if (numberDays <= 1) {
-                orderDateStr = orderModel.getCreatedAt()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            } else if (numberDays <= 30) {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            } else if (numberDays <= 92) {
-                int week = orderDate.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
-                orderDateStr = "Week " + week + ", " + orderDate.getYear();
-            } else if (numberDays <= 365 * 2) {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("MM-yyyy"));
-            } else {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("yyyy"));
-            }
-            double totalAmount = orderModel.getTotalPrice();
-            totalRevenueByDate.put(orderDateStr, totalRevenueByDate.getOrDefault(orderDateStr, 0.0) + totalAmount);
-        }
-        List<String> time = new ArrayList<>(totalRevenueByDate.keySet());
-        List<String> data = totalRevenueByDate.values().stream()
-                .map(String::valueOf)
-                .collect(Collectors.toList());
-
-        return DashBoardResponseDTO.builder()
-                .time(time)
-                .data(data)
-                .build();
-    }
-
-    @Override
-    public DashBoardResponseDTO getProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-        List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
-        Map<String, Double> totalRevenueByDate = new ArrayMap<>();
-        long numberDays = ChronoUnit.DAYS.between(startDate, endDate);
-        for (BillModel orderModel : listOrder) {
-            String orderDateStr;
-            LocalDate orderDate = orderModel.getCreatedAt()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-
-            if (numberDays <= 1) {
-                orderDateStr = orderModel.getCreatedAt()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            } else if (numberDays <= 30) {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            } else if (numberDays <= 92) {
-                int week = orderDate.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
-                orderDateStr = "Week " + week + ", " + orderDate.getYear();
-            } else if (numberDays <= 365 * 2) {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("MM-yyyy"));
-            } else {
-                orderDateStr = orderDate.format(DateTimeFormatter.ofPattern("yyyy"));
-            }
-            double totalAmount = orderModel.getTotalPrice();
-            for (LineItemModel item : orderModel.getItems()) {
-                totalAmount -= item.getQuantity() * item.getProductModel().getOriginalPrice();
-            }
-            totalRevenueByDate.put(orderDateStr, totalRevenueByDate.getOrDefault(orderDateStr, 0.0) + totalAmount);
-        }
-        List<String> time = new ArrayList<>(totalRevenueByDate.keySet());
-        List<String> data = totalRevenueByDate.values().stream()
-                .map(String::valueOf)
-                .collect(Collectors.toList());
-
-        return DashBoardResponseDTO.builder()
-                .time(time)
-                .data(data)
-                .build();
     }
 
     @Scheduled(cron = "0 */10 * * * *")
