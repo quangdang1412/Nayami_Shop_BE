@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+    
 public interface IBillRepository extends JpaRepository<BillModel, Long> {
     List<BillModel> findByCustomerModelOrderByCreatedAtDesc(UserModel user);
 

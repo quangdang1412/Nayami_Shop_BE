@@ -31,7 +31,10 @@ public class WebSecurityConfig {
             "/api/reset-password",
             "/api/check-email-exist",
             "/api/reset-password",
+//            Test purposes
             "/api/categories/**",
+            "/api/promotions/**",
+            "/api/products/**",
 
             //Swagger
             "/swagger-ui/**",
