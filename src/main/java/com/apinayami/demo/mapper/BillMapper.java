@@ -46,7 +46,7 @@ public interface BillMapper {
 
     @Mapping(target = "items", source = "items")
     @Mapping(target = "coupon", source = "couponModel")
-    @Mapping(target = "customer", source = "customerModel")
+    @Mapping(target = "customer", source = "customerModel", qualifiedByName = "userWithoutPassword")
     @Mapping(target = "payment", source = "paymentModel")
     @Mapping(target = "shipping", source = "shippingModel")
     @Mapping(target = "createdAt", source = "createdAt")
