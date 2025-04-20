@@ -3,6 +3,7 @@ package com.apinayami.demo.repository;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.util.Enum.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -17,5 +18,11 @@ public interface IUserRepository extends JpaRepository<UserModel,Long> {
     UserModel getUserByEmail(String email);
     boolean existsByEmailAndIdNot(String email, long id);
     boolean existsByPhoneNumberAndIdNot(String phoneNumber, long id);
+    @Query("SELECT COUNT(u) > 0 FROM UserModel u " +
+            "JOIN u.listBill b " +
+            "JOIN b.items li " +
+            "WHERE u.email = :email AND li.productModel.id = :proId AND b.status = 'COMPLETED'")
+    boolean checkUserPurchaseProduct(String email, long proId);
+
     
 }

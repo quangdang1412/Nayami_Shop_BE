@@ -6,6 +6,8 @@ import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.BrandMapper;
 import com.apinayami.demo.mapper.UserMapper;
+import com.apinayami.demo.model.BillModel;
+import com.apinayami.demo.model.LineItemModel;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.repository.IBrandRepository;
 import com.apinayami.demo.repository.IUserRepository;
@@ -19,7 +21,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -132,6 +137,17 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserDTO getUserByEmail(String email) {
         return userMapper.toDetailDtoWithoutPassword(userRepository.findByEmail(email));
+    }
+
+    @Override
+    public boolean checkUserBoughtProduct(String userEmail, long proID) {
+        try{
+            return userRepository.checkUserPurchaseProduct(userEmail, proID);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new CustomException(e.getMessage());
+        }
     }
 
     @Override

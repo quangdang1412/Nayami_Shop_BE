@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 //@RequestMapping("/api/users")
@@ -53,6 +54,13 @@ public class UserController implements Serializable {
     @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
         UserDTO user = userService.getUserByEmail(email);
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping()
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestBody Map<String, Object> requestBody) {
+        UserDTO user = userService.getUserByEmail(requestBody.get("email").toString());
+        System.out.println(user.getEmail());
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
     @PostMapping("/create")
@@ -116,6 +124,18 @@ public class UserController implements Serializable {
             if (e instanceof CustomException)
                 return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Delete failed");
+        }
+    }
+
+    @PostMapping("/check")
+    public ResponseData<Boolean> checkUSerBoughtProduct(@RequestBody Map<String, Object> requestBody) {
+        try{
+            long proId = Long.parseLong(requestBody.get("proId").toString());
+            String userEmail = requestBody.get("email").toString();
+            return new ResponseData<>(HttpStatus.OK.value(), "Check customer bought product", userService.checkUserBoughtProduct(userEmail, proId));
+        }
+        catch(Exception e){
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
 }

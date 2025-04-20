@@ -66,4 +66,10 @@ public class CommentServiceImpl implements ICommentService {
             throw new CustomException("Promotion has existed");
         }
     }
+
+    @Override
+    public List<CommentDTO> getCommentByUserEmail(String email) {
+        UserModel user = userRepository.findByEmail(email);
+        return commentRepository.findByProductModel_Id(user.getId()).stream().map(commentMapper::ToCommentDTO).collect(Collectors.toList());
+    }
 }

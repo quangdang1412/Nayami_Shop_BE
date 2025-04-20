@@ -9,4 +9,5 @@ public interface ICommentService{
     List<CommentDTO> getCommentByProductId(long id);
     CommentDTO getCommentById(long id);
     String create(CommentDTO comment);
+    List<CommentDTO> getCommentByUserEmail(String email);
 }

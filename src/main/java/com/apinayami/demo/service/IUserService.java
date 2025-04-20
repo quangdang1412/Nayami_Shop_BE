@@ -13,4 +13,5 @@ public interface IUserService extends IBaseCRUD<UserDTO> {
     boolean checkUserExistByEmail(String email);
     boolean updateUserPassword(ResetPasswordDTO resetPasswordDTO, String authHeader);
     UserDTO getUserByEmail(String email);
+    boolean checkUserBoughtProduct(String userEmail, long proID);
 }

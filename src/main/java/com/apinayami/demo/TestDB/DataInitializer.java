@@ -66,6 +66,18 @@ public class DataInitializer {
 //            userModel.setPassword(hashedPassword);
 //            userModel.setActive(true);
 //            userRepository.save(userModel);
+//            UserModel userModel = UserModel.builder()
+//                    .userName("demoTB")
+//                    .email("demotranbao123@gmail.com")
+//                    .password("baooa4477")
+//                    .type(Role.CUSTOMER)
+//                    .active(true)
+//                    .phoneNumber(null)
+//                    .build();
+//            String hashedPassword = passwordEncoder.encode(userModel.getPassword());
+//            userModel.setPassword(hashedPassword);
+//            userModel.setActive(true);
+//            userRepository.save(userModel);
 //
 //            // ✅ Tạo Product
 //            ProductModel productSamsung = ProductModel.builder()
