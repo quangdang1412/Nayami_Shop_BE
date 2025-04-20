@@ -25,7 +25,6 @@ public class WebSecurityConfig {
      * Những endpoint mà ai cũng có thể truy cập, trong trường hợp là là những unregistered customer, lúc gọi đến này không cần token
      * */
     private final String[] PUBLIC_API = {
-            "/api/users/**",
             "/api/login",
             "/api/signup",
             "/api/reset-password",

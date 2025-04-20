@@ -131,7 +131,7 @@ public class UserServiceImpl implements IUserService {
     }
     @Override
     public UserDTO getUserByEmail(String email) {
-        return userMapper.toDetailDto(userRepository.findByEmail(email));
+        return userMapper.toDetailDtoWithoutPassword(userRepository.findByEmail(email));
     }
 
     @Override
@@ -158,6 +158,10 @@ public class UserServiceImpl implements IUserService {
         return false;
     }
 
+
+    /*
+    * Is used for refresh
+    * */
     private final JwtDecoder jwtDecoder;
     private String getEmailFromToken(String authHeader){
         try {
@@ -166,11 +170,7 @@ public class UserServiceImpl implements IUserService {
             Jwt decodedJwt = jwtDecoder.decode(token);
 
             String tokenEmail = decodedJwt.getSubject();
-            String role = decodedJwt.getClaimAsString("roles");
 
-            if (!"REFRESH_PASSWORD_TOKEN".equals(role)) {
-                return "";
-            }
             return tokenEmail;
         }catch (Exception e){
             log.error("Error: {}", e.getMessage());
