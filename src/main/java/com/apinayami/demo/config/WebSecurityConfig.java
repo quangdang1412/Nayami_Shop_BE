@@ -35,7 +35,7 @@ public class WebSecurityConfig {
             "/api/comments/**",
             "/api/promotions/**",
 //            Test purposes
-//            "/api/bills/**",
+            "/api/dashboard/**",
 
             //Swagger
             "/swagger-ui/**",

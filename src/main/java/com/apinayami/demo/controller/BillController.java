@@ -118,7 +118,7 @@ public class BillController {
                                       @RequestBody Map<String, Object> billUpdate){
         String email = billUpdate.get("email").toString();
         try{
-            System.out.println("Received billID: " + billUpdate.get("billID"));
+            System.out.println("Received update billID: " + billUpdate.get("billID"));
             billService.updateBill(email, Long.parseLong(billUpdate.get("billID").toString()), billUpdate.get("status").toString());
             return new ResponseData<>(HttpStatus.OK.value(), "Cập nhật đơn hàng thành công");
         } catch (Exception e) {
