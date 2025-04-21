@@ -8,20 +8,22 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Service
 @RequiredArgsConstructor
-public class LoginService {
+public class LoginServiceImpl {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
+
     public ResLoginDTO login(LoginDTO loginDTO) {
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+
         String accessToken = securityUtil.createToken(authentication);
         String refreshToken = securityUtil.createRefreshToken(authentication);
-        ResLoginDTO resLoginDTO = new ResLoginDTO(accessToken,refreshToken);
+        ResLoginDTO resLoginDTO = new ResLoginDTO(accessToken, refreshToken);
         return resLoginDTO;
     }
 }

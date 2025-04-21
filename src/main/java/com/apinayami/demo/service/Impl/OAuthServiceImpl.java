@@ -1,6 +1,6 @@
 package com.apinayami.demo.service.Impl;
+
 import com.apinayami.demo.dto.response.ResLoginDTO;
-import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.repository.IUserRepository;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class OAuthService {
+public class OAuthServiceImpl {
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final UserServiceImpl userService;
     private final SecurityUtil securityUtil;
@@ -49,7 +49,8 @@ public class OAuthService {
                 .build();
         return authorizationRequest.getAuthorizationRequestUri();
     }
-    public ResLoginDTO getCredentialOfUser(Map<String, String> map){
+
+    public ResLoginDTO getCredentialOfUser(Map<String, String> map) {
         try {
             String code = map.get("code");
             String accessTokenWithGoogle = getAccessToken(code);
@@ -60,7 +61,7 @@ public class OAuthService {
             String accessTokenForUser = securityUtil.createAcessTokenForOauth(userInfo.getType(), userInfo.getUsername(), userInfo.getEmail());
             String refreshTokenForUser = securityUtil.createRefreshTokenOauth(userInfo.getType(), userInfo.getEmail());
             return new ResLoginDTO(accessTokenForUser, refreshTokenForUser);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException(e.getMessage());
         }
     }
@@ -75,8 +76,8 @@ public class OAuthService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("code", authorizationCode);
         body.add("client_id", clientId);
-        body.add("client_secret",clientSecret);
-        body.add("redirect_uri",redirectUri);
+        body.add("client_secret", clientSecret);
+        body.add("redirect_uri", redirectUri);
         body.add("grant_type", "authorization_code");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
@@ -92,6 +93,7 @@ public class OAuthService {
             throw new RuntimeException(e);
         }
     }
+
     public UserModel getUserInfo(String accessToken) {
         final String defaultPassword = "123456";
 
