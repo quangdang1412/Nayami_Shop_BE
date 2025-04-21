@@ -8,15 +8,13 @@ import com.apinayami.demo.service.IBillService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -55,17 +53,22 @@ public class BillController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody BillRequestDTO billRequestDTO) {
 
-        String email = extractUserEmail(authHeader);
-        if (email == null) {
-            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập");
-        }
+        try {
+            String email = extractUserEmail(authHeader);
+            if (email == null) {
+                return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập");
+            }
 
-        Object response = billService.createBill(email, billRequestDTO);
-        if (response instanceof String) {
-            return new ResponseData<>(HttpStatus.OK.value(), "Thanh toán online", Map.of("paymentUrl", response));
-        }
+            Object response = billService.createBill(email, billRequestDTO);
+            if (response instanceof String) {
+                return new ResponseData<>(HttpStatus.OK.value(), "Thanh toán online", Map.of("paymentUrl", response));
+            }
 
-        return new ResponseData<>(HttpStatus.CREATED.value(), "Đặt hàng thành công", response);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Đặt hàng thành công", response);
+
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Đặt hàng thất bại", e.getMessage());
+        }
     }
 
     @GetMapping("/history")
@@ -101,11 +104,12 @@ public class BillController {
         return new ResponseData<>(HttpStatus.OK.value(), "Trạng thái thanh toán không hợp lệ");
 
     }
+
     @PostMapping("/cancel")
     public ResponseData<?> cancelBill(@RequestHeader(value = "Authorization", required = false) String authHeader,
-                                      @RequestBody Map<String, Object> billID){
+                                      @RequestBody Map<String, Object> billID) {
         String email = extractUserEmail(authHeader);
-        try{
+        try {
             String result = billService.cancelBill(email, Long.parseLong(billID.get("billID").toString()));
             return new ResponseData<>(HttpStatus.OK.value(), result);
         } catch (Exception e) {
@@ -115,10 +119,10 @@ public class BillController {
 
     @PostMapping("/status")
     public ResponseData<?> updateStatus(@RequestHeader(value = "Authorization", required = false) String authHeader,
-                                      @RequestBody Map<String, Object> billUpdate){
+                                        @RequestBody Map<String, Object> billUpdate) {
         String email = billUpdate.get("email").toString();
-        try{
-            System.out.println("Received update billID: " + billUpdate.get("billID"));
+        try {
+            System.out.println("Received billID: " + billUpdate.get("billID"));
             billService.updateBill(email, Long.parseLong(billUpdate.get("billID").toString()), billUpdate.get("status").toString());
             return new ResponseData<>(HttpStatus.OK.value(), "Cập nhật đơn hàng thành công");
         } catch (Exception e) {
@@ -127,20 +131,22 @@ public class BillController {
     }
 
     @GetMapping()
-    public ResponseData<?> getAllBill(){
+    public ResponseData<?> getAllBill() {
 //        try{
-            List<BillDTO> billDTOList = billService.getAllBills();
-            return new ResponseData<>(HttpStatus.OK.value(), "Danh sách đơn hàng", billDTOList);
+        List<BillDTO> billDTOList = billService.getAllBills();
+        return new ResponseData<>(HttpStatus.OK.value(), "Danh sách đơn hàng", billDTOList);
 //        }
 //        catch (Exception e) {
 //            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
 //        }
     }
+
     @GetMapping("/{id}")
-    public ResponseData<?> getBillById(@PathVariable("id") Long id){
+    public ResponseData<?> getBillById(@PathVariable("id") Long id) {
         BillDetailDTO billDetail = billService.getBillByID(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Đơn hàng", billDetail);
     }
+
     @PostMapping("/guarantee")
     public ResponseData<?> RequestGuarantee(@RequestHeader(value = "Authorization", required = false) String authHeader,
                                             @RequestBody Map<String, Object> billID) {
@@ -153,7 +159,6 @@ public class BillController {
             return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
     }
-    
 
 
 }

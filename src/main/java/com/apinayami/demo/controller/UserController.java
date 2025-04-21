@@ -7,10 +7,6 @@ import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.UserMapper;
-import com.apinayami.demo.model.BrandModel;
-import com.apinayami.demo.model.UserModel;
-import com.apinayami.demo.service.IBrandService;
-import com.apinayami.demo.service.IUserService;
 import com.apinayami.demo.service.Impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -128,6 +124,7 @@ public class UserController implements Serializable {
     }
 
     @PostMapping("/check")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseData<Boolean> checkUSerBoughtProduct(@RequestBody Map<String, Object> requestBody) {
         try{
             long proId = Long.parseLong(requestBody.get("proId").toString());

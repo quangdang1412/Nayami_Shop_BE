@@ -1,6 +1,5 @@
 package com.apinayami.demo.service.Impl;
 
-import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.util.SecurityUtil;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +12,13 @@ public class ResetPasswordService {
     private final SecurityUtil securityUtil;
     private final EmailService emailService;
     private final UserServiceImpl userService;
-    private String generateLinkResetPassword(String email){
+
+    private String generateLinkResetPassword(String email) {
         String resetPassWordToken = securityUtil.createResetPasswordToken(email);
-        String linkToResetPassword = domainFrontEnd+"?token="+resetPassWordToken;
+        String linkToResetPassword = domainFrontEnd + "?token=" + resetPassWordToken;
         return linkToResetPassword;
     }
+
     public boolean sendLinkResetPassword(String email) {
         String linkToResetPassword = generateLinkResetPassword(email);
         String emailContent = String.format("""
@@ -34,9 +35,9 @@ public class ResetPasswordService {
                 </html>
                 """, linkToResetPassword);
         try {
-            if(emailService.checkEmail(email)){
-                if(userService.checkUserExistByEmail(email)){
-                    boolean isSendLinkToEmailSuccessfully = emailService.sendEmail(email, "Your link to reset password: ", emailContent);
+            if (emailService.checkEmail(email)) {
+                if (userService.checkUserExistByEmail(email)) {
+                    boolean isSendLinkToEmailSuccessfully = emailService.sendResetPassEmail(email, "Your link to reset password: ", linkToResetPassword, userService.getUserByEmail(email).getUserName());
                     return isSendLinkToEmailSuccessfully;
                 }
             }

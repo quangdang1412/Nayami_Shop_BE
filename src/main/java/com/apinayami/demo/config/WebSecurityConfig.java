@@ -10,9 +10,14 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 
 @Configuration
@@ -27,6 +32,8 @@ public class WebSecurityConfig {
     private final String[] PUBLIC_API = {
             "/api/login",
             "/api/signup",
+            "/api/users",
+            "/api/users/create",
             "/api/reset-password",
             "/api/check-email-exist",
             "/api/reset-password",
@@ -34,6 +41,8 @@ public class WebSecurityConfig {
             "/api/products/**",
             "/api/comments/**",
             "/api/promotions/**",
+            "/api/auth/social-login/google",
+            "/api/login/oauth2/code/google",
 //            Test purposes
             "/api/dashboard/**",
 
@@ -62,7 +71,6 @@ public class WebSecurityConfig {
 
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -79,8 +87,9 @@ public class WebSecurityConfig {
                 .exceptionHandling(
                         exception -> exception.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) // 401
                                 .accessDeniedHandler(new BearerTokenAccessDeniedHandler()) // 403
+                                .authenticationEntryPoint(customAuthenticationEntryPoint)
+
                 )
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtAuthConverter())))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf.disable());
@@ -95,7 +104,5 @@ public class WebSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-    //Ai cung co the truy cap
 
 }

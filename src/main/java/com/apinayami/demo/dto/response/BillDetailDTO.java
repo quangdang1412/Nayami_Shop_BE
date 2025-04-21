@@ -1,8 +1,6 @@
 package com.apinayami.demo.dto.response;
 
-import com.apinayami.demo.dto.request.LineItemDTO;
 import com.apinayami.demo.dto.request.UserDTO;
-import com.apinayami.demo.model.*;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
 import jakarta.persistence.EnumType;
@@ -27,6 +25,7 @@ public class BillDetailDTO implements Serializable {
     @Enumerated(EnumType.STRING)
     private EBillStatus status;
     private String orderNumber;
+    private Long id;
 
     private UserDTO customer;
     private ShippingDTO shipping;
