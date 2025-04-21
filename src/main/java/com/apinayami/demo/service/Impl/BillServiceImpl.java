@@ -83,9 +83,7 @@ public class BillServiceImpl implements IBillService {
 
     @Transactional
     public Object createBill(String email, BillRequestDTO request) {
-
         UserModel customer = userRepository.getUserByEmail(email);
-
         if (customer == null) {
             throw new ResourceNotFoundException("User is empty");
         }
@@ -130,34 +128,28 @@ public class BillServiceImpl implements IBillService {
         List<LineItemModel> items = new ArrayList<>();
         Double totalPrice = 0.0;
         for (CartItemModel item : cartItem) {
-            double unitPrice = item.getProductModel().getUnitPrice();
-            if (item.getProductModel().getDiscountDetailModel() != null && item.getProductModel().getDiscountDetailModel().getPercentage() != null) {
-                double discountPercentage = item.getProductModel().getDiscountDetailModel().getPercentage();
-                double discountAmountPerUnit = unitPrice * (discountPercentage / 100);
-                unitPrice -= discountAmountPerUnit;
-            }
-            Integer quantity = item.getQuantity();
-            totalPrice += unitPrice * quantity;
             ProductModel product = item.getProductModel();
             if (product.getQuantity() < item.getQuantity()) {
                 throw new ResourceNotFoundException("Not enough stock for product: " + product.getProductName());
             }
-            product.setQuantity(product.getQuantity() - item.getQuantity());
-            productRepository.save(product);
             LineItemModel lineItem = LineItemModel.builder()
                     .productModel(product)
                     .billModel(bill)
                     .quantity(item.getQuantity())
                     .build();
-            if (product.getDiscountDetailModel() != null && product.getDiscountDetailModel().getPercentage() != null) {
-                lineItem.setUnitPrice(unitPrice - unitPrice * (product.getDiscountDetailModel().getPercentage() / 100));
-            } else {
-                lineItem.setUnitPrice(unitPrice);
+            double unitPrice = item.getProductModel().getUnitPrice();
+            if (item.getProductModel().getDiscountDetailModel() != null && item.getProductModel().getDiscountDetailModel().getPercentage() != null) {
+                double discountPercentage = item.getProductModel().getDiscountDetailModel().getPercentage();
+                unitPrice = product.getUnitPrice() * ((100 - discountPercentage) / 100);
             }
+            lineItem.setUnitPrice(unitPrice);
+            Integer quantity = item.getQuantity();
+            totalPrice += unitPrice * quantity;
+            product.setQuantity(product.getQuantity() - item.getQuantity());
+            
+            productRepository.save(product);
             lineItemRepository.save(lineItem);
             items.add(lineItem);
-
-
         }
         bill.setTotalPrice(totalPrice);
         if (coupon != null) {
