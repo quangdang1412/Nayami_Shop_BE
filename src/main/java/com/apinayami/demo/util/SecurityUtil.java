@@ -1,6 +1,7 @@
 package com.apinayami.demo.util;
 
 import com.apinayami.demo.model.CustomUserDetail;
+import com.apinayami.demo.util.Enum.Role;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
@@ -17,6 +18,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +53,21 @@ public class SecurityUtil {
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,claims)).getTokenValue();
     }
+
+    public String createAcessTokenForOauth(Role role,String fullName,String email){
+        Instant now = Instant.now();
+        Instant validity = now.plus(JWR_EXPIRATION_ACCESSTOKEN, ChronoUnit.SECONDS);
+        JwtClaimsSet claims = JwtClaimsSet.builder().
+                issuedAt(now).
+                expiresAt(validity).
+                claim("roles", List.of(role)).
+                claim("fullName",fullName).
+                claim("email",email).
+                subject(email)
+                .build();
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,claims)).getTokenValue();
+    }
     public String createRefreshToken(Authentication authentication) {
         Instant now = Instant.now();
         Instant validity = now.plus(JWR_EXPIRATION_REFRESHTOKEN, ChronoUnit.SECONDS);
@@ -65,6 +82,19 @@ public class SecurityUtil {
                 .subject(authentication.getName())
                 .build();
 
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+    public String createRefreshTokenOauth(Role role,String email) {
+        Instant now = Instant.now();
+        Instant validity = now.plus(JWR_EXPIRATION_REFRESHTOKEN, ChronoUnit.SECONDS);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .claim("role_of_user",List.of(role))
+                .claim("roles","REFRESH_TOKEN")
+                .subject(email)
+                .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
