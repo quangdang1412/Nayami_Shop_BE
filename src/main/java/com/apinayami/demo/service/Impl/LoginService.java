@@ -19,8 +19,6 @@ public class LoginService {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-
         String accessToken = securityUtil.createToken(authentication);
         String refreshToken = securityUtil.createRefreshToken(authentication);
         ResLoginDTO resLoginDTO = new ResLoginDTO(accessToken,refreshToken);
