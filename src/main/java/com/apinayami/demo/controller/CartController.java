@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cart")
-@SecurityRequirement(name = "bearerAuth") 
+@SecurityRequirement(name = "bearerAuth")
 public class CartController {
 
     private final ICartItemService cartItemService;
@@ -30,27 +30,31 @@ public class CartController {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return null;
         }
-        String token = authHeader.substring(7); 
+        String token = authHeader.substring(7);
         Jwt decodedToken = jwtConfig.decodeToken(token);
-        return decodedToken.getSubject(); 
+        return decodedToken.getSubject();
     }
 
     @GetMapping
     public ResponseData<?> getCart(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        String email = extractUserEmail(authHeader);
-        if (email == null) {
-            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xem giỏ hàng");
-        }
+        try {
+            String email = extractUserEmail(authHeader);
+            if (email == null) {
+                return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xem giỏ hàng");
+            }
 
-        List<CartItemDTO> cart = cartItemService.getUserCart(email);
-        return new ResponseData<>(HttpStatus.OK.value(), "Lấy giỏ hàng thành công", cart);
+            List<CartItemDTO> cartItems = cartItemService.getUserCart(email);
+            return new ResponseData<>(HttpStatus.OK.value(), "Lấy giỏ hàng thành công", cartItems);
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lỗi khi lấy giỏ hàng", e.getMessage());
+        }
     }
 
     @PostMapping
-    public ResponseData<CartItemDTO> addToCart(
+    public ResponseData<?> addToCart(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody CartItemDTO request) {
-
+    try {
         String email = extractUserEmail(authHeader);
         if (email == null) {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để thêm vào giỏ hàng");
@@ -58,34 +62,46 @@ public class CartController {
 
         CartItemDTO addedItem = cartItemService.addToCart(email, request);
         return new ResponseData<>(HttpStatus.CREATED.value(), "Thêm vào giỏ hàng thành công", addedItem);
+    } catch (Exception e) {
+        return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lỗi khi thêm vào giỏ hàng", e.getMessage());
+    }
     }
 
     @PutMapping("/{id}")
-    public ResponseData<CartItemDTO> updateCartItem(
-        @RequestHeader(value = "Authorization", required = false) String authHeader,
-        @PathVariable Long id,
-        @RequestBody CartItemDTO request) {
-        
-        String email = extractUserEmail(authHeader);
-        if (email == null) {
-            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để cập nhật giỏ hàng");
-        }
+    public ResponseData<?> updateCartItem(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Long id,
+            @RequestBody CartItemDTO request) {
 
-        CartItemDTO updatedItem = cartItemService.updateCartItem(email, id, request.getQuantity());
-        return new ResponseData<>(HttpStatus.OK.value(), "Cập nhật giỏ hàng thành công", updatedItem);
+        try {
+            String email = extractUserEmail(authHeader);
+            if (email == null) {
+                return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để cập nhật giỏ hàng");
+            }
+
+            CartItemDTO updatedItem = cartItemService.updateCartItem(email, id, request.getQuantity());
+            return new ResponseData<>(HttpStatus.OK.value(), "Cập nhật giỏ hàng thành công", updatedItem);
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lỗi khi cập nhật giỏ hàng", e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseData<Void> removeFromCart(
+    public ResponseData<?> removeFromCart(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Long id) {
-        
-        String email = extractUserEmail(authHeader);
-        if (email == null) {
-            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để xóa sản phẩm khỏi giỏ hàng");
-        }
 
-        cartItemService.removeFromCart(email, id);
-        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "Xóa sản phẩm khỏi giỏ hàng thành công");
+        try {
+            String email = extractUserEmail(authHeader);
+            if (email == null) {
+                return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(),
+                        "Vui lòng đăng nhập để xóa sản phẩm khỏi giỏ hàng");
+            }
+
+            cartItemService.removeFromCart(email, id);
+            return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "Xóa sản phẩm khỏi giỏ hàng thành công");
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lỗi khi xóa sản phẩm khỏi giỏ hàng", e.getMessage());
+        }
     }
 }
