@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,6 +73,7 @@ public class BillController {
     }
 
     @GetMapping("/history")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseData<?> getBillHistory(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         String email = extractUserEmail(authHeader);
         if (email == null) {
