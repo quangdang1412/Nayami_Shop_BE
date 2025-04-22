@@ -36,4 +36,7 @@ public interface IBillService {
     List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
 
     DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status, int a);
+    
+    String handlePayment(String email,Long id);
+
 }
