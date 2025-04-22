@@ -113,7 +113,7 @@ public class BillController {
             String result = billService.cancelBill(email, Long.parseLong(billID.get("billID").toString()));
             return new ResponseData<>(HttpStatus.OK.value(), result);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
     }
 
@@ -156,9 +156,18 @@ public class BillController {
             billService.RequestGuarantee(email, Long.parseLong(billID.get("billID").toString()));
             return new ResponseData<>(HttpStatus.OK.value(), "Yêu cầu bảo hành thành công");
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
     }
-
+    @PostMapping("/payment/{id}")
+    public ResponseData<?> handlePayment(@RequestHeader(value = "Authorization", required = false) String authHeader,@PathVariable Long id) {
+        String email = extractUserEmail(authHeader);
+        try {
+            Object response = billService.handlePayment(email, id);
+            return new ResponseData<>(HttpStatus.OK.value(), "Payment URL generated", Map.of("paymentUrl", response));
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        }
+    }
 
 }
