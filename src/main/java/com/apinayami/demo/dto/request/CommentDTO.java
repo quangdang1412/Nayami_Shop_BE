@@ -19,4 +19,5 @@ public class CommentDTO implements Serializable {
     String userName;
     String userEmail;
     long productId;
+    boolean active;
 }

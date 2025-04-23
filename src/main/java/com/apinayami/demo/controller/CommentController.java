@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/comments")
@@ -34,6 +36,18 @@ public class CommentController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
+        }
+    }
+
+    @PostMapping("/active")
+    public ResponseData<?> cancelComment(@RequestBody Map<String, String> body) {
+        try{
+            String result = commentService.updateStatus(Long.parseLong(body.get("id")));
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", result);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update active failed");
         }
     }
 

@@ -4,6 +4,8 @@ import com.apinayami.demo.model.ImageModel;
 import com.apinayami.demo.model.ProductModel;
 import com.apinayami.demo.repository.IImageRepository;
 import com.apinayami.demo.service.IImageService;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -12,10 +14,12 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,11 +28,15 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ImageServiceImpl implements IImageService {
+
+    @Autowired
+    private Cloudinary cloudinary;
 
     private final IImageRepository imageRepository;
     @Value("${app.firebase.bucket}")
@@ -112,4 +120,18 @@ public class ImageServiceImpl implements IImageService {
         }
     }
 
+    @Override
+    public boolean cloudinaryDelete(String url) {
+        try {
+            ImageModel imageModel = imageRepository.findByUrl(url);
+            imageRepository.delete(imageModel);
+
+            String publicId = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
+            Map result = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            return "ok".equals(result.get("result"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
