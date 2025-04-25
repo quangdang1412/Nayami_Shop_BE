@@ -39,9 +39,11 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public List<CategoryWithBrandsDTO> getAllCategoriesWithBrands() {
+    public List<CategoryWithBrandsDTO> getAllCategoriesWithBrands(int type) {
         List<CategoryWithBrandsDTO> categoryWithBrandsDTOList = new ArrayList<>();
         List<CategoryModel> categoryModelList = categoryRepository.findAll();
+        if (type == 1)
+            categoryModelList = categoryModelList.stream().filter(CategoryModel::isActive).toList();
         for (CategoryModel a : categoryModelList) {
             Set<BrandModel> brandModelSet = new HashSet<>();
             List<ProductModel> productModelList = productRepository.getProductModelsByCategoryModel_Id(a.getId());
@@ -66,10 +68,16 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
+    public List<CategoryDTO> getAllCateActive() {
+        return categoryRepository.findAll().stream().filter(CategoryModel::isActive).map(categoryMapper::toCategoryDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public String create(CategoryDTO a) {
         try {
             boolean checkExists = categoryRepository.existsByCategoryName(a.getCategoryName());
-            if(checkExists){
+            if (checkExists) {
                 throw new CustomException("Category has existed");
             }
             CategoryModel savedCategory = categoryRepository.save(CategoryMapper.INSTANCE.toCategoryModel(a));
