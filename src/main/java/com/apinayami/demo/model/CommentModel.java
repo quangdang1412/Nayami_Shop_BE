@@ -1,5 +1,6 @@
 package com.apinayami.demo.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -15,6 +16,8 @@ import lombok.experimental.SuperBuilder;
 public class CommentModel extends AbstractEntity<Long> {
     private String description;
     private Integer rating;
+    @Column(columnDefinition = "BOOLEAN default true")
+    private boolean active;
 
     //reference
     @ManyToOne

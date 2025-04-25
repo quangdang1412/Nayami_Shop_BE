@@ -72,4 +72,17 @@ public class CommentServiceImpl implements ICommentService {
         UserModel user = userRepository.findByEmail(email);
         return commentRepository.findByProductModel_Id(user.getId()).stream().map(commentMapper::ToCommentDTO).collect(Collectors.toList());
     }
+
+    @Override
+    public String updateStatus(long id) {
+        try{
+            CommentModel commentModel = commentRepository.findById(id).isPresent() ? commentRepository.findById(id).get() : null;
+            commentModel.setActive(!commentModel.isActive());
+            commentRepository.save(commentModel);
+            return "Update success";
+        }
+        catch (Exception e){
+            throw new CustomException("Update failed");
+        }
+    }
 }

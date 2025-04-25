@@ -17,6 +17,7 @@ public interface CommentMapper {
     @Mapping(source = "customerModel.email", target = "userEmail")
     @Mapping(source = "customerModel.username", target = "userName")
     @Mapping(source = "productModel.id", target = "productId")
+    @Mapping(source = "active", target = "active")
     CommentDTO ToCommentDTO(CommentModel commentModel);
 
 }

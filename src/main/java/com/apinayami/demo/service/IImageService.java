@@ -16,4 +16,5 @@ public interface IImageService {
     boolean isPresent(String url, long pid);
 
     String upload(MultipartFile multipartFile);
+    boolean cloudinaryDelete(String url);
 }

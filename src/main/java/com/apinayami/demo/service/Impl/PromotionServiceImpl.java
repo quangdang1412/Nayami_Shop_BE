@@ -42,8 +42,8 @@ public class PromotionServiceImpl implements IPromotionService {
                 for (ImageModel image : promotionDTO.getPromotionImages()) {
                     image.setPromotionModel(savedPromotion);
                     imageRepository.save(image);
+                }
             }
-        }
             return "Thêm thành công" + savedPromotion.getTitle();
         }
         catch (Exception e){
@@ -62,7 +62,14 @@ public class PromotionServiceImpl implements IPromotionService {
             updated_model.setStartDate(promotionDTO.getStartDate());
             updated_model.setEndDate(promotionDTO.getEndDate());
             updated_model.setDisplayStatus(promotionDTO.isDisplayStatus());
-            promotionRepository.save(updated_model);
+            PromotionModel savedPromotion = promotionRepository.save(updated_model);
+
+            if(!promotionDTO.getPromotionImages().isEmpty()) {
+                for (ImageModel image : promotionDTO.getPromotionImages()) {
+                    image.setPromotionModel(savedPromotion);
+                    imageRepository.save(image);
+                }
+            }
             return "Cập nhật thành công " + promotionDTO.getTitle();
 
         } catch (Exception e) {

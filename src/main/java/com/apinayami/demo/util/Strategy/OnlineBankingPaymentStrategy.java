@@ -1,5 +1,7 @@
 package com.apinayami.demo.util.Strategy;
 
+import java.security.SecureRandom;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.apinayami.demo.dto.request.BillRequestDTO;
@@ -43,9 +45,13 @@ public class OnlineBankingPaymentStrategy implements PaymentStrategy {
             }
 
             PayOS payos = new PayOS(clientId, apiKey, checksumKey);
+             SecureRandom random = new SecureRandom();
+            long billId = Math.abs(random.nextLong());
+
+
 
             PaymentData paymentData = PaymentData.builder()
-                    .orderCode(orderId)
+                    .orderCode(billId)
                     .description("Đơn hàng: " + orderId)
                     .amount(finalTotal)
                     .returnUrl(returnUrl)
