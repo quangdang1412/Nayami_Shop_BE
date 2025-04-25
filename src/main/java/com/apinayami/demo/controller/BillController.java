@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,6 +73,7 @@ public class BillController {
     }
 
     @GetMapping("/history")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseData<?> getBillHistory(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         String email = extractUserEmail(authHeader);
         if (email == null) {
@@ -113,7 +115,7 @@ public class BillController {
             String result = billService.cancelBill(email, Long.parseLong(billID.get("billID").toString()));
             return new ResponseData<>(HttpStatus.OK.value(), result);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
     }
 
@@ -156,9 +158,18 @@ public class BillController {
             billService.RequestGuarantee(email, Long.parseLong(billID.get("billID").toString()));
             return new ResponseData<>(HttpStatus.OK.value(), "Yêu cầu bảo hành thành công");
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
     }
-
+    @PostMapping("/payment/{id}")
+    public ResponseData<?> handlePayment(@RequestHeader(value = "Authorization", required = false) String authHeader,@PathVariable Long id) {
+        String email = extractUserEmail(authHeader);
+        try {
+            Object response = billService.handlePayment(email, id);
+            return new ResponseData<>(HttpStatus.OK.value(), "Payment URL generated", Map.of("paymentUrl", response));
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+        }
+    }
 
 }

@@ -10,4 +10,5 @@ public interface ICommentService{
     CommentDTO getCommentById(long id);
     String create(CommentDTO comment);
     List<CommentDTO> getCommentByUserEmail(String email);
+    String updateStatus(long id);
 }

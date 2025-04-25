@@ -65,6 +65,7 @@ public class PromotionController {
             update_promotion.setStartDate(promotionDTO.getStartDate());
             update_promotion.setEndDate(promotionDTO.getEndDate());
             update_promotion.setDisplayStatus(promotionDTO.isDisplayStatus());
+            update_promotion.setPromotionImages(promotionDTO.getPromotionImages());
             String result = promotionService.update(update_promotion);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", result);
         } catch (Exception e) {

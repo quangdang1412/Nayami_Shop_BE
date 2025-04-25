@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -413,5 +414,21 @@ public class BillServiceImpl implements IBillService {
                 .data(data)
                 .build();
     }
+public String handlePayment(String email,Long id){
+        BillModel bill = billRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bill not found with id: " + id));
+        if (bill.getCustomerModel().getEmail() == null || !bill.getCustomerModel().getEmail().equals(email)) {
+            throw new ResourceNotFoundException("Bill not found with id: " + id);
+        }
+       
+        if (bill.getPaymentModel().getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
+            String returnUrl = "http://localhost:5173/checkout";
+            String cancelUrl = "http://localhost:5173/checkout";
 
+            String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategyFactory.getStrategy(EPaymentMethod.ONLINE_BANKING.name()))
+                    .createCheckout(bill.getTotalPrice().intValue(), bill.getId(), returnUrl, cancelUrl);
+
+            return paymentUrl;
+        }
+        return null;
+    }
 }

@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IImageRepository extends JpaRepository<ImageModel, Long> {
     ImageModel findByUrlAndProductModelId(String url, long id);
+    ImageModel findByUrl(String url);
+
 }
