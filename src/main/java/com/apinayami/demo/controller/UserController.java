@@ -1,6 +1,5 @@
 package com.apinayami.demo.controller;
 
-import com.apinayami.demo.dto.request.BrandDTO;
 import com.apinayami.demo.dto.request.ResetPasswordDTO;
 import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResponseData;
@@ -14,9 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-//@RequestMapping("/api/users")
 @RequestMapping("api/users")
 @Validated
 @Slf4j
@@ -46,6 +41,7 @@ public class UserController implements Serializable {
         UserDTO user = userService.getUserById(id);
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
+
     @GetMapping("/email/{email}")
     @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
@@ -59,11 +55,12 @@ public class UserController implements Serializable {
         System.out.println(user.getEmail());
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
+
     @PostMapping("/create")
     public ResponseData<String> createUser(@Valid @RequestBody UserDTO userDTO) {
         try {
             userService.create(userDTO);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success","Add user successfully");
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Add user successfully");
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
             if (e instanceof CustomException)
@@ -71,13 +68,14 @@ public class UserController implements Serializable {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Add user failed");
         }
     }
-//    @SuppressWarnings("unchecked")
+
+    //    @SuppressWarnings("unchecked")
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CUSTOMER')")
     public ResponseData<String> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
         try {
-            log.info("Request update user: {}",userDTO.getUserName());
-             userService.update(userDTO);
+            log.info("Request update user: {}", userDTO.getUserName());
+            userService.update(userDTO);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "update successfully");
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
@@ -86,15 +84,15 @@ public class UserController implements Serializable {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update failed");
         }
     }
+
     @PutMapping("/update-password")
     @PreAuthorize("hasAuthority('CUSTOMER')")
-    public ResponseData<String> updateUser(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+    public ResponseData<String> updateUser(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
         try {
-            boolean isResetPassword =  userService.updateUserPassword(resetPasswordDTO,authHeader);
-            if(isResetPassword){
-                return new ResponseData<>(HttpStatus.OK.value(), "Thành công","Cập nhật password thành công");
-            }
-            else{
+            boolean isResetPassword = userService.updateUserPassword(resetPasswordDTO, authHeader);
+            if (isResetPassword) {
+                return new ResponseData<>(HttpStatus.OK.value(), "Thành công", "Cập nhật password thành công");
+            } else {
                 return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Cập nhật password không thành công");
             }
         } catch (Exception e) {
@@ -104,7 +102,8 @@ public class UserController implements Serializable {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update failed");
         }
     }
-//
+
+    //
 //    @SuppressWarnings("unchecked")
     @DeleteMapping("/delete/{id}")
     public ResponseData<String> deleteUser(@PathVariable Long id) {
@@ -125,12 +124,11 @@ public class UserController implements Serializable {
 
     @PostMapping("/check")
     public ResponseData<Boolean> checkUSerBoughtProduct(@RequestBody Map<String, Object> requestBody) {
-        try{
+        try {
             long proId = Long.parseLong(requestBody.get("proId").toString());
             String userEmail = requestBody.get("email").toString();
             return new ResponseData<>(HttpStatus.OK.value(), "Check customer bought product", userService.checkUserBoughtProduct(userEmail, proId));
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
