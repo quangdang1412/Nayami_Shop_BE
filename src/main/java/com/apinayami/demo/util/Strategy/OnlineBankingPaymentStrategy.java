@@ -8,6 +8,8 @@ import com.apinayami.demo.dto.request.BillRequestDTO;
 import com.apinayami.demo.model.PaymentModel;
 import com.apinayami.demo.util.Enum.EPaymentCurrency;
 import com.apinayami.demo.util.Enum.EPaymentStatus;
+
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
@@ -45,10 +47,9 @@ public class OnlineBankingPaymentStrategy implements PaymentStrategy {
             }
 
             PayOS payos = new PayOS(clientId, apiKey, checksumKey);
-             SecureRandom random = new SecureRandom();
+            SecureRandom random = new SecureRandom();
             long billId = Math.abs(random.nextLong());
-
-
+            billId = billId % 100_000_000L;
 
             PaymentData paymentData = PaymentData.builder()
                     .orderCode(billId)

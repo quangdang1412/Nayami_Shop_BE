@@ -1,6 +1,7 @@
 package com.apinayami.demo.controller;
 
 
+import com.apinayami.demo.config.JwtConfig;
 import com.apinayami.demo.dto.request.CreateCouponRequest;
 import com.apinayami.demo.dto.response.CouponDto;
 import com.apinayami.demo.dto.response.ResponseData;
@@ -9,6 +10,7 @@ import com.apinayami.demo.service.ICouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
 public class CouponController {
 
     private final ICouponService couponService;
+    private final JwtConfig jwtConfig;
 
     @GetMapping
     public ResponseData<List<CouponDto>> getAllCoupons() {
@@ -57,6 +60,25 @@ public class CouponController {
         return new ResponseData<>(HttpStatus.OK.value(), "Coupon deleted successfully", null);
     }
 
-
-
+    @GetMapping("/customer")
+    public ResponseData<?> getCouponByCustomer(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+      try {
+          String email = extractUserEmail(authHeader);
+          if (email == null) {
+              return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để thêm vào giỏ hàng");
+          }
+          List<CouponDto> coupon = couponService.getCouponsByEmail(email);
+          return new ResponseData<>(HttpStatus.OK.value(), "Coupon applied successfully", coupon);
+      } catch (Exception e) {
+          return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lỗi khi lấy giỏ hàng", e.getMessage());
+      }
+    }
+    private String extractUserEmail(String authHeader) {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return null;
+            }
+            String token = authHeader.substring(7);
+            Jwt decodedToken = jwtConfig.decodeToken(token);
+            return decodedToken.getSubject();
+    }
 }

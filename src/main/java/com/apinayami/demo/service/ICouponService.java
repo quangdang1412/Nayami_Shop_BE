@@ -13,5 +13,7 @@ public interface ICouponService {
     CouponDto createCoupon(CreateCouponRequest request);
     CouponDto updateCoupon(String id, CreateCouponRequest request);
     CouponDto getIdIsActive(String id);
+    List<CouponDto> getCouponsByCustomerId(Long customerId);
+    List<CouponDto> getCouponsByEmail(String email);
 
 }

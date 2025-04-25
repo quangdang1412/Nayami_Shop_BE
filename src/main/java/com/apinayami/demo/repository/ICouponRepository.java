@@ -21,4 +21,5 @@ public interface ICouponRepository extends JpaRepository<CouponModel, String> {
 
     Optional<CouponModel> findByIdAndActiveTrue(String id);
 
+
 }
