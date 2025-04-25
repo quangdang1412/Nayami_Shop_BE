@@ -1,5 +1,6 @@
 package com.apinayami.demo.controller;
 
+import com.apinayami.demo.dto.request.BrandDTO;
 import com.apinayami.demo.dto.request.ResetPasswordDTO;
 import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResponseData;
@@ -28,7 +29,6 @@ import java.util.Map;
 public class UserController implements Serializable {
 
     private final UserServiceImpl userService;
-    private final UserMapper userMapper;
 
     @GetMapping("/get-all-users")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -102,8 +102,7 @@ public class UserController implements Serializable {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update failed");
         }
     }
-
-    //
+//
 //    @SuppressWarnings("unchecked")
     @DeleteMapping("/delete/{id}")
     public ResponseData<String> deleteUser(@PathVariable Long id) {
@@ -124,11 +123,12 @@ public class UserController implements Serializable {
 
     @PostMapping("/check")
     public ResponseData<Boolean> checkUSerBoughtProduct(@RequestBody Map<String, Object> requestBody) {
-        try {
+        try{
             long proId = Long.parseLong(requestBody.get("proId").toString());
             String userEmail = requestBody.get("email").toString();
             return new ResponseData<>(HttpStatus.OK.value(), "Check customer bought product", userService.checkUserBoughtProduct(userEmail, proId));
-        } catch (Exception e) {
+        }
+        catch(Exception e){
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
