@@ -27,8 +27,15 @@ public class AuthController {
 
     @PostMapping("/api/login")
     public ResponseData<ResLoginDTO> login(@RequestBody LoginDTO loginDTO) {
-        ResLoginDTO resLoginDTO = loginService.login(loginDTO);
-        return new ResponseData<>(HttpStatus.CREATED.value(), "Login Successfully", resLoginDTO);
+        try {
+            ResLoginDTO resLoginDTO = loginService.login(loginDTO);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Đăng nhập thành công", resLoginDTO);
+        } catch (Exception e) {
+            if (e instanceof CustomException)
+                return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Đăng nhập không thành công");
+        }
+
     }
 
     private final SignupServiceImpl signupService;
