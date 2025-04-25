@@ -28,9 +28,17 @@ public class BrandServiceImpl implements IBrandService {
     }
 
     @Override
-    public BrandModel findBrandById(Long id) {
-       return brandRepository.findBrandById(id);
+    public List<BrandDTO> getAllBrandActive() {
+        return brandRepository.findAll().stream().filter(BrandModel::isActive)
+                .map(brandMapper::toDetailDto)
+                .collect(Collectors.toList());
     }
+
+    @Override
+    public BrandModel findBrandById(Long id) {
+        return brandRepository.findBrandById(id);
+    }
+
     @Override
     public BrandDTO findBrandByIdDTO(Long id) {
         log.info("Finding brand by ID: {}", id);
@@ -65,7 +73,7 @@ public class BrandServiceImpl implements IBrandService {
     }
 
     @Override
-    public String update(BrandDTO a,Long id) {
+    public String update(BrandDTO a, Long id) {
         try {
             log.info("Updating brand: {}", a.getName());
             if (brandRepository.existsByBrandName(a.getName())) {
@@ -98,7 +106,7 @@ public class BrandServiceImpl implements IBrandService {
                 brandModel.setActive(false);
             } else {
                 brandModel.setActive(true);
-                
+
             }
             brandRepository.save(brandModel);
             return "Thay đổi trạng thái thành công " + brandModel.getBrandName();

@@ -203,8 +203,8 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public FilterOptionDTO getFilterOption() {
         FilterOptionDTO filterOptionDTO = new FilterOptionDTO();
-        filterOptionDTO.setListBrandDTO(brandService.getAllBrand());
-        filterOptionDTO.setListCategoryDTO(categoryService.getAll());
+        filterOptionDTO.setListBrandDTO(brandService.getAllBrandActive());
+        filterOptionDTO.setListCategoryDTO(categoryService.getAllCateActive());
         List<Integer> listRating = new ArrayList<>();
         for (int i = 0; i <= 5; i++) {
             listRating.add(productRepository.getQuantityProductOfRating(i));

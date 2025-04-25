@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +41,17 @@ public class DiscountCampaignServiceImpl implements IDiscountCampaignService {
             }
 
             discountDetailModel.setListProduct(productModelList);
-            if (x.getId() != 0)
+            if (x.getId() != 0) {
                 discountDetailModel.setId(x.getId());
+                Optional<DiscountDetailModel> optionalDetail = discountDetailRepository.findById(x.getId());
+                if (optionalDetail.isPresent()) {
+                    DiscountDetailModel detail = optionalDetail.get();
+                    for (ProductModel productModel : detail.getListProduct()) {
+                        productModel.setDiscountDetailModel(null);
+                        productRepository.save(productModel);
+                    }
+                }
+            }
             discountDetailModelList.add(discountDetailModel);
         }
         DiscountCampaignModel discountCampaignModel;
@@ -77,6 +87,7 @@ public class DiscountCampaignServiceImpl implements IDiscountCampaignService {
             for (ProductModel productModel : x.getListProduct()) {
                 productModel.setDiscountDetailModel(x);
                 productModelList.add(productModel);
+                productRepository.save(productModel);
             }
         }
         productRepository.saveAll(productModelList);

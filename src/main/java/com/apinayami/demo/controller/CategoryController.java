@@ -10,9 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -88,7 +86,14 @@ public class CategoryController {
     @Operation(summary = "Get all categories with brands", description = "Retrieves a list of all categories with brands")
     @GetMapping("/brands")
     public ResponseData<List<CategoryWithBrandsDTO>> getAllCategoriesWithBrands() {
-        List<CategoryWithBrandsDTO> categories = categoryService.getAllCategoriesWithBrands();
+        List<CategoryWithBrandsDTO> categories = categoryService.getAllCategoriesWithBrands(0);
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", categories);
+    }
+
+    @Operation(summary = "Get all categories active with brands", description = "Retrieves a list of all categories active with brands")
+    @GetMapping("/active/brands")
+    public ResponseData<List<CategoryWithBrandsDTO>> getAllCategoriesActiveWithBrands() {
+        List<CategoryWithBrandsDTO> categories = categoryService.getAllCategoriesWithBrands(1);
         return new ResponseData<>(HttpStatus.OK.value(), "Success", categories);
     }
 

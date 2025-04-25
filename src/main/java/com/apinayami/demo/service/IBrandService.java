@@ -8,11 +8,16 @@ import java.util.List;
 public interface IBrandService {
     List<BrandDTO> getAllBrand();
 
+    List<BrandDTO> getAllBrandActive();
+
     BrandDTO findBrandByIdDTO(Long id);
+
     BrandModel findBrandById(Long id);
 
-    String create (BrandDTO a);
-    String update (BrandDTO a,Long id);
-    String delete (Long a);
+    String create(BrandDTO a);
+
+    String update(BrandDTO a, Long id);
+
+    String delete(Long a);
 
 }
