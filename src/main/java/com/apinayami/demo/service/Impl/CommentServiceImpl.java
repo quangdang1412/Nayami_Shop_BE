@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CommentServiceImpl implements ICommentService {
+public class    CommentServiceImpl implements ICommentService {
     private final ICommentRepository commentRepository;
     private final IProductRepository productRepository;
     private final IUserRepository userRepository;

@@ -36,6 +36,7 @@ public class WebSecurityConfig {
             "/api/categories/**",
             "/api/products/**",
             "/api/comments/**",
+            "/api/responses/**",
             "/api/promotions/**",
             "/api/auth/social-login/google",
             "/api/login/oauth2/code/google",

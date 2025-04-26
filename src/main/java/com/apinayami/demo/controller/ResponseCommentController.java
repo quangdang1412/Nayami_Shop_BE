@@ -1,21 +1,21 @@
 package com.apinayami.demo.controller;
 
+import com.apinayami.demo.dto.response.ResponseCommentDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
+import com.apinayami.demo.model.ResponseCommentModel;
 import com.apinayami.demo.service.Impl.ResponseCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/response")
+@RequestMapping("/api/responses")
 @Validated
 public class ResponseCommentController {
     private final ResponseCommentService responseCommentService;
@@ -28,6 +28,17 @@ public class ResponseCommentController {
         }
         catch (Exception e){
             return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Tạo phản hồi thất bại");
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseData<?> getResponseCommentsByProductId(@PathVariable long id) {
+        try{
+            List<ResponseCommentDTO> responseCommentDTOList = responseCommentService.getResponseCommentsByProductId(id);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get responses successfully", responseCommentDTOList);
+        }
+        catch (Exception e){
+            return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lấy phản hồi thất bại");
         }
     }
 

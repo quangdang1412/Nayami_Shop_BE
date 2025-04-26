@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 
 .env
-**/serviceAccountKey.json
+src/main/resources/serviceAccountKey.json
 ### STS ###
 .apt_generated
 .classpath

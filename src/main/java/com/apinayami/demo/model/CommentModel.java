@@ -17,7 +17,7 @@ public class CommentModel extends AbstractEntity<Long> {
     private String description;
     private Integer rating;
     @Column(columnDefinition = "BOOLEAN default true")
-    private boolean active;
+    private boolean active = true;
 
     //reference
     @ManyToOne
