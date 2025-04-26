@@ -62,7 +62,7 @@ public class BrandServiceImpl implements IBrandService {
             }
             BrandModel brandModel = new BrandModel();
             brandModel.setBrandName(a.getName());
-
+            brandModel.setActive(true);
             brandRepository.save(brandModel);
             return "Thêm thành công " + a.getName();
 

@@ -39,11 +39,21 @@ public class CouponServiceImpl implements ICouponService {
                 .map(couponMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
     }
+  
 
     public List<CouponDto> getCouponsByCustomerId(Long customerId) {
         UserModel customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
         
+        return couponMapper.toDtoList(couponRepository.findByCustomerModel(customer));
+    }
+    public List<CouponDto> getCouponsByEmail(String email) {
+        UserModel customer = userRepository.findByEmail(email);
+        if (customer == null) {
+            throw new ResourceNotFoundException("Customer not found with email: " + email);
+            
+        }
+
         return couponMapper.toDtoList(couponRepository.findByCustomerModel(customer));
     }
     
