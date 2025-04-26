@@ -5,6 +5,7 @@ import com.apinayami.demo.dto.request.CartPaymentDTO;
 import com.apinayami.demo.dto.response.*;
 import com.apinayami.demo.util.Enum.EBillStatus;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface IBillService {
 
     String cancelBill(String email, Long billId);
 
-    void updateBill(String email, Long billId, String status);
+    void updateBill(String email, Long billId, String status) throws IOException;
 
     void confirmBill(String email, Long billId);
 

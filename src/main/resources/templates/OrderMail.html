@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="icon" href="images/favicon.png" type="image/x-icon" />
+    <title>NayamiShop | Đặt hàng thành công</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;300;400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style type="text/css">
+      body {
+        text-align: center;
+        margin: 20px auto;
+        width: 100% !important;
+        max-width: 750px !important;
+        min-width: 750px !important;
+        font-family: "Nunito Sans", "Public Sans", sans-serif;
+        background-color: #e2e2e2;
+        display: block;
+        -webkit-text-size-adjust: none !important;
+        -ms-text-size-adjust: none !important;
+      }
+      ul {
+        margin: 0;
+        padding: 0;
+      }
+      li {
+        display: inline-block;
+        text-decoration: unset;
+      }
+      a {
+        text-decoration: none;
+      }
+      h5 {
+        margin: 10px;
+        color: #777;
+      }
+      .text-center {
+        text-align: center;
+      }
+      .main-bg-light {
+        background-color: #fafafa;
+      }
+      .header-menu ul li a {
+        font-size: 14px;
+        color: #252525;
+        font-weight: 500;
+      }
+      .product-name {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        word-break: break-word;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+      
+      
+      .product-table tbody tr td img {
+        margin-right: 26px;
+        max-width: 80px;
+      }
+      .product-table tbody tr td .product-detail {
+        text-align: left;
+        gap: 7px;
+      }
+      .product-table tbody tr td .product-detail li {
+        display: block;
+        width: 100%;
+        font-size: 16px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .product-table tbody tr td .product-detail li span {
+        color: #939393;
+      }
+      .order-table {
+        background-image: url(images/order-poster.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 5px;
+        overflow: hidden;
+        padding: 18px 27px;
+        margin-top: 40px;
+      }
+      .footer-table {
+        position: relative;
+        margin-top: 34px;
+      }
+      .footer-table::before {
+        position: absolute;
+        content: "";
+        background-image: url(images/footer-left.svg);
+        background-position: top right;
+        top: 0;
+        left: -71%;
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        z-index: -1;
+        background-size: contain;
+        opacity: 0.3;
+      }
+      .footer-table::after {
+        position: absolute;
+        content: "";
+        background-image: url(images/footer-right.svg);
+        background-position: top right;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        z-index: -1;
+        background-size: contain;
+        opacity: 0.3;
+      }
+      @media only screen and (max-width: 750px) {
+        body,
+        table,
+        td,
+        p,
+        a,
+        li,
+        blockquote {
+          -webkit-text-size-adjust: none !important;
+          -ms-text-size-adjust: none !important;
+        }
+        table {
+          width: 100% !important;
+          max-width: 750px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <table
+      align="center"
+      border="0"
+      cellpadding="0"
+      cellspacing="0"
+      style="
+        background-color: #fff;
+        box-shadow: 0px 0px 14px -4px rgba(0, 0, 0, 0.2705882353);
+        -webkit-box-shadow: 0px 0px 14px -4px rgba(0, 0, 0, 0.2705882353);
+        width: 100% !important;
+        max-width: 750px !important;
+      "
+    >
+      <tbody>
+        <tr>
+          <td>
+            <table
+              class="header-table"
+              align="center"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              width="100%"
+            >
+              <tr
+                class="header"
+                style="
+                  background-color: #f7f7f7;
+                  text-align: center;
+                  width: 100%;
+                "
+              >
+                <td class="header-logo" style="padding: 10px 32px">
+                  <a
+                    href="../front-end/index.html"
+                    style="display: block; text-align: center"
+                  >
+                    <img
+                      src="https://lh3.google.com/u/0/d/1I5A5vJUMc7W8TAAcxd6CYZ7ZXJ4Jnyny=w1912-h507-iv1?auditContext=prefetch"
+                      class="main-logo"
+                      alt="logo"
+                    />
+                  </a>
+                </td>
+              </tr>
+            </table>
+            <table
+              style="padding: 27px"
+              align="center"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              width="100%"
+            >
+              <tr>
+                <td>
+                  <img
+                    src="https://lh3.google.com/u/0/d/1qiY8ZVqcH0C4NgWI9QPBGEJvrUhSTb_O=w1912-h507-iv1?auditContext=prefetch"
+                    alt="Đặt hàng thành công"
+                    style="width: 100%; height: 100%"
+                  />
+                </td>
+              </tr>
+            </table>
+            <table
+              align="center"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              width="100%"
+              style="padding: 0 27px"
+            >
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="title title-2 text-center">
+                      <h2
+                        style="
+                          font-size: 20px;
+                          font-weight: 700;
+                          margin: 24px 0 0;
+                        "
+                      >
+                        Cảm ơn bạn đã đặt hàng
+                      </h2>
+                      <p
+                        style="
+                          font-size: 14px;
+                          margin: 5px auto 0;
+                          line-height: 1.5;
+                          color: #939393;
+                          font-weight: 500;
+                          width: 70%;
+                        "
+                      >
+                        Bạn sẽ nhận được email khi đơn hàng được gửi đi. Nếu có
+                        bất kỳ thắc mắc nào, vui lòng gọi số 1-978-8767.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table
+              class="dilivery-table"
+              align="center"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              width="100%"
+              style="
+                margin: 25px 27px;
+                padding: 20px 32px;
+                width: fit-content;
+                background-color: #f7f7f7;
+              "
+            >
+              <tbody>
+                <tr>
+                  <td
+                    style="
+                      text-align: left;
+                      padding-right: 28px;
+                      width: 50%;
+                      border-right: 2px solid rgba(217, 217, 217, 0.5);
+                    "
+                  >
+                    <div class="title title-2" style="text-align: left">
+                      <h2
+                        style="
+                          font-size: 16px;
+                          font-weight: 700;
+                          margin: 0 0 12px;
+                        "
+                      >
+                        Thông tin giao hàng
+                      </h2>
+                      <p
+                        style="
+                          font-size: 14px;
+                          margin: 0;
+                          line-height: 1.5;
+                          color: #939393;
+                          font-weight: 500;
+                        "
+                      >
+                        Tên người nhận:
+                        <span th:text="${name}">Nguyễn Đăng Quang</span> <br />
+                        Địa chỉ:
+                        <span th:text="${address}"
+                          >268 Đường Cầu Giấy, Quận Cầu Giấy, Hà Nội</span
+                        ><br />
+                        Số điện thoại:
+                        <span th:text="${phoneNumber}">0912 345 678</span>
+                      </p>
+                    </div>
+                  </td>
+                  <td style="text-align: left; padding-left: 32px; width: 50%">
+                    <div class="title title-2" style="text-align: left">
+                      <h2
+                        style="
+                          font-size: 16px;
+                          font-weight: 700;
+                          margin: 0 0 12px;
+                        "
+                      >
+                        Thông tin vận chuyển
+                      </h2>
+                      <p
+                        style="
+                          font-size: 14px;
+                          margin: 0;
+                          line-height: 1.5;
+                          color: #939393;
+                          font-weight: 500;
+                        "
+                      >
+                        Đơn hàng sẽ được giao trong vòng 2-3 ngày làm việc. Theo
+                        dõi đơn hàng qua mã: VN123456789
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table
+              class="shipping-table"
+              align="center"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              width="100%"
+              style="padding: 0 27px"
+            >
+              <thead>
+                <tr>
+                  <th
+                    style="
+                      font-size: 17px;
+                      font-weight: 700;
+                      padding-bottom: 8px;
+                      border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                      text-align: left;
+                    "
+                  >
+                    Sản phẩm đã đặt
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="width: 100%">
+                  <td style="width: 50%; vertical-align: top">
+                    <table
+                      class="product-table"
+                      align="center"
+                      border="0"
+                      cellpadding="0"
+                      cellspacing="0"
+                      width="100%"
+                    >
+                      <tbody>
+                        <tr th:each="item : ${orderItems}">
+                          <td
+                            style="
+                              padding: 28px 0;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                          >
+                            <img
+                              th:src="@{${item.productImage}}"
+                              th:alt="${item.productName}"
+                            />
+                          </td>
+                          <td
+                            style="
+                              padding: 28px 0;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                          >
+                            <ul
+                              class="product-detail"
+                              style="list-style: none; padding-left: 0"
+                            >
+                              <li>
+                                Tên sản phẩm:<span
+                                  th:text="${item.productName}"
+                                  class="product-name"
+                                >
+                                  Iphone 16 pro max</span
+                                >
+                              </li>
+                              <li>
+                                Số lượng:
+                                <span th:text="${item.quantity}">1</span>
+                              </li>
+                              <li>
+                                Giá:
+                                <span
+                                  th:text="${#numbers.formatDecimal(subTotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'"
+                                  >809.450 ₫</span
+                                >
+                              </li>
+                            </ul>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                  <td style="width: 50%; vertical-align: top">
+                    <table
+                      class="dilivery-table"
+                      align="center"
+                      border="0"
+                      cellpadding="0"
+                      style="background-color: #f7f7f7; padding: 14px"
+                      cellspacing="0"
+                      width="100%"
+                    >
+                      <tbody>
+                        <tr>
+                          <td
+                            style="
+                              font-weight: 700;
+                              font-size: 17px;
+                              padding-bottom: 15px;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                            colspan="2"
+                          >
+                            Tổng quan đơn hàng
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style="
+                              text-align: left;
+                              font-size: 15px;
+                              font-weight: 400;
+                              padding: 15px 0;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                          >
+                            Tạm tính
+                          </td>
+                          <td
+                            style="
+                              text-align: right;
+                              font-size: 15px;
+                              font-weight: 400;
+                              padding: 15px 0;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                          >
+                            <span
+                              th:text="${#numbers.formatDecimal(subTotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'"
+                            ></span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style="
+                              text-align: left;
+                              font-size: 15px;
+                              font-weight: 400;
+                              padding: 15px 0;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                          >
+                            Giảm giá
+                          </td>
+                          <td
+                            style="
+                              text-align: right;
+                              font-size: 15px;
+                              font-weight: 400;
+                              padding: 15px 0;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                          >
+                            <span
+                              th:text="'-' + ${#numbers.formatDecimal(coupon, 0, 'COMMA', 0, 'POINT')} + ' ₫'"
+                            ></span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style="
+                              text-align: left;
+                              font-size: 15px;
+                              font-weight: 400;
+                              padding: 15px 0;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                          >
+                            Phí vận chuyển
+                          </td>
+                          <td
+                            style="
+                              text-align: right;
+                              font-size: 15px;
+                              font-weight: 400;
+                              padding: 15px 0;
+                              border-bottom: 1px solid rgba(217, 217, 217, 0.5);
+                            "
+                          >
+                            <span
+                              th:text="${#numbers.formatDecimal(shippingFee, 0, 'COMMA', 0, 'POINT')} + ' ₫'"
+                            ></span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style="
+                              text-align: left;
+                              font-size: 15px;
+                              font-weight: 600;
+                              padding-top: 15px;
+                            "
+                          >
+                            Tổng thanh toán
+                          </td>
+                          <td
+                            style="
+                              text-align: right;
+                              font-size: 15px;
+                              font-weight: 600;
+                              padding-top: 15px;
+                            "
+                          >
+                            <span
+                              th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT')} + ' ₫'"
+                            ></span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table
+              class="footer-table"
+              align="center"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              width="100%"
+              style="
+                padding: 20px 27px;
+                margin-top: 30px;
+                background-color: #f7f7f7;
+              "
+            >
+              <tbody>
+                <tr>
+                  <td style="text-align: center">
+                    <div
+                      style="
+                        margin-bottom: 10px;
+                        font-size: 14px;
+                        color: #252525;
+                      "
+                    ></div>
+                    <div style="margin-top: 10px">
+                      <a href="#" style="display: inline-block; margin: 0 5px">
+                        <img
+                          src="https://lh3.google.com/u/0/d/1rArltyd285DYzOtTAqyc5Yg9FN9aqfQX=w1912-h507-iv1?auditContext=prefetch"
+                          alt="Facebook"
+                          style="width: 24px; height: 24px"
+                        />
+                      </a>
+                      <a href="#" style="display: inline-block; margin: 0 5px">
+                        <img
+                          src="https://lh3.google.com/u/0/d/14M_fM2EOUt3RCswF02qx-y4TiDGFyeVC=w1912-h507-iv1?auditContext=prefetch"
+                          alt="Twitter"
+                          style="width: 24px; height: 24px"
+                        />
+                      </a>
+                      <a href="#" style="display: inline-block; margin: 0 5px">
+                        <img
+                          src="https://lh3.google.com/u/0/d/1VqPLFDKU-7EpJYDX0LmmM4RSW3aC9OHf=w1912-h507-iv1?auditContext=prefetch"
+                          alt="Instagram"
+                          style="width: 24px; height: 24px"
+                        />
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
