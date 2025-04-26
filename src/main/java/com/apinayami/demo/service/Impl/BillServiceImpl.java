@@ -19,12 +19,15 @@ import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
 import com.google.api.client.util.ArrayMap;
+
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,6 +58,7 @@ public class BillServiceImpl implements IBillService {
     private final PaymentStrategyFactory paymentStrategyFactory;
     private final CartItemMapper cartItemMapper;
     private final AddressMapper addressMapper;
+    private final EmailService emailService;
 
     @Transactional
     public BillResponseDTO getBill(String email, CartPaymentDTO billRequestDTO) {
@@ -223,11 +227,15 @@ public class BillServiceImpl implements IBillService {
     }
 
     @Override
-    public void updateBill(String email, Long billId, String status) {
+    public void updateBill(String email, Long billId, String status) throws IOException {
         UserModel customer = userRepository.getUserByEmail(email);
         BillModel bill = billRepository.findByIdAndCustomerModel(billId, customer);
         for (EBillStatus billStatus : EBillStatus.values()) {
+           
             if (billStatus.name().equalsIgnoreCase(status)) {
+                if (billStatus == EBillStatus.CONFIRMED) {
+                    emailService.sendEmailOrder(customer.getEmail(),  "Đơn hàng của bạn đã được xác nhận",billMapper.toBillDetailDTO(bill));
+                }
                 bill.setStatus(billStatus);
                 billRepository.save(bill);
                 break;
