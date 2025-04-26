@@ -1,5 +1,6 @@
 package com.apinayami.demo.service.Impl;
 
+import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResLoginDTO;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.model.UserModel;
@@ -55,8 +56,15 @@ public class OAuthServiceImpl {
             String code = map.get("code");
             String accessTokenWithGoogle = getAccessToken(code);
             UserModel userInfo = getUserInfo(accessTokenWithGoogle);
-            if (!userService.checkUserExistByEmail(userInfo.getEmail())) { // Neu user khong ton tai
+
+            UserDTO currentUser = userService.getUserByEmail(userInfo.getEmail());
+            if (currentUser == null) { // Neu user khong ton tai
                 userRepository.save(userInfo);
+            }else{ // Neu user ton tai
+                if(currentUser.isActive() == false) //user da bi vo hieu hoa
+                {
+                    throw new CustomException("Tài khoản đã bị vô hiệu hóa");
+                }
             }
             String accessTokenForUser = securityUtil.createAcessTokenForOauth(userInfo.getType(), userInfo.getUsername(), userInfo.getEmail());
             String refreshTokenForUser = securityUtil.createRefreshTokenOauth(userInfo.getType(), userInfo.getEmail());

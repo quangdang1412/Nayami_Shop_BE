@@ -23,6 +23,7 @@ public interface IUserRepository extends JpaRepository<UserModel,Long> {
             "JOIN b.items li " +
             "WHERE u.email = :email AND li.productModel.id = :proId AND b.status = 'COMPLETED'")
     boolean checkUserPurchaseProduct(String email, long proId);
+    UserModel findUserModelByEmailAndActive(String emai,boolean active);
 
     
 }
