@@ -27,7 +27,7 @@ public class WebSecurityConfig {
     private final String[] PUBLIC_API = {
             "/api/login",
             "/api/signup",
-            "/api/users",
+            "/api/users/**",
             "/api/users/check",
             "/api/users/create",
             "/api/reset-password",
