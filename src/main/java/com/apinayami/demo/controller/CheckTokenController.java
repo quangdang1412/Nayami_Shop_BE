@@ -16,18 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CheckTokenController {
     @PostMapping("/api/check-token-admin")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<String> checkTokenAdmin()
     {
         return new ResponseData<>(HttpStatus.OK.value(), "Admin retrieved successfully");
     }
 
-    @PostMapping("/api/check-token-staff")
-    @PreAuthorize("hasAuthority('STAFF')")
-    public ResponseData<String> checkTokenStaff()
-    {
-        return new ResponseData<>(HttpStatus.OK.value(), "Staff retrieved successfully");
-    }
+//    @PostMapping("/api/check-token-staff")
+//    public ResponseData<String> checkTokenStaff()
+//    {
+//        return new ResponseData<>(HttpStatus.OK.value(), "Staff retrieved successfully");
+//    }
 
     @PostMapping("/api/check-token-customer")
     @PreAuthorize("hasAuthority('CUSTOMER')")
