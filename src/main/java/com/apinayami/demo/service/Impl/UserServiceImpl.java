@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class    UserServiceImpl implements IUserService {
+public class  UserServiceImpl implements IUserService {
     private final IUserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -119,16 +119,16 @@ public class    UserServiceImpl implements IUserService {
                 .collect(Collectors.toList());
         return allUser;
     }
-    public List<UserDTO> getAllUsersWithoutPassword() {
-        List<UserDTO> allUser = userRepository.getAllByType(Role.CUSTOMER).stream()
+    public List<UserDTO> getAllUsersWithoutPassword(Role role) {
+        List<UserDTO> allUser = userRepository.getAllByType(role).stream()
                 .map(userMapper::toDetailDtoWithoutPassword)
                 .collect(Collectors.toList());
         return allUser;
     }
 
     @Override
-    public UserDTO getUserById(Long id) {
-        UserModel userModel = userRepository.findByIdAndType(id,Role.CUSTOMER);
+    public UserDTO getUserByIdAndRole(Long id,Role role) {
+        UserModel userModel = userRepository.findByIdAndType(id,role);
         if(userModel == null) {
             return null;
         }

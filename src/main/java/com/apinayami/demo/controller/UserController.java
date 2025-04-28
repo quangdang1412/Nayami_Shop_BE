@@ -8,6 +8,7 @@ import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.UserMapper;
 import com.apinayami.demo.service.Impl.UserServiceImpl;
+import com.apinayami.demo.util.Enum.Role;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,28 +33,48 @@ public class UserController implements Serializable {
 
     @GetMapping("/get-all-users")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsersWithoutPassword();
-        return ResponseEntity.ok(users);
+        try {
+            List<UserDTO> users = userService.getAllUsersWithoutPassword(Role.CUSTOMER);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            log.error("Error fetching all users: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-        UserDTO user = userService.getUserById(id);
-        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        try {
+            UserDTO user = userService.getUserByIdAndRole(id,Role.CUSTOMER);
+            return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error fetching user by id: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/email/{email}")
     @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
-        UserDTO user = userService.getUserByEmail(email);
-        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        try {
+            UserDTO user = userService.getUserByEmail(email);
+            return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error fetching user by email: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping()
     public ResponseEntity<UserDTO> getUserByEmail(@RequestBody Map<String, Object> requestBody) {
-        UserDTO user = userService.getUserByEmail(requestBody.get("email").toString());
-        System.out.println(user.getEmail());
-        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        try {
+            UserDTO user = userService.getUserByEmail(requestBody.get("email").toString());
+            System.out.println(user.getEmail());
+            return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error fetching user by email from request body: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/create")
@@ -62,12 +83,13 @@ public class UserController implements Serializable {
             userService.create(userDTO);
             return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Add user successfully");
         } catch (Exception e) {
-            log.error("errorMessage={}", e.getMessage(), e.getCause());
+            log.error("Error creating user: {}", e.getMessage(), e);
             if (e instanceof CustomException)
                 return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Add user failed");
         }
     }
+
 
     //    @SuppressWarnings("unchecked")
     @PutMapping("/update/{id}")
@@ -107,7 +129,7 @@ public class UserController implements Serializable {
     @DeleteMapping("/delete/{id}")
     public ResponseData<String> deleteUser(@PathVariable Long id) {
         try {
-            UserDTO user = userService.getUserById(id);
+            UserDTO user = userService.getUserByIdAndRole(id,Role.CUSTOMER);
             if (user == null) {
                 return new ResponseError(HttpStatus.NOT_FOUND.value(), "User not found");
             }
@@ -132,4 +154,47 @@ public class UserController implements Serializable {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+/*
+* These controller is used for get all staffs
+* */
+    @GetMapping("/get-all-staffs")
+    public ResponseEntity<List<UserDTO>> getAllStaffs() {
+        try {
+            List<UserDTO> users = userService.getAllUsersWithoutPassword(Role.STAFF);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            log.error("Error fetching all users: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    //Update staff
+    @GetMapping("/staff/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UserDTO> getStaffById(@PathVariable Long id) {
+        try {
+            UserDTO user = userService.getUserByIdAndRole(id,Role.STAFF);
+            return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error fetching user by id: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @PutMapping("/update/password/staff/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseData<String> updatePassword(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+        try {
+            log.info("Request update user: {}", userDTO.getUserName());
+            userService.update(userDTO);
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", "update successfully");
+        } catch (Exception e) {
+            log.error("errorMessage={}", e.getMessage(), e.getCause());
+            if (e instanceof CustomException)
+                return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update failed");
+        }
+    }
+
+
+
+
 }

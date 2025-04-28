@@ -27,7 +27,7 @@ public class WebSecurityConfig {
     private final String[] PUBLIC_API = {
             "/api/login",
             "/api/signup",
-            "/api/users",
+            "/api/users/**",
             "/api/users/check",
             "/api/users/create",
             "/api/reset-password",
@@ -36,6 +36,7 @@ public class WebSecurityConfig {
             "/api/categories/**",
             "/api/products/**",
             "/api/comments/**",
+            "/api/responses/**",
             "/api/promotions/**",
             "/api/auth/social-login/google",
             "/api/login/oauth2/code/google",

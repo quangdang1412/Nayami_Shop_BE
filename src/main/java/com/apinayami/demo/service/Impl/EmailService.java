@@ -95,6 +95,7 @@ public class EmailService {
             Context context = new Context();
             Map<String, Object> properties = new HashMap<>();
             properties.put("phone", billDetailDTO.getShipping().getAddress().getPhone());
+            properties.put("status",subject) ;
             properties.put("name", billDetailDTO.getShipping().getAddress().getRecipientName());
             properties.put("address", billDetailDTO.getShipping().getAddress().getAddressName() + ", "
                     + billDetailDTO.getShipping().getAddress().getWard() + ", "
