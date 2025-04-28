@@ -75,7 +75,7 @@ public class ProductController {
 
     }
 
-//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     @GetMapping()
     public ResponseData<?> getAllProduct() {
         try {

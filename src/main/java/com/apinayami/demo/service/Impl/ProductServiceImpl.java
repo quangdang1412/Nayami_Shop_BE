@@ -78,7 +78,6 @@ public class ProductServiceImpl implements IProductService {
         otherConfigurationRepository.saveAll(otherConfigurationModelList);
 
         CategoryModel categoryModel = CategoryMapper.INSTANCE.toCategoryModelWithID(categoryService.findCategoryById(productRequestDTO.getCategoryDTO().getId()));
-        System.out.println(categoryModel);
 
 
         ProductModel productModel = ProductModel.builder()
