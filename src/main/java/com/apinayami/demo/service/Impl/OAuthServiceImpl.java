@@ -3,6 +3,7 @@ package com.apinayami.demo.service.Impl;
 import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResLoginDTO;
 import com.apinayami.demo.exception.CustomException;
+import com.apinayami.demo.mapper.UserMapper;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.util.Enum.Role;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
@@ -51,6 +53,7 @@ public class OAuthServiceImpl {
         return authorizationRequest.getAuthorizationRequestUri();
     }
 
+    private final PasswordEncoder passwordEncoder;
     public ResLoginDTO getCredentialOfUser(Map<String, String> map) {
         try {
             String code = map.get("code");
@@ -59,6 +62,8 @@ public class OAuthServiceImpl {
 
             UserDTO currentUser = userService.getUserByEmail(userInfo.getEmail());
             if (currentUser == null) { // Neu user khong ton tai
+                String hashedPasswrod = passwordEncoder.encode(userInfo.getPassword());
+                userInfo.setPassword(hashedPasswrod);
                 userRepository.save(userInfo);
             }else{ // Neu user ton tai
                 if(currentUser.isActive() == false) //user da bi vo hieu hoa
