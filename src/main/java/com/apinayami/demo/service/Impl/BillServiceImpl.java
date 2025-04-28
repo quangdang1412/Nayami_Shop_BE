@@ -230,17 +230,36 @@ public class BillServiceImpl implements IBillService {
     public void updateBill(String email, Long billId, String status) throws IOException {
         UserModel customer = userRepository.getUserByEmail(email);
         BillModel bill = billRepository.findByIdAndCustomerModel(billId, customer);
-        for (EBillStatus billStatus : EBillStatus.values()) {
-           
-            if (billStatus.name().equalsIgnoreCase(status)) {
-                if (billStatus == EBillStatus.CONFIRMED) {
-                    emailService.sendEmailOrder(customer.getEmail(),  "Đơn hàng của bạn đã được xác nhận",billMapper.toBillDetailDTO(bill));
-                }
-                bill.setStatus(billStatus);
-                billRepository.save(bill);
-                break;
-            }
+        if (bill == null) {
+            throw new ResourceNotFoundException("Bill not found with id: " + billId);
         }
+        EBillStatus billStatus = EBillStatus.valueOf(status);
+        String subject = "";
+        switch (billStatus) {
+            case CONFIRMED:
+                subject = "Đơn hàng của bạn đã được xác nhận";
+                break;
+            case SHIPPED:
+                subject = "Đơn hàng của bạn đã được giao";
+                break;
+            case GUARANTEE:
+                subject = "Đơn hàng của bạn đang được bảo hành";
+                break;
+            case SHIPPING:
+                subject = "Đơn hàng của bạn đang được giao";
+                break;
+            case COMPLETED:
+                subject = "Đơn hàng của bạn đã được hoàn thành";
+                break;
+            case CANCELLED:
+                subject = "Đơn hàng của bạn đã bị hủy";
+                break;
+            default:
+                throw new ResourceNotFoundException("Unknown bill status: " + billStatus);
+        }
+        emailService.sendEmailOrder(customer.getEmail(), subject, billMapper.toBillDetailDTO(bill));
+        bill.setStatus(billStatus);
+        billRepository.save(bill);
     }
 
     @Transactional
