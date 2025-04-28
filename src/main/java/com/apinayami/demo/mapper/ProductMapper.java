@@ -44,6 +44,7 @@ public class ProductMapper {
         productDTO.setRatingAvg(productModel.getRatingAvg());
         productDTO.setProductStatus(productModel.getProductStatus().toString());
         productDTO.setConfigDTO(configurationDTO);
+        productDTO.setRateQuantity(productModel.getListComment().size());
         return productDTO;
     }
 }

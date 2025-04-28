@@ -36,4 +36,5 @@ public class ProductDTO implements Serializable {
     private String productStatus;
     private List<String> listImage;
     private ConfigurationDTO configDTO;
+    private int rateQuantity;
 }
