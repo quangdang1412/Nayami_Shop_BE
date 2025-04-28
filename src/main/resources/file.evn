@@ -1,6 +1,6 @@
-DB_URL=jdbc:mysql://localhost:3306/nayami_shop?createDatabaseIfNotExist=true
-DB_USERNAME=root
-DB_PASSWORD=admin1234
+DB_URL=jdbc:mysql://mysql-39c8d988-hadangquang1408-2d08.j.aivencloud.com:23103/nayami_shop?createDatabaseIfNotExist=true
+DB_USERNAME=avnadmin
+DB_PASSWORD=AVNS_-oWIuF1NYBi4IssMorH
 PAYOS_CLIENT_ID=f1cf353d-8948-467e-8121-b73e5c0c4459
 PAYOS_API_KEY=8dc9009d-647f-4fc1-85be-4ca362e31149
 PAYOS_CHECKSUM_KEY=1e1b46c16dcf2a01e23705ba857f13e4bbf49224416b591f5894baa41bf401c9
