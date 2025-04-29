@@ -8,11 +8,9 @@ import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.CategoryMapper;
 import com.apinayami.demo.mapper.ProductMapper;
 import com.apinayami.demo.model.*;
-import com.apinayami.demo.repository.IConfigurationRepository;
-import com.apinayami.demo.repository.IOtherConfigurationRepository;
-import com.apinayami.demo.repository.IProductRepository;
-import com.apinayami.demo.repository.ProductSpecification;
+import com.apinayami.demo.repository.*;
 import com.apinayami.demo.service.*;
+import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EProductStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +24,8 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +39,7 @@ public class ProductServiceImpl implements IProductService {
     private final IDiscountDetailService discountDetailService;
     private final IOtherConfigurationRepository otherConfigurationRepository;
     private final IConfigurationRepository configurationRepository;
+    private final IBillRepository billRepository;
     private final IImageService imageService;
     private final ProductMapper productMapper;
     private final PagedResourcesAssembler<ProductDTO> pagedResourcesAssembler;
@@ -197,6 +198,22 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public Long getQuantityOfProduct() {
         return productRepository.getQuantityOfProduct();
+    }
+
+    @Override
+    public List<ProductDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+        List<ProductDTO> data = new ArrayList<>();
+        List<Object[]> listProduct = billRepository.topSeller(startDateTime, endDateTime, EBillStatus.COMPLETED);
+        for (int i = 0; i < Math.min(5, listProduct.size()); i++) {
+            Object[] productInfo = listProduct.get(i);
+            if (productInfo != null && productInfo.length > 0) {
+                ProductModel productModel = (ProductModel) productInfo[0];
+                data.add(productMapper.convertToDTO(productModel));
+            }
+        }
+        return data;
     }
 
     @Override
