@@ -20,7 +20,6 @@ import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
 import com.google.api.client.util.ArrayMap;
 
-import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -51,7 +49,7 @@ public class BillServiceImpl implements IBillService {
     private final IShippingRepository shippingRepository;
     private final ICouponRepository couponRepository;
     private final IPaymentRepository paymentRepository;
-    private final ICartItemRepository cartItemRepository;
+    private final ICartRepository cartRepository;
     private final IAddressRepository addressRepository;
     private final ILineItemRepository lineItemRepository;
     private final BillMapper billMapper;
@@ -67,13 +65,22 @@ public class BillServiceImpl implements IBillService {
             throw new ResourceNotFoundException("User is empty");
         }
         BillResponseDTO bill = new BillResponseDTO();
-        List<CartItemModel> cartItems = billRequestDTO.getCartId().stream()
-                .map(id -> cartItemRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + id)))
+
+        CartModel cart = cartRepository.findByCustomerModel(customer)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user"));
+
+        List<CartItemModel> cartItems = cart.getCartItems().stream()
+                .filter(item -> billRequestDTO.getCartId().contains(item.getId()))
                 .collect(Collectors.toList());
+
+        if (cartItems.isEmpty()) {
+            throw new ResourceNotFoundException("No cart items found with the provided IDs");
+        }
+
         bill.setListCartItem(cartItems.stream()
                 .map(cartItemMapper::toCartItemDTO)
                 .collect(Collectors.toList()));
+
         List<AddressModel> address = addressRepository.findByCustomerModel_IdAndActiveTrue(customer.getId());
 
         bill.setListAddress(address.stream()
@@ -83,7 +90,6 @@ public class BillServiceImpl implements IBillService {
         bill.setCoupon(billRequestDTO.getCouponId());
         bill.setDiscount(billRequestDTO.getDiscount());
         return bill;
-
     }
 
     @Transactional
@@ -105,7 +111,8 @@ public class BillServiceImpl implements IBillService {
         CouponModel coupon = null;
         if (request.getCouponId() != null) {
             coupon = couponRepository.findByIdAndActiveTrue(request.getCouponId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + request.getCouponId()));
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Coupon not found with id: " + request.getCouponId()));
             coupon.setActive(false);
             couponRepository.save(coupon);
         }
@@ -122,17 +129,20 @@ public class BillServiceImpl implements IBillService {
                 .status(EBillStatus.PENDING)
                 .paymentModel(payment)
                 .build();
-        List<CartItemModel> cartItem = request.getCartId().stream()
-                .map(id -> cartItemRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + id)))
+
+        CartModel cart = cartRepository.findByCustomerModel(customer)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user"));
+
+        List<CartItemModel> cartItems = cart.getCartItems().stream()
+                .filter(item -> request.getCartId().contains(item.getId()))
                 .collect(Collectors.toList());
 
-        if (cartItem.isEmpty()) {
+        if (cartItems.isEmpty()) {
             throw new ResourceNotFoundException("Cart is empty");
         }
         List<LineItemModel> items = new ArrayList<>();
         Double totalPrice = 0.0;
-        for (CartItemModel item : cartItem) {
+        for (CartItemModel item : cartItems) {
             ProductModel product = item.getProductModel();
             if (product.getQuantity() < item.getQuantity()) {
                 throw new ResourceNotFoundException("Not enough stock for product: " + product.getProductName());
@@ -143,7 +153,8 @@ public class BillServiceImpl implements IBillService {
                     .quantity(item.getQuantity())
                     .build();
             double unitPrice = item.getProductModel().getUnitPrice();
-            if (item.getProductModel().getDiscountDetailModel() != null && item.getProductModel().getDiscountDetailModel().getPercentage() != null) {
+            if (item.getProductModel().getDiscountDetailModel() != null
+                    && item.getProductModel().getDiscountDetailModel().getPercentage() != null) {
                 double discountPercentage = item.getProductModel().getDiscountDetailModel().getPercentage();
                 unitPrice = product.getUnitPrice() * ((100 - discountPercentage) / 100);
             }
@@ -151,7 +162,7 @@ public class BillServiceImpl implements IBillService {
             Integer quantity = item.getQuantity();
             totalPrice += unitPrice * quantity;
             product.setQuantity(product.getQuantity() - item.getQuantity());
-            
+
             productRepository.save(product);
             lineItemRepository.save(lineItem);
             items.add(lineItem);
@@ -162,9 +173,9 @@ public class BillServiceImpl implements IBillService {
             bill = couponDecorator.getBillModel();
         }
         bill.setItems(items);
-        for (CartItemModel item : cartItem) {
-            cartItemRepository.delete(item);
-        }
+
+        cartItems.forEach(item -> cart.getCartItems().remove(item));
+        cartRepository.save(cart);
 
         BillModel savedBill = billRepository.save(bill);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
@@ -305,7 +316,8 @@ public class BillServiceImpl implements IBillService {
 
         LocalDateTime cutoffTime = LocalDateTime.now().minus(24, ChronoUnit.HOURS);
 
-        List<BillModel> unpaidBills = billRepository.findByPaymentModel_PaymentStatusAndCreatedAtBefore(EPaymentStatus.PENDING, cutoffTime);
+        List<BillModel> unpaidBills = billRepository
+                .findByPaymentModel_PaymentStatusAndCreatedAtBefore(EPaymentStatus.PENDING, cutoffTime);
 
         if (!unpaidBills.isEmpty()) {
             log.info("Found {} unpaid bills to cancel", unpaidBills.size());
@@ -375,7 +387,8 @@ public class BillServiceImpl implements IBillService {
     }
 
     @Override
-    public List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate, EBillStatus status) {
+    public List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate,
+            EBillStatus status) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<ProductBestSellingDTO> data = new ArrayList<>();
@@ -397,7 +410,8 @@ public class BillServiceImpl implements IBillService {
     }
 
     @Override
-    public DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status, int a) {
+    public DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status,
+            int a) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
@@ -441,17 +455,20 @@ public class BillServiceImpl implements IBillService {
                 .data(data)
                 .build();
     }
-public String handlePayment(String email,Long id){
-        BillModel bill = billRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bill not found with id: " + id));
+
+    public String handlePayment(String email, Long id) {
+        BillModel bill = billRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Bill not found with id: " + id));
         if (bill.getCustomerModel().getEmail() == null || !bill.getCustomerModel().getEmail().equals(email)) {
             throw new ResourceNotFoundException("Bill not found with id: " + id);
         }
-       
+
         if (bill.getPaymentModel().getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
             String returnUrl = "http://localhost:5173/checkout";
             String cancelUrl = "http://localhost:5173/checkout";
 
-            String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategyFactory.getStrategy(EPaymentMethod.ONLINE_BANKING.name()))
+            String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategyFactory
+                    .getStrategy(EPaymentMethod.ONLINE_BANKING.name()))
                     .createCheckout(bill.getTotalPrice().intValue(), bill.getId(), returnUrl, cancelUrl);
 
             return paymentUrl;
