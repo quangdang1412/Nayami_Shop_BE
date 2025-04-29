@@ -23,7 +23,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = "email"),
-                @UniqueConstraint(columnNames = "phoneNumber") })
+        @UniqueConstraint(columnNames = "phoneNumber") })
 public class UserModel extends AbstractEntity<Long> implements UserDetails {
     protected String userName;
     protected String password;
@@ -33,12 +33,12 @@ public class UserModel extends AbstractEntity<Long> implements UserDetails {
     protected boolean active;
     protected String phoneNumber;
 
-    //reference
-        //staff
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "staffModel", cascade = CascadeType.ALL)
+    // reference
+    // staff
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "staffModel", cascade = CascadeType.ALL)
     private Set<ResponseCommentModel> listResponseComments;
 
-        //customer
+    // customer
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
     private Set<AddressModel> listAddress;
 
@@ -46,10 +46,10 @@ public class UserModel extends AbstractEntity<Long> implements UserDetails {
     private Set<CouponModel> listCoupon;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
-    private Set<CartItemModel> listCartItem;
+    private Set<CartModel> listCart;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
-    @JsonIgnore 
+    @JsonIgnore
     private Set<BillModel> listBill;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customerModel", cascade = CascadeType.ALL)
