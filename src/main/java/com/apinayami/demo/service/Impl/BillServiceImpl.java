@@ -10,8 +10,8 @@ import com.apinayami.demo.mapper.BillMapper;
 import com.apinayami.demo.mapper.CartItemMapper;
 import com.apinayami.demo.model.*;
 import com.apinayami.demo.repository.*;
-import com.apinayami.demo.service.CouponDecorator;
 import com.apinayami.demo.service.IBillService;
+import com.apinayami.demo.util.Decorator.CouponDecorator;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EPaymentMethod;
 import com.apinayami.demo.util.Enum.EPaymentStatus;
@@ -19,7 +19,6 @@ import com.apinayami.demo.util.Strategy.OnlineBankingPaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategy;
 import com.apinayami.demo.util.Strategy.PaymentStrategyFactory;
 import com.google.api.client.util.ArrayMap;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +47,7 @@ public class BillServiceImpl implements IBillService {
     private final IProductRepository productRepository;
     private final IShippingRepository shippingRepository;
     private final ICouponRepository couponRepository;
+    private final ISerialProductRepository serialProductRepository;
     private final IPaymentRepository paymentRepository;
     private final ICartRepository cartRepository;
     private final IAddressRepository addressRepository;
@@ -113,8 +113,6 @@ public class BillServiceImpl implements IBillService {
             coupon = couponRepository.findByIdAndActiveTrue(request.getCouponId())
                     .orElseThrow(
                             () -> new ResourceNotFoundException("Coupon not found with id: " + request.getCouponId()));
-            coupon.setActive(false);
-            couponRepository.save(coupon);
         }
 
         PaymentStrategy paymentStrategy = paymentStrategyFactory.getStrategy(request.getPaymentMethod().name());
@@ -144,7 +142,7 @@ public class BillServiceImpl implements IBillService {
         Double totalPrice = 0.0;
         for (CartItemModel item : cartItems) {
             ProductModel product = item.getProductModel();
-            if (product.getQuantity() < item.getQuantity()) {
+            if (productRepository.getQuantityProductInStock(product.getId()) < item.getQuantity()) {
                 throw new ResourceNotFoundException("Not enough stock for product: " + product.getProductName());
             }
             LineItemModel lineItem = LineItemModel.builder()
@@ -161,9 +159,21 @@ public class BillServiceImpl implements IBillService {
             lineItem.setUnitPrice(unitPrice);
             Integer quantity = item.getQuantity();
             totalPrice += unitPrice * quantity;
-            product.setQuantity(product.getQuantity() - item.getQuantity());
 
-            productRepository.save(product);
+            List<SerialProductModel> activeSerials = product.getListSerialOfProduct().stream()
+                    .filter(SerialProductModel::isActive)
+                    .limit(item.getQuantity())
+                    .toList();
+
+            if (activeSerials.size() < item.getQuantity()) {
+                throw new ResourceNotFoundException("Not enough active serials for product: " + product.getProductName());
+            }
+
+            for (SerialProductModel serial : activeSerials) {
+                serial.setActive(false);
+                serial.setLineItemModel(lineItem);
+                serialProductRepository.save(serial);
+            }
             lineItemRepository.save(lineItem);
             items.add(lineItem);
         }
@@ -171,11 +181,11 @@ public class BillServiceImpl implements IBillService {
         if (coupon != null) {
             CouponDecorator couponDecorator = new CouponDecorator(bill, coupon);
             bill = couponDecorator.getBillModel();
+            coupon.setActive(false);
+            couponRepository.save(coupon);
         }
         bill.setItems(items);
 
-        cartItems.forEach(item -> cart.getCartItems().remove(item));
-        cartRepository.save(cart);
 
         BillModel savedBill = billRepository.save(bill);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
@@ -187,6 +197,7 @@ public class BillServiceImpl implements IBillService {
 
             return paymentUrl;
         }
+        cartRepository.delete(cart);
         return billMapper.toResponseDTO(savedBill);
     }
 
@@ -388,7 +399,7 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate,
-            EBillStatus status) {
+                                                                   EBillStatus status) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<ProductBestSellingDTO> data = new ArrayList<>();
@@ -401,7 +412,7 @@ public class BillServiceImpl implements IBillService {
                         .url(productModel.getListImage().getFirst().getUrl())
                         .name(productModel.getProductName())
                         .unitPrice(productModel.getUnitPrice())
-                        .quantity(productModel.getQuantity())
+                        .quantity(productRepository.getQuantityProductInStock(productModel.getId()))
                         .quantitySold(((Long) productInfo[1]).intValue())
                         .build());
             }
@@ -411,7 +422,7 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status,
-            int a) {
+                                                         int a) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);

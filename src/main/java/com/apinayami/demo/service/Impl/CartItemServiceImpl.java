@@ -5,6 +5,7 @@ import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.mapper.CartItemMapper;
 import com.apinayami.demo.model.CartModel;
 import com.apinayami.demo.model.UserModel;
+import com.apinayami.demo.repository.ICartItemRepository;
 import com.apinayami.demo.repository.ICartRepository;
 import com.apinayami.demo.repository.IProductRepository;
 import com.apinayami.demo.repository.IUserRepository;
@@ -12,10 +13,8 @@ import com.apinayami.demo.service.ICartItemService;
 import com.apinayami.demo.util.Command.AddToCartCommand;
 import com.apinayami.demo.util.Command.RemoveFromCartCommand;
 import com.apinayami.demo.util.Command.UpdateCartItemCommand;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +29,7 @@ public class CartItemServiceImpl implements ICartItemService {
     private final IUserRepository userRepository;
     private final IProductRepository productRepository;
     private final ICartRepository cartRepository;
+    private final ICartItemRepository cartItemRepository;
     private final CartItemMapper cartItemMapper;
 
     public List<CartItemDTO> getUserCart(String email) {
@@ -64,6 +64,6 @@ public class CartItemServiceImpl implements ICartItemService {
 
     @Transactional
     public void removeFromCart(String email, Long cartItemId) {
-        new RemoveFromCartCommand(email, cartItemId, cartRepository, userRepository).execute();
+        new RemoveFromCartCommand(email, cartItemId, cartRepository, userRepository, cartItemRepository).execute();
     }
 }

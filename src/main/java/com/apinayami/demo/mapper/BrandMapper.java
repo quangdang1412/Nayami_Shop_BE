@@ -16,6 +16,7 @@ public class BrandMapper {
                 .id(brand.getId())
                 .name(brand.getBrandName())
                 .active(brand.isActive())
+                .quantityProduct(brand.getListProduct().size())
                 .build();
     }
 

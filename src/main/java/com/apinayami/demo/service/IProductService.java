@@ -3,9 +3,11 @@ package com.apinayami.demo.service;
 import com.apinayami.demo.dto.request.FilterOptionDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.model.ProductModel;
+import com.apinayami.demo.util.Enum.EBillStatus;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IProductService {
@@ -35,4 +37,7 @@ public interface IProductService {
     List<ProductDTO> getProductOutOfStock();
 
     Long getQuantityOfProduct();
+
+    List<ProductDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate, EBillStatus status);
+
 }

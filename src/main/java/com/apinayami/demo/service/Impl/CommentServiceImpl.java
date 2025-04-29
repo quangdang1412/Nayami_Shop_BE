@@ -2,7 +2,6 @@ package com.apinayami.demo.service.Impl;
 
 import com.apinayami.demo.dto.request.CommentDTO;
 import com.apinayami.demo.exception.CustomException;
-import com.apinayami.demo.mapper.CategoryMapper;
 import com.apinayami.demo.mapper.CommentMapper;
 import com.apinayami.demo.model.CommentModel;
 import com.apinayami.demo.model.ProductModel;
@@ -21,11 +20,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class    CommentServiceImpl implements ICommentService {
+public class CommentServiceImpl implements ICommentService {
     private final ICommentRepository commentRepository;
     private final IProductRepository productRepository;
     private final IUserRepository userRepository;
     private final CommentMapper commentMapper;
+
     @Override
     public List<CommentDTO> getAllComments() {
         List<CommentModel> commentModel = commentRepository.findAll();
@@ -44,7 +44,7 @@ public class    CommentServiceImpl implements ICommentService {
 
     @Override
     public String create(CommentDTO commentDTO) {
-        try{
+        try {
             UserModel userModel = userRepository.findByEmail(commentDTO.getUserEmail());
             ProductModel productModel = productRepository.findById(commentDTO.getProductId()).get();
             CommentModel commentModel = commentMapper.ToCommentModel(commentDTO);
@@ -54,13 +54,11 @@ public class    CommentServiceImpl implements ICommentService {
 
             List<CommentDTO> commentDTOS = getCommentByProductId(productModel.getId());
             int avgRate = commentDTOS.stream().mapToInt(CommentDTO::getRating).sum() / commentDTOS.size();
-            System.out.println(avgRate);
             productModel.setRatingAvg(avgRate);
             productRepository.save(productModel);
 
             return "Thêm thành công " + commentModel.getDescription();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("Error: {}", e.getMessage());
             throw new CustomException("Promotion has existed");
@@ -75,13 +73,12 @@ public class    CommentServiceImpl implements ICommentService {
 
     @Override
     public String updateStatus(long id) {
-        try{
+        try {
             CommentModel commentModel = commentRepository.findById(id).isPresent() ? commentRepository.findById(id).get() : null;
             commentModel.setActive(!commentModel.isActive());
             commentRepository.save(commentModel);
             return "Update success";
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException("Update failed");
         }
     }

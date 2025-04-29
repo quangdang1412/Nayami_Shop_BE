@@ -90,7 +90,6 @@ public class BillController {
         Long orderID = Long.parseLong(params.get("orderCode"));
         String cancel = params.get("cancel");
 
-        System.out.println("Received Payment Callback: " + params);
         String email = extractUserEmail(authHeader);
         if (email == null) {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập");
@@ -161,8 +160,9 @@ public class BillController {
             return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
     }
+
     @PostMapping("/payment/{id}")
-    public ResponseData<?> handlePayment(@RequestHeader(value = "Authorization", required = false) String authHeader,@PathVariable Long id) {
+    public ResponseData<?> handlePayment(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Long id) {
         String email = extractUserEmail(authHeader);
         try {
             Object response = billService.handlePayment(email, id);

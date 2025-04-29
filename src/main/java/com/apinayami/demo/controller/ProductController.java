@@ -1,11 +1,13 @@
 package com.apinayami.demo.controller;
 
+import com.apinayami.demo.dto.request.DashBoardDateDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.service.IProductService;
+import com.apinayami.demo.util.Enum.EBillStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.validation.Valid;
@@ -18,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -75,7 +78,7 @@ public class ProductController {
 
     }
 
-//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     @GetMapping()
     public ResponseData<?> getAllProduct() {
         try {
@@ -156,6 +159,18 @@ public class ProductController {
         try {
             PagedModel<?> productPage = productService.getProductFilter(pageNo, pageSize, sortBy, brands, categories, rating, discounts, searchQuery, price);
             return new ResponseData<>(HttpStatus.OK.value(), "Get product filter successfully", productPage);
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+    }
+
+    @PostMapping("/productBestSelling")
+    public ResponseData<?> getProductBestSelling(@RequestBody DashBoardDateDTO dashboardDateDTO) {
+        try {
+            LocalDate startDate = dashboardDateDTO.getStartDate();
+            LocalDate endDate = dashboardDateDTO.getEndDate();
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getProductBestSellingByTime(startDate, endDate, EBillStatus.COMPLETED));
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
