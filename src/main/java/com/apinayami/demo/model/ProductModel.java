@@ -22,7 +22,6 @@ public class ProductModel extends AbstractEntity<Long> {
     @Column(columnDefinition = "LONGTEXT")
     private String description;
     private boolean displayStatus;
-    private Integer quantity;
     private Integer ratingAvg;
     private Double originalPrice;
     private Double unitPrice;
@@ -52,6 +51,9 @@ public class ProductModel extends AbstractEntity<Long> {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productModel", cascade = CascadeType.ALL)
     private List<LineItemModel> listLineItem;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productModel", cascade = CascadeType.ALL)
+    private List<SerialProductModel> listSerialOfProduct;
 
 
 }

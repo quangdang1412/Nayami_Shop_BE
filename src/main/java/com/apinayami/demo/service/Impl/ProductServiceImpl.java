@@ -14,6 +14,7 @@ import com.apinayami.demo.util.Enum.EBillStatus;
 import com.apinayami.demo.util.Enum.EProductStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,7 @@ import java.util.List;
 @Slf4j
 public class ProductServiceImpl implements IProductService {
     private final IProductRepository productRepository;
+    private final ISerialProductRepository serialProductRepository;
     private final IBrandService brandService;
     private final ICategoryService categoryService;
     private final IDiscountDetailService discountDetailService;
@@ -87,10 +89,9 @@ public class ProductServiceImpl implements IProductService {
                 .categoryModel(categoryModel)
                 .description(productRequestDTO.getDescription())
                 .discountDetailModel(productRequestDTO.getDiscountDTO() == null ? null : discountDetailService.findDiscountDetailById(productRequestDTO.getDiscountDTO().getId()))
-                .quantity(productRequestDTO.getQuantity())
                 .unitPrice(productRequestDTO.getUnitPrice())
                 .originalPrice(productRequestDTO.getOriginalPrice())
-                .quantity(productRequestDTO.getQuantity())
+                .listSerialOfProduct(null)
                 .ratingAvg(0)
                 .displayStatus(true)
                 .productStatus(EProductStatus.valueOf(productRequestDTO.getProductStatus()))
@@ -126,6 +127,12 @@ public class ProductServiceImpl implements IProductService {
 
         }
         productModel.setListImage(imageModelList);
+
+        for (int i = 0; i < productRequestDTO.getQuantity(); i++) {
+            String s = RandomStringUtils.randomAlphanumeric(10);
+            ;
+            serialProductRepository.save(new SerialProductModel(true, productModel, null, s));
+        }
         productRepository.save(productModel);
         return productRequestDTO.getName();
     }

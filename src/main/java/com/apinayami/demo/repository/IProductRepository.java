@@ -4,14 +4,18 @@ import com.apinayami.demo.model.ProductModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface IProductRepository extends JpaRepository<ProductModel, Long>, JpaSpecificationExecutor<ProductModel> {
-    @Query("from ProductModel p where p.quantity<=6")
+    @Query("SELECT p FROM ProductModel p JOIN SerialProductModel sp ON sp.productModel = p WHERE sp.active = true GROUP BY p HAVING COUNT(sp) <= 6")
     List<ProductModel> getProductOutOfStock();
+
+    @Query("SELECT COUNT(sp) FROM SerialProductModel sp WHERE sp.active = true AND sp.productModel.id = :id")
+    Integer getQuantityProductInStock(@Param("id") long id);
 
     List<ProductModel> getProductModelsByCategoryModel_Id(long id);
 
