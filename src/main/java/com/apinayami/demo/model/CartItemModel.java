@@ -1,19 +1,16 @@
 package com.apinayami.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @Entity
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class CartItemModel extends AbstractEntity<Long> {
+public class CartItemModel extends AbstractEntity<Long>  {
+
+
     private Integer quantity;
 
     @ManyToOne
@@ -21,6 +18,6 @@ public class CartItemModel extends AbstractEntity<Long> {
     private ProductModel productModel;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private UserModel customerModel;
+    @JoinColumn(name = "cart_id")
+    private CartModel cartModel;
 }

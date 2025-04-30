@@ -1,9 +1,9 @@
 package com.apinayami.demo.repository;
 
-import com.apinayami.demo.model.PaymentModel;
+import com.apinayami.demo.model.SerialProductModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IPaymentRepository extends JpaRepository<PaymentModel, Long> {
+public interface ISerialProductRepository extends JpaRepository<SerialProductModel, Long> {
 }

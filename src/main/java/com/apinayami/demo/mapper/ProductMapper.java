@@ -6,6 +6,7 @@ import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.model.ImageModel;
 import com.apinayami.demo.model.OtherConfigurationModel;
 import com.apinayami.demo.model.ProductModel;
+import com.apinayami.demo.repository.IProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import java.util.List;
 public class ProductMapper {
     private final BrandMapper brandMapper;
     private final CategoryMapper categoryMapper;
+    private final IProductRepository productRepository;
     private final DiscountDetailMapper discountDetailMapper;
 
     public ProductDTO convertToDTO(ProductModel productModel) {
@@ -37,7 +39,7 @@ public class ProductMapper {
         productDTO.setListImage(productModel.getListImage().stream().map(ImageModel::getUrl).toList());
         productDTO.setDescription(productModel.getDescription());
         productDTO.setUnitPrice(productModel.getUnitPrice());
-        productDTO.setQuantity(productModel.getQuantity());
+        productDTO.setQuantity(productRepository.getQuantityProductInStock(productModel.getId()));
         productDTO.setDisplayStatus(productModel.isDisplayStatus());
         productDTO.setUnitPrice(productModel.getUnitPrice());
         productDTO.setOriginalPrice(productModel.getOriginalPrice());
