@@ -1,12 +1,11 @@
 package com.apinayami.demo.controller;
 
-import com.apinayami.demo.dto.request.BrandDTO;
+import com.apinayami.demo.dto.request.AdminInformationUpdateDTO;
 import com.apinayami.demo.dto.request.ResetPasswordDTO;
 import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
-import com.apinayami.demo.mapper.UserMapper;
 import com.apinayami.demo.service.Impl.UserServiceImpl;
 import com.apinayami.demo.util.Enum.Role;
 import jakarta.validation.Valid;
@@ -185,6 +184,20 @@ public class UserController implements Serializable {
         try {
             log.info("Request update user: {}", userDTO.getUserName());
             userService.update(userDTO);
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", "update successfully");
+        } catch (Exception e) {
+            log.error("errorMessage={}", e.getMessage(), e.getCause());
+            if (e instanceof CustomException)
+                return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update failed");
+        }
+    }
+/*Update information of admin*/
+    @PutMapping("/update/inform/admin")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseData<String> updatePassword(@Valid @RequestBody AdminInformationUpdateDTO adminDTO) {
+        try {
+            userService.updateAdmin(adminDTO);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "update successfully");
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());

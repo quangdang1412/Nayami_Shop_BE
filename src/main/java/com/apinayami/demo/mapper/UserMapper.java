@@ -1,5 +1,6 @@
 package com.apinayami.demo.mapper;
 
+import com.apinayami.demo.dto.request.AdminInformationUpdateDTO;
 import com.apinayami.demo.dto.request.BrandDTO;
 import com.apinayami.demo.dto.request.SignupDTO;
 import com.apinayami.demo.dto.request.UserDTO;
