@@ -37,7 +37,6 @@ public class ProductController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             ProductDTO productDTO = objectMapper.readValue(productDTOJson, ProductDTO.class);
-
             return new ResponseData<>(HttpStatus.CREATED.value(), "Success", productService.saveProduct(productDTO, files));
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
