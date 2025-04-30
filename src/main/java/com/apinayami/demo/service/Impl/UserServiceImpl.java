@@ -1,5 +1,6 @@
 package com.apinayami.demo.service.Impl;
 
+import com.apinayami.demo.dto.request.AdminInformationUpdateDTO;
 import com.apinayami.demo.dto.request.ResetPasswordDTO;
 import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResponseError;
@@ -89,6 +90,19 @@ public class  UserServiceImpl implements IUserService {
             }
             userRepository.save(userModel);
             return "Cập nhật thành công " +userDTO.getUserName();
+        } catch (Exception e) {
+            log.error("Error: {}", e.getMessage());
+            if (e instanceof CustomException)
+                throw new CustomException(e.getMessage());
+            throw new CustomException("Update user failed");
+        }
+    }
+    public String updateAdmin(AdminInformationUpdateDTO adminDTO) {
+        try {
+            String hashedPassword = passwordEncoder.encode(adminDTO.getPassword());
+            String email = adminDTO.getEmail();
+            userRepository.updateInformationOfAdmin(email,hashedPassword);
+            return "Cập nhật thành công thông tin admin";
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
             if (e instanceof CustomException)
