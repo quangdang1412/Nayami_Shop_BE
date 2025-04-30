@@ -47,9 +47,11 @@ public class ProductServiceImpl implements IProductService {
     private final PagedResourcesAssembler<ProductDTO> pagedResourcesAssembler;
 
     public String saveProduct(ProductDTO productRequestDTO, List<MultipartFile> files) {
-        List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
-        if (productRequestDTO.getConfigDTO() == null)
+        if (productRequestDTO.getConfigDTO() == null) {
             throw new CustomException("Configuration not be flank");
+        }
+
+        List<OtherConfigurationModel> otherConfigurationModelList = new ArrayList<>();
         for (OtherConfigurationDTO a : productRequestDTO.getConfigDTO().getListOtherConfigDTO()) {
             OtherConfigurationModel otherConfig = OtherConfigurationModel.builder()
                     .name(a.getName())
@@ -57,11 +59,11 @@ public class ProductServiceImpl implements IProductService {
                     .build();
             otherConfigurationModelList.add(otherConfig);
         }
+
         ConfigurationModel configurationModel;
         if (productRequestDTO.getConfigDTO().getId() != 0) {
             configurationModel = configurationRepository.findById(productRequestDTO.getConfigDTO().getId())
                     .orElseThrow(() -> new CustomException("Configuration not found"));
-
             otherConfigurationRepository.deleteByConfigurationModel(configurationModel.getId());
         } else {
             configurationModel = ConfigurationModel.builder().build();
@@ -81,7 +83,6 @@ public class ProductServiceImpl implements IProductService {
         otherConfigurationRepository.saveAll(otherConfigurationModelList);
 
         CategoryModel categoryModel = CategoryMapper.INSTANCE.toCategoryModelWithID(categoryService.findCategoryById(productRequestDTO.getCategoryDTO().getId()));
-
 
         ProductModel productModel = ProductModel.builder()
                 .productName(productRequestDTO.getName())
@@ -128,11 +129,26 @@ public class ProductServiceImpl implements IProductService {
         }
         productModel.setListImage(imageModelList);
 
-        for (int i = 0; i < productRequestDTO.getQuantity(); i++) {
-            String s = RandomStringUtils.randomAlphanumeric(10);
-            ;
-            serialProductRepository.save(new SerialProductModel(true, productModel, null, s));
+        int quantityProductActive = 0;
+        if (productRequestDTO.getId() != 0) {
+            quantityProductActive = productRepository.getQuantityProductInStock(productRequestDTO.getId());
+
         }
+        int quantityProduct = productRequestDTO.getQuantity() - quantityProductActive;
+        if (quantityProduct >= 0) {
+            for (int i = 0; i < quantityProduct; i++) {
+                String s = RandomStringUtils.randomAlphanumeric(10);
+                serialProductRepository.save(new SerialProductModel(true, productModel, null, s));
+            }
+        } else {
+            for (SerialProductModel a : serialProductRepository.findSerialProductModelByProductModel_Id(productRequestDTO.getId()).stream().filter(SerialProductModel::isActive).toList()) {
+                if (quantityProduct == 0)
+                    break;
+                serialProductRepository.delete(a);
+                quantityProduct++;
+            }
+        }
+
         productRepository.save(productModel);
         return productRequestDTO.getName();
     }
