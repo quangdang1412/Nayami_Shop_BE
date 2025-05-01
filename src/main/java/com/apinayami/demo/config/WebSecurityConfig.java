@@ -75,6 +75,7 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                         .requestMatchers(PUBLIC_API).permitAll()
                         .requestMatchers(ADMIN_API).hasAuthority("ADMIN")
                         .requestMatchers(CUSTOMER_API).hasAuthority("CUSTOMER")
@@ -108,11 +109,14 @@ public class WebSecurityConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("https://nayami-shop-fe.vercel.app", "http://localhost:5173")
-                        .allowedMethods("*")
+                registry.addMapping("/api/**")
+                        .allowedOrigins(
+                                "https://nayami-shop-fe.vercel.app",  // FE production domain
+                                "http://localhost:5173"                // FE development domain
+                        )
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowCredentials(true); // Nếu dùng cookie/token
             }
         };
     }
