@@ -9,9 +9,9 @@ spring:
     name: nayami_shop
   datasource:
     url:
-      ${DB_URL2:yourDBURL}
+      ${DB_URL:yourDBURL}
     username: ${DB_USERNAME:yourUserName}
-    password: ${DB_PASSWORD2:yourUserName}
+    password: ${DB_PASSWORD:yourUserName}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
