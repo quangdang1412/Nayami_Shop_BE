@@ -41,7 +41,6 @@ public class WebSecurityConfig {
             "/api/auth/social-login/google",
             "/api/login/oauth2/code/google",
 //            Test purposes
-            "/api/dashboard/**",
 
             //Swagger
             "/swagger-ui/**",

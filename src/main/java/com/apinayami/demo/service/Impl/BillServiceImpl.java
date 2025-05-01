@@ -409,7 +409,7 @@ public class BillServiceImpl implements IBillService {
             if (productInfo != null && productInfo.length > 0) {
                 ProductModel productModel = (ProductModel) productInfo[0];
                 data.add(ProductBestSellingDTO.builder()
-                        .url(productModel.getListImage().getFirst().getUrl())
+                        .url(productModel.getListImage().get(0).getUrl())
                         .name(productModel.getProductName())
                         .unitPrice(productModel.getUnitPrice())
                         .quantity(productRepository.getQuantityProductInStock(productModel.getId()))
