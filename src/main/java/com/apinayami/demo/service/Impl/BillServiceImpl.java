@@ -189,8 +189,8 @@ public class BillServiceImpl implements IBillService {
 
         BillModel savedBill = billRepository.save(bill);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
-            String returnUrl = "http://localhost:5173/checkout";
-            String cancelUrl = "http://localhost:5173/checkout";
+            String returnUrl = "https://nayami-shop-fe.vercel.app/checkout";
+            String cancelUrl = "https://nayami-shop-fe.vercel.app/checkout";
 
             String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategy)
                     .createCheckout(totalPrice.intValue(), savedBill.getId(), returnUrl, cancelUrl);
@@ -475,8 +475,8 @@ public class BillServiceImpl implements IBillService {
         }
 
         if (bill.getPaymentModel().getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
-            String returnUrl = "http://localhost:5173/checkout";
-            String cancelUrl = "http://localhost:5173/checkout";
+            String returnUrl = "https://nayami-shop-fe.vercel.app/checkout";
+            String cancelUrl = "https://nayami-shop-fe.vercel.app/checkout";
 
             String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategyFactory
                     .getStrategy(EPaymentMethod.ONLINE_BANKING.name()))
