@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-    
+
 public interface IBillRepository extends JpaRepository<BillModel, Long> {
     List<BillModel> findByCustomerModelOrderByCreatedAtDesc(UserModel user);
 
@@ -37,7 +37,7 @@ public interface IBillRepository extends JpaRepository<BillModel, Long> {
             "JOIN od.productModel p " +
             "JOIN od.billModel o " +
             "WHERE o.createdAt >= ?1 and o.createdAt <= ?2 and o.status = :status " +
-            "GROUP BY p.productName " +
+            "GROUP BY p.id " +
             "ORDER BY totalQuantity DESC")
     List<Object[]> topSeller(LocalDateTime startDate, LocalDateTime endDate, @Param("status") EBillStatus status);
 
@@ -46,5 +46,5 @@ public interface IBillRepository extends JpaRepository<BillModel, Long> {
     List<BillModel> findByStatusAndUpdatedAtBefore(EBillStatus shipped, LocalDateTime cutoffTime);
 
     List<BillModel> findAllByOrderByCreatedAtDesc();
-    
+
 }
