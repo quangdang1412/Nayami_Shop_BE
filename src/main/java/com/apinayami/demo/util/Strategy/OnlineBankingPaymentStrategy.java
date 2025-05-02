@@ -5,10 +5,13 @@ import java.security.SecureRandom;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.apinayami.demo.dto.request.BillRequestDTO;
+import com.apinayami.demo.model.BillModel;
 import com.apinayami.demo.model.PaymentModel;
+import com.apinayami.demo.repository.IBillRepository;
 import com.apinayami.demo.util.Enum.EPaymentCurrency;
 import com.apinayami.demo.util.Enum.EPaymentStatus;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import vn.payos.PayOS;
@@ -17,6 +20,8 @@ import vn.payos.type.PaymentData;
 
 @Component("ONLINE_BANKING")
 @Slf4j
+@RequiredArgsConstructor
+
 public class OnlineBankingPaymentStrategy implements PaymentStrategy {
 
     @Value("${payos.client-id}")
@@ -27,6 +32,8 @@ public class OnlineBankingPaymentStrategy implements PaymentStrategy {
 
     @Value("${payos.checksum-key}")
     private String checksumKey;
+
+    private final IBillRepository billRepository;
 
     @Override
     public PaymentModel processPayment(BillRequestDTO request) {
@@ -51,6 +58,9 @@ public class OnlineBankingPaymentStrategy implements PaymentStrategy {
             long billId = Math.abs(random.nextLong());
             billId = billId % 100_000_000L;
 
+
+            BillModel billModel = billRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Đơn hàng không tồn tại!"));
+            billModel.setOrderNumber(billId);
             PaymentData paymentData = PaymentData.builder()
                     .orderCode(billId)
                     .description("Đơn hàng: " + orderId)
