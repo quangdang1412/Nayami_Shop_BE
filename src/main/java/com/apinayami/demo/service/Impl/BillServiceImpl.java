@@ -54,6 +54,7 @@ public class BillServiceImpl implements IBillService {
     private final ISerialProductRepository serialProductRepository;
     private final IPaymentRepository paymentRepository;
     private final ICartRepository cartRepository;
+    private final ICartItemRepository cartItemRepository;
     private final IAddressRepository addressRepository;
     private final ILineItemRepository lineItemRepository;
     private final BillMapper billMapper;
@@ -206,6 +207,11 @@ public class BillServiceImpl implements IBillService {
         Double totalPriceWithShipping = totalPrice + request.getShippingFee();
         savedBill = billRepository.save(savedBill);
 
+        for (CartItemModel item : cartItems) {
+            cart.getCartItems().remove(item);
+            cartItemRepository.delete(item);
+        }
+        cartRepository.save(cart);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
             String returnUrl = "http://localhost:5173/checkout";
             String cancelUrl = "http://localhost:5173/checkout";
@@ -214,7 +220,7 @@ public class BillServiceImpl implements IBillService {
                     .createCheckout(totalPriceWithShipping.intValue(), savedBill.getId(), returnUrl, cancelUrl);
             return paymentUrl;
         }
-        cartRepository.delete(cart);
+
         return billMapper.toResponseDTO(savedBill);
     }
 
@@ -336,7 +342,6 @@ public class BillServiceImpl implements IBillService {
             log.error("Error getting payment link information: {}", e.getMessage());
         }
 
-        
     }
 
     @Override
