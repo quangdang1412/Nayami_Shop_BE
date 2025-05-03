@@ -15,7 +15,10 @@ import java.util.List;
 public interface IBillRepository extends JpaRepository<BillModel, Long> {
     List<BillModel> findByCustomerModelOrderByCreatedAtDesc(UserModel user);
 
+    BillModel findByOrderNumberAndCustomerModel(Long billId, UserModel user);
+    
     BillModel findByIdAndCustomerModel(Long billId, UserModel user);
+
 
 
     @Query("SELECT COUNT(b) FROM BillModel b WHERE b.status = :status")

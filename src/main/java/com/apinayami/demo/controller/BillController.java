@@ -98,11 +98,11 @@ public class BillController {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Xử lý thanh toán thất bại");
         }
 
-        if ("SUCCESS".equalsIgnoreCase(status)) {
+        if ("PAID".equalsIgnoreCase(status)) {
             billService.confirmBill(email, orderID);
             return new ResponseData<>(HttpStatus.OK.value(), "Xử lý thanh toán thành công");
         }
-        return new ResponseData<>(HttpStatus.OK.value(), "Trạng thái thanh toán không hợp lệ");
+        return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Trạng thái thanh toán không hợp lệ");
 
     }
 

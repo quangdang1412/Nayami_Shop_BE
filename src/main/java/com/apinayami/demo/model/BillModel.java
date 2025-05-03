@@ -24,7 +24,7 @@ public class BillModel extends AbstractEntity<Long> {
     @Enumerated(EnumType.STRING)
     private EBillStatus status;
 
-    private String orderNumber;
+    private Long orderNumber;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
