@@ -34,36 +34,37 @@ public class CouponServiceImpl implements ICouponService {
                 .map(couponMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
     }
-    public CouponDto getIdIsActive(String id){
+
+    public CouponDto getIdIsActive(String id) {
         return couponRepository.findByIdAndActiveTrue(id)
                 .map(couponMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
     }
-  
 
     public List<CouponDto> getCouponsByCustomerId(Long customerId) {
         UserModel customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
-        
+
         return couponMapper.toDtoList(couponRepository.findByCustomerModel(customer));
     }
+
     public List<CouponDto> getCouponsByEmail(String email) {
         UserModel customer = userRepository.findByEmail(email);
         if (customer == null) {
             throw new ResourceNotFoundException("Customer not found with email: " + email);
-            
+
         }
 
         return couponMapper.toDtoList(couponRepository.findByCustomerModel(customer));
     }
-    
+
     public List<CouponDto> getActiveCouponsByCustomerId(Long customerId) {
         UserModel customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
-        
+
         return couponMapper.toDtoList(couponRepository.findByCustomerModelAndActive(customer, true));
     }
-    
+
     public List<CouponDto> getCouponsByType(ETypeCoupon type) {
         return couponMapper.toDtoList(couponRepository.findByType(type));
     }
@@ -80,13 +81,14 @@ public class CouponServiceImpl implements ICouponService {
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .build();
-                
+
         if (request.getCustomerId() != null) {
             UserModel customer = userRepository.findById(request.getCustomerId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + request.getCustomerId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Customer not found with id: " + request.getCustomerId()));
             coupon.setCustomerModel(customer);
         }
-        
+
         CouponModel savedCoupon = couponRepository.save(coupon);
         return couponMapper.toDto(savedCoupon);
     }
@@ -95,7 +97,7 @@ public class CouponServiceImpl implements ICouponService {
     public CouponDto updateCoupon(String id, CreateCouponRequest request) {
         CouponModel coupon = couponRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
-        
+
         coupon.setContent(request.getContent());
         coupon.setValue(request.getValue());
         coupon.setType(request.getType());
@@ -103,28 +105,28 @@ public class CouponServiceImpl implements ICouponService {
         coupon.setActive(request.isActive());
         coupon.setStartDate(request.getStartDate());
         coupon.setEndDate(request.getEndDate());
-        
+
         if (request.getCustomerId() != null) {
             UserModel customer = userRepository.findById(request.getCustomerId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + request.getCustomerId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Customer not found with id: " + request.getCustomerId()));
             coupon.setCustomerModel(customer);
         }
-        
+
         return couponMapper.toDto(couponRepository.save(coupon));
     }
-    
+
     @Transactional
     public void deleteCoupon(String id) {
         CouponModel coupon = couponRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon not found with id: " + id));
         if (coupon.isActive()) {
             coupon.setActive(false);
         } else {
             coupon.setActive(true);
-            
+
         }
         couponRepository.save(coupon);
     }
-    
 
 }
