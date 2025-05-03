@@ -77,7 +77,7 @@ public class CouponServiceImpl implements ICouponService {
                 .value(request.getValue())
                 .type(request.getType())
                 .constraintMoney(request.getConstraintMoney())
-                .active(true)
+                .active(request.isActive())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .build();
