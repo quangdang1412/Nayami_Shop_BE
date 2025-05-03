@@ -22,12 +22,11 @@ import com.google.api.client.util.ArrayMap;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import vn.payos.PayOS;
-import vn.payos.type.PaymentLinkData;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import vn.payos.PayOS;
+import vn.payos.type.PaymentLinkData;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -213,8 +212,8 @@ public class BillServiceImpl implements IBillService {
         }
         cartRepository.save(cart);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
-            String returnUrl = "http://localhost:5173/checkout";
-            String cancelUrl = "http://localhost:5173/checkout";
+            String returnUrl = "https://nayami-shop-fe.vercel.app/checkout";
+            String cancelUrl = "https://nayami-shop-fe.vercel.app/checkout";
 
             String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategy)
                     .createCheckout(totalPriceWithShipping.intValue(), savedBill.getId(), returnUrl, cancelUrl);
@@ -438,7 +437,7 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate,
-            EBillStatus status) {
+                                                                   EBillStatus status) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<ProductBestSellingDTO> data = new ArrayList<>();
@@ -461,7 +460,7 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status,
-            int a) {
+                                                         int a) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
