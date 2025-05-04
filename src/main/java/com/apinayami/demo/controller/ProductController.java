@@ -31,6 +31,7 @@ public class ProductController {
     private final IProductService productService;
 
     @PostMapping()
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<String> addProduct(@RequestPart("productDTO") @Valid String productDTOJson,
                                            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         try {
@@ -46,6 +47,7 @@ public class ProductController {
     }
 
     @PutMapping()
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<String> updateProduct(@RequestPart("productDTO") @Valid String productDTOJson,
                                               @RequestPart("files") List<MultipartFile> files) {
         try {
@@ -64,6 +66,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "{proID}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<?> changeDisplayStatusProduct(@PathVariable long proID) {
         try {
             log.info("Request update display status : {}", proID);
@@ -111,7 +114,7 @@ public class ProductController {
     }
 
     @GetMapping(value = "/categories/{categoryID}")
-    public ResponseData<?> getProductByBrand(@PathVariable long categoryID) {
+    public ResponseData<?> getProductByCategory(@PathVariable long categoryID) {
         try {
             return new ResponseData<>(HttpStatus.OK.value(), "Get product successfully", productService.findProductByCategoryId(categoryID));
         } catch (ResourceNotFoundException e) {
