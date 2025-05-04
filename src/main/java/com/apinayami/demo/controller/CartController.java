@@ -1,19 +1,15 @@
 package com.apinayami.demo.controller;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.*;
-
 import com.apinayami.demo.config.JwtConfig;
 import com.apinayami.demo.dto.request.CartItemDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.service.ICartItemService;
-import com.apinayami.demo.service.Impl.CartItemServiceImpl;
-
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import com.apinayami.demo.model.UserModel;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -51,23 +47,25 @@ public class CartController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseData<?> addToCart(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody CartItemDTO request) {
-    try {
-        String email = extractUserEmail(authHeader);
-        if (email == null) {
-            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để thêm vào giỏ hàng");
-        }
+        try {
+            String email = extractUserEmail(authHeader);
+            if (email == null) {
+                return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập để thêm vào giỏ hàng");
+            }
 
-        CartItemDTO addedItem = cartItemService.addToCart(email, request);
-        return new ResponseData<>(HttpStatus.CREATED.value(), "Thêm vào giỏ hàng thành công", addedItem);
-    } catch (Exception e) {
-        return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lỗi khi thêm vào giỏ hàng", e.getMessage());
-    }
+            CartItemDTO addedItem = cartItemService.addToCart(email, request);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Thêm vào giỏ hàng thành công", addedItem);
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lỗi khi thêm vào giỏ hàng", e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseData<?> updateCartItem(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Long id,
@@ -87,6 +85,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseData<?> removeFromCart(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Long id) {

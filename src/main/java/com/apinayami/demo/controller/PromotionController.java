@@ -1,16 +1,13 @@
 package com.apinayami.demo.controller;
 
-import com.apinayami.demo.dto.request.BrandDTO;
 import com.apinayami.demo.dto.request.PromotionDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
-import com.apinayami.demo.model.CategoryModel;
-import com.apinayami.demo.model.PromotionModel;
 import com.apinayami.demo.service.IPromotionService;
-import com.apinayami.demo.service.Impl.PromotionServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +19,9 @@ import java.util.List;
 @Validated
 public class PromotionController {
     private final IPromotionService promotionService;
+
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN','STAFF')")
     public ResponseData<String> addPromotion(@RequestBody @Valid PromotionDTO promotionDTO) {
         try {
             String result = promotionService.create(promotionDTO);
@@ -32,6 +31,7 @@ public class PromotionController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
         }
     }
+
     @GetMapping
     public ResponseData<?> getAllPromotions() {
         List<PromotionDTO> promotionList = promotionService.getAllPromotions();
@@ -44,7 +44,9 @@ public class PromotionController {
 
         return new ResponseData<>(HttpStatus.OK.value(), "Success", promotion);
     }
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','STAFF')")
     public ResponseData<String> deletePromotion(@PathVariable long id) {
         try {
             PromotionDTO deleted_promotion = promotionService.getPromotionById(id);
@@ -56,7 +58,9 @@ public class PromotionController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
         }
     }
+
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','STAFF')")
     public ResponseData<String> updatePromotion(@PathVariable long id, @RequestBody @Valid PromotionDTO promotionDTO) {
         try {
             PromotionDTO update_promotion = promotionService.getPromotionById(id);
