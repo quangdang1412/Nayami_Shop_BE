@@ -67,7 +67,6 @@ public class UserController implements Serializable {
     }
 
     @PostMapping()
-    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<UserDTO> getUserByEmail(@RequestBody Map<String, Object> requestBody) {
         try {
             UserDTO user = userService.getUserByEmail(requestBody.get("email").toString());

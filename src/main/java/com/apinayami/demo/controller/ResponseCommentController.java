@@ -17,11 +17,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/responses")
 @Validated
-@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
 public class ResponseCommentController {
     private final ResponseCommentService responseCommentService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<?> createResponseComment(@RequestBody Map<String, String> body) {
         try {
             String result = responseCommentService.createResponseComment(body.get("reply"), body.get("staff"), Long.parseLong(body.get("id")));
