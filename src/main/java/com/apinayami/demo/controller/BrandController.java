@@ -25,7 +25,6 @@ import java.util.List;
 public class BrandController {
 
     private final IBrandService brandService;
-    private final BrandMapper brandMapper;
 
     @Operation(summary = "Get all brands", description = "Returns a list of all available brands")
     @GetMapping

@@ -285,6 +285,7 @@ public class BillServiceImpl implements IBillService {
                 break;
             case SHIPPED:
                 subject = "Đơn hàng của bạn đã được giao";
+                bill.getPaymentModel().setPaymentStatus(EPaymentStatus.COMPLETED);
                 break;
             case GUARANTEE:
                 subject = "Đơn hàng của bạn đang được bảo hành";
