@@ -13,7 +13,7 @@ public class AppConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .allowedOrigins(
                         "https://nayami-shop-fe.vercel.app",  // FE production domain
-                        "http://localhost:5173"                // FE development domain
+                        "http://localhost:5173"          // FE development domain
                 )
                 .allowedMethods("*")
                 .allowedHeaders("*");

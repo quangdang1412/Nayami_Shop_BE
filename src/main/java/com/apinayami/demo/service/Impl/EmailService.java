@@ -3,6 +3,7 @@ package com.apinayami.demo.service.Impl;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -28,11 +29,15 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
 
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+
     public boolean sendEmail(String toEmail, String subject, String content) throws MessagingException {
         boolean result = false;
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(fromEmail);
             helper.setTo(toEmail);
             helper.setSubject(subject);
             helper.setText(content, true);
@@ -50,6 +55,7 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(fromEmail);
             helper.setTo(toEmail);
             helper.setSubject(subject);
             Context context = new Context();
@@ -89,13 +95,14 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(fromEmail);
             helper.setTo(toEmail);
             helper.setSubject(subject);
 
             Context context = new Context();
             Map<String, Object> properties = new HashMap<>();
             properties.put("phone", billDetailDTO.getShipping().getAddress().getPhone());
-            properties.put("status",subject) ;
+            properties.put("status", subject);
             properties.put("name", billDetailDTO.getShipping().getAddress().getRecipientName());
             properties.put("address", billDetailDTO.getShipping().getAddress().getAddressName() + ", "
                     + billDetailDTO.getShipping().getAddress().getWard() + ", "
@@ -105,13 +112,14 @@ public class EmailService {
             properties.put("orderItems", billDetailDTO.getItems());
             double subTotal = 0.0;
             for (int i = 0; i < billDetailDTO.getItems().size(); i++) {
-                subTotal += billDetailDTO.getItems().get(i).getUnitPrice() * billDetailDTO.getItems().get(i).getQuantity();
+                subTotal += billDetailDTO.getItems().get(i).getUnitPrice()
+                        * billDetailDTO.getItems().get(i).getQuantity();
             }
             properties.put("subTotal", subTotal);
             properties.put("shippingFee", billDetailDTO.getShipping().getShippingFee());
             double discount = billDetailDTO.getDiscount() == null ? 0.0 : billDetailDTO.getDiscount();
             properties.put("coupon", discount);
-            Double total= billDetailDTO.getTotalPrice() - discount+ billDetailDTO.getShipping().getShippingFee();
+            Double total = billDetailDTO.getTotalPrice() - discount + billDetailDTO.getShipping().getShippingFee();
             properties.put("total", total);
 
             context.setVariables(properties);

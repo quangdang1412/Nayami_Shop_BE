@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ResetPasswordService {
-    private final String domainFrontEnd = "http://localhost:5173/reset-password/";
+    private final String domainFrontEnd = "https://nayami-shop-fe.vercel.app/reset-password/";
     private final SecurityUtil securityUtil;
     private final EmailService emailService;
     private final UserServiceImpl userService;

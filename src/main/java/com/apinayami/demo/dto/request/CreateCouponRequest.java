@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.apinayami.demo.util.Enum.ETypeCoupon;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,8 @@ public class CreateCouponRequest {
     private Double value;
 
     private ETypeCoupon type;
-
+    
+    @Column(columnDefinition = "TINYINT(1)")
     private boolean active;
 
     private Double constraintMoney;

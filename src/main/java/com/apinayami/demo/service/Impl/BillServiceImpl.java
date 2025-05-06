@@ -22,6 +22,10 @@ import com.google.api.client.util.ArrayMap;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import vn.payos.PayOS;
+import vn.payos.type.PaymentLinkData;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +54,7 @@ public class BillServiceImpl implements IBillService {
     private final ISerialProductRepository serialProductRepository;
     private final IPaymentRepository paymentRepository;
     private final ICartRepository cartRepository;
+    private final ICartItemRepository cartItemRepository;
     private final IAddressRepository addressRepository;
     private final ILineItemRepository lineItemRepository;
     private final BillMapper billMapper;
@@ -57,6 +62,15 @@ public class BillServiceImpl implements IBillService {
     private final CartItemMapper cartItemMapper;
     private final AddressMapper addressMapper;
     private final EmailService emailService;
+
+    @Value("${payos.client-id}")
+    private String clientId;
+
+    @Value("${payos.api-key}")
+    private String apiKey;
+
+    @Value("${payos.checksum-key}")
+    private String checksumKey;
 
     @Transactional
     public BillResponseDTO getBill(String email, CartPaymentDTO billRequestDTO) {
@@ -138,6 +152,9 @@ public class BillServiceImpl implements IBillService {
         if (cartItems.isEmpty()) {
             throw new ResourceNotFoundException("Cart is empty");
         }
+
+        BillModel savedBill = billRepository.save(bill);
+
         List<LineItemModel> items = new ArrayList<>();
         Double totalPrice = 0.0;
         for (CartItemModel item : cartItems) {
@@ -147,7 +164,7 @@ public class BillServiceImpl implements IBillService {
             }
             LineItemModel lineItem = LineItemModel.builder()
                     .productModel(product)
-                    .billModel(bill)
+                    .billModel(savedBill)
                     .quantity(item.getQuantity())
                     .build();
             double unitPrice = item.getProductModel().getUnitPrice();
@@ -166,7 +183,8 @@ public class BillServiceImpl implements IBillService {
                     .toList();
 
             if (activeSerials.size() < item.getQuantity()) {
-                throw new ResourceNotFoundException("Not enough active serials for product: " + product.getProductName());
+                throw new ResourceNotFoundException(
+                        "Not enough active serials for product: " + product.getProductName());
             }
 
             for (SerialProductModel serial : activeSerials) {
@@ -177,27 +195,32 @@ public class BillServiceImpl implements IBillService {
             lineItemRepository.save(lineItem);
             items.add(lineItem);
         }
-        bill.setTotalPrice(totalPrice);
+
+        savedBill.setTotalPrice(totalPrice);
         if (coupon != null) {
-            CouponDecorator couponDecorator = new CouponDecorator(bill, coupon);
-            bill = couponDecorator.getBillModel();
+            CouponDecorator couponDecorator = new CouponDecorator(savedBill, coupon);
+            savedBill = couponDecorator.getBillModel();
             coupon.setActive(false);
             couponRepository.save(coupon);
         }
-        bill.setItems(items);
+        savedBill.setItems(items);
+        Double totalPriceWithShipping = totalPrice + request.getShippingFee();
+        savedBill = billRepository.save(savedBill);
 
-
-        BillModel savedBill = billRepository.save(bill);
+        for (CartItemModel item : cartItems) {
+            cart.getCartItems().remove(item);
+            cartItemRepository.delete(item);
+        }
+        cartRepository.save(cart);
         if (request.getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
             String returnUrl = "http://localhost:5173/checkout";
             String cancelUrl = "http://localhost:5173/checkout";
 
             String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategy)
-                    .createCheckout(totalPrice.intValue(), savedBill.getId(), returnUrl, cancelUrl);
-
+                    .createCheckout(totalPriceWithShipping.intValue(), savedBill.getId(), returnUrl, cancelUrl);
             return paymentUrl;
         }
-        cartRepository.delete(cart);
+
         return billMapper.toResponseDTO(savedBill);
     }
 
@@ -263,6 +286,7 @@ public class BillServiceImpl implements IBillService {
                 break;
             case SHIPPED:
                 subject = "Đơn hàng của bạn đã được giao";
+                bill.getPaymentModel().setPaymentStatus(EPaymentStatus.COMPLETED);
                 break;
             case GUARANTEE:
                 subject = "Đơn hàng của bạn đang được bảo hành";
@@ -285,7 +309,8 @@ public class BillServiceImpl implements IBillService {
     }
 
     @Transactional
-    public void confirmBill(String email, Long billId) {
+    public void confirmBill(String email, Long billCode) {
+
         if (email == null) {
             throw new ResourceNotFoundException("Vui lòng đăng nhập");
         }
@@ -293,16 +318,31 @@ public class BillServiceImpl implements IBillService {
         if (customer == null) {
             throw new ResourceNotFoundException("User not found");
         }
-        BillModel bill = billRepository.findByIdAndCustomerModel(billId, customer);
-        if (bill == null) {
-            throw new ResourceNotFoundException("Bill not found with id: " + billId);
 
+        PayOS payOS = new PayOS(clientId, apiKey, checksumKey);
+
+        try {
+            PaymentLinkData paymentLinkData = payOS.getPaymentLinkInformation(billCode);
+            if (paymentLinkData.getStatus().equals("PAID")) {
+                BillModel bill = billRepository.findByOrderNumberAndCustomerModel(billCode, customer);
+                if (bill == null) {
+                    throw new ResourceNotFoundException("Bill not found with id: " + billCode);
+
+                }
+                if (bill.getPaymentModel().getPaymentMethod() != EPaymentMethod.ONLINE_BANKING) {
+                    throw new ResourceNotFoundException("Bill not found with id: " + billCode);
+                }
+
+                PaymentModel paymentModel = bill.getPaymentModel();
+                paymentModel.setPaymentStatus(EPaymentStatus.COMPLETED);
+                paymentRepository.save(paymentModel);
+
+                billRepository.save(bill);
+            }
+        } catch (Exception e) {
+            log.error("Error getting payment link information: {}", e.getMessage());
         }
-        if (bill.getPaymentModel().getPaymentMethod() != EPaymentMethod.ONLINE_BANKING) {
-            throw new ResourceNotFoundException("Bill not found with id: " + billId);
-        }
-        bill.setPaymentModel(PaymentModel.builder().paymentStatus(EPaymentStatus.COMPLETED).build());
-        billRepository.save(bill);
+
     }
 
     @Override
@@ -399,7 +439,7 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public List<ProductBestSellingDTO> getProductBestSellingByTime(LocalDate startDate, LocalDate endDate,
-                                                                   EBillStatus status) {
+            EBillStatus status) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<ProductBestSellingDTO> data = new ArrayList<>();
@@ -422,7 +462,7 @@ public class BillServiceImpl implements IBillService {
 
     @Override
     public DashBoardResponseDTO getRevenueOrProfitByTime(LocalDate startDate, LocalDate endDate, EBillStatus status,
-                                                         int a) {
+            int a) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         List<BillModel> listOrder = billRepository.revenueByTime(startDateTime, endDateTime, status);
@@ -475,8 +515,8 @@ public class BillServiceImpl implements IBillService {
         }
 
         if (bill.getPaymentModel().getPaymentMethod() == EPaymentMethod.ONLINE_BANKING) {
-            String returnUrl = "http://localhost:5173/checkout";
-            String cancelUrl = "http://localhost:5173/checkout";
+            String returnUrl = "https://nayami-shop-fe.vercel.app/checkout";
+            String cancelUrl = "https://nayami-shop-fe.vercel.app/checkout";
 
             String paymentUrl = ((OnlineBankingPaymentStrategy) paymentStrategyFactory
                     .getStrategy(EPaymentMethod.ONLINE_BANKING.name()))
