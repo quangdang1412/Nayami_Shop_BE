@@ -72,7 +72,6 @@ public class UserController implements Serializable {
     
 
     @PostMapping()
-    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<UserDTO> getUserByEmail(@RequestBody Map<String, Object> requestBody) {
         try {
             UserDTO user = userService.getUserByEmail(requestBody.get("email").toString());
@@ -135,6 +134,23 @@ public class UserController implements Serializable {
     public ResponseData<String> updateUser(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
         try {
             boolean isResetPassword = userService.updateUserPassword(resetPasswordDTO, authHeader);
+            if (isResetPassword) {
+                return new ResponseData<>(HttpStatus.OK.value(), "Thành công", "Cập nhật password thành công");
+            } else {
+                return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Cập nhật password không thành công");
+            }
+        } catch (Exception e) {
+            log.error("errorMessage={}", e.getMessage(), e.getCause());
+            if (e instanceof CustomException)
+                return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update failed");
+        }
+    }
+    @PutMapping("/admin/update-password/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseData<String> updateUser(@PathVariable Long id,@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+        try {
+            boolean isResetPassword = userService.updateUserPasswordByAdmin(resetPasswordDTO,id);
             if (isResetPassword) {
                 return new ResponseData<>(HttpStatus.OK.value(), "Thành công", "Cập nhật password thành công");
             } else {
