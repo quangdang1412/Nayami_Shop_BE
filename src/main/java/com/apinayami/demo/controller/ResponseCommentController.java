@@ -6,7 +6,6 @@ import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.service.Impl.ResponseCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,6 @@ public class ResponseCommentController {
     private final ResponseCommentService responseCommentService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<?> createResponseComment(@RequestBody Map<String, String> body) {
         try {
             String result = responseCommentService.createResponseComment(body.get("reply"), body.get("staff"), Long.parseLong(body.get("id")));
