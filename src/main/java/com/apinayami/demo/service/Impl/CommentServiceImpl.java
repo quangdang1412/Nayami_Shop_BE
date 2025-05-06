@@ -28,8 +28,8 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     public List<CommentDTO> getAllComments() {
-        List<CommentModel> commentModel = commentRepository.findAll();
-        return commentModel.stream().map(commentMapper::ToCommentDTO).collect(Collectors.toList());
+        List<CommentModel> commentModels = commentRepository.findAll();
+        return commentModels.stream().map(commentMapper::ToCommentDTO).collect(Collectors.toList());
     }
 
     @Override

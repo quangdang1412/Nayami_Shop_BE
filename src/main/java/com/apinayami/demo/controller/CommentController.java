@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,7 +21,8 @@ public class CommentController {
 
     @GetMapping
     public ResponseData<?> getAllComments() {
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", commentService.getAllComments());
+        List<CommentDTO> commentDTOs= commentService.getAllComments();
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", commentDTOs);
     }
 
     @GetMapping("/{id}")
