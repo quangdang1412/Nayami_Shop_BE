@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +45,7 @@ public class CategoryController {
 
     @Operation(summary = "Create a new category", description = "Creates a new category")
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public ResponseData<?> addCategory(@RequestBody @Valid CategoryDTO category) {
         try {
             String result = categoryService.create(category);
@@ -56,6 +58,7 @@ public class CategoryController {
 
     @Operation(summary = "Update a category", description = "Updates an existing category by ID")
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public ResponseData<?> updateCategory(@PathVariable long id, @RequestBody @Valid CategoryDTO category) {
         try {
             System.out.println(category.isActive());
@@ -72,6 +75,7 @@ public class CategoryController {
 
     @Operation(summary = "Delete a category", description = "Deletes a category by ID")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public ResponseData<?> deleteCategory(@PathVariable long id) {
         try {
             CategoryDTO updated_category = categoryService.findCategoryById(id);

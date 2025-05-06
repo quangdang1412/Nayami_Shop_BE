@@ -20,7 +20,6 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/bills")
-
 @SecurityRequirement(name = "bearerAuth")
 public class BillController {
     private final IBillService billService;
