@@ -73,7 +73,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(PUBLIC_API).permitAll()
                         .requestMatchers(ADMIN_API).hasAuthority("ADMIN")
                         .requestMatchers(CUSTOMER_API).hasAuthority("CUSTOMER")

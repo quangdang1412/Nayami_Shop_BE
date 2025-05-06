@@ -157,6 +157,7 @@ public class UserController implements Serializable {
 * These controller is used for get all staffs
 * */
     @GetMapping("/get-all-staffs")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllStaffs() {
         try {
             List<UserDTO> users = userService.getAllUsersWithoutPassword(Role.STAFF);
@@ -194,7 +195,7 @@ public class UserController implements Serializable {
     }
 /*Update information of admin*/
     @PutMapping("/update/inform/admin")
-//    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseData<String> updatePassword(@Valid @RequestBody AdminInformationUpdateDTO adminDTO) {
         try {
             userService.updateAdmin(adminDTO);
