@@ -1,6 +1,5 @@
 package com.apinayami.demo.controller;
 
-import com.apinayami.demo.dto.request.DashBoardDateDTO;
 import com.apinayami.demo.dto.request.ProductDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
@@ -32,12 +31,12 @@ public class ProductController {
     private final IProductService productService;
 
     @PostMapping()
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<String> addProduct(@RequestPart("productDTO") @Valid String productDTOJson,
                                            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             ProductDTO productDTO = objectMapper.readValue(productDTOJson, ProductDTO.class);
-
             return new ResponseData<>(HttpStatus.CREATED.value(), "Success", productService.saveProduct(productDTO, files));
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
@@ -48,6 +47,7 @@ public class ProductController {
     }
 
     @PutMapping()
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<String> updateProduct(@RequestPart("productDTO") @Valid String productDTOJson,
                                               @RequestPart("files") List<MultipartFile> files) {
         try {
@@ -66,6 +66,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "{proID}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
     public ResponseData<?> changeDisplayStatusProduct(@PathVariable long proID) {
         try {
             log.info("Request update display status : {}", proID);
@@ -113,7 +114,7 @@ public class ProductController {
     }
 
     @GetMapping(value = "/categories/{categoryID}")
-    public ResponseData<?> getProductByBrand(@PathVariable long categoryID) {
+    public ResponseData<?> getProductByCategory(@PathVariable long categoryID) {
         try {
             return new ResponseData<>(HttpStatus.OK.value(), "Get product successfully", productService.findProductByCategoryId(categoryID));
         } catch (ResourceNotFoundException e) {
@@ -133,6 +134,19 @@ public class ProductController {
         }
 
     }
+
+    @GetMapping("/bestSelling")
+    public ResponseData<?> getProductBestSellingInMonth(@RequestParam LocalDate startDate,
+                                                        @RequestParam LocalDate endDate) {
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getProductBestSellingByTime(startDate, endDate, EBillStatus.COMPLETED));
+        } catch (ResourceNotFoundException e) {
+            log.info("errorMessage={}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+
+    }
+
 
     @GetMapping("/filterOption")
     public ResponseData<?> getFilterOption() {
@@ -159,18 +173,6 @@ public class ProductController {
         try {
             PagedModel<?> productPage = productService.getProductFilter(pageNo, pageSize, sortBy, brands, categories, rating, discounts, searchQuery, price);
             return new ResponseData<>(HttpStatus.OK.value(), "Get product filter successfully", productPage);
-        } catch (ResourceNotFoundException e) {
-            log.info("errorMessage={}", e.getMessage(), e.getCause());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
-    }
-
-    @PostMapping("/productBestSelling")
-    public ResponseData<?> getProductBestSelling(@RequestBody DashBoardDateDTO dashboardDateDTO) {
-        try {
-            LocalDate startDate = dashboardDateDTO.getStartDate();
-            LocalDate endDate = dashboardDateDTO.getEndDate();
-            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", productService.getProductBestSellingByTime(startDate, endDate, EBillStatus.COMPLETED));
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
