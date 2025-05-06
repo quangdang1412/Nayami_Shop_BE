@@ -5,16 +5,13 @@ import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.mapper.BrandMapper;
-import com.apinayami.demo.model.BrandModel;
 import com.apinayami.demo.service.IBrandService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,8 +46,8 @@ public class BrandController {
     }
 
     @Operation(summary = "Create new brand", description = "Creates a new brand with the provided information")
-    @SuppressWarnings("unchecked")
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public ResponseData<String> createBrand(@Valid @RequestBody BrandDTO brandDTO) {
         try {
             log.info("Request add brand: {}", brandDTO.getName());
@@ -66,11 +63,12 @@ public class BrandController {
 
     @Operation(summary = "Update brand", description = "Updates an existing brand with the provided information")
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public ResponseData<?> updateBrand(@PathVariable Long id, @Valid @RequestBody BrandDTO brandDTO) {
         try {
             log.info("Request update brand: {}", brandDTO.getName());
 
-            brandService.update(brandDTO,id);
+            brandService.update(brandDTO, id);
             return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + brandDTO.getName());
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
@@ -82,11 +80,12 @@ public class BrandController {
 
     @Operation(summary = "Change status brand", description = "Deletes a brand by its ID")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public ResponseData<?> deleteBrand(@PathVariable Long id) {
         try {
             brandService.delete(id);
             return new ResponseData<>(HttpStatus.OK.value(), "Success",
-                    "Thay đổi trạng thái thành công " );
+                    "Thay đổi trạng thái thành công ");
         } catch (Exception e) {
             log.error("errorMessage={}", e.getMessage(), e.getCause());
             if (e instanceof CustomException)
