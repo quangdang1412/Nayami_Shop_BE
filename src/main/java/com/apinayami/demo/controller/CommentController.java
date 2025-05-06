@@ -34,7 +34,8 @@ public class CommentController {
     public ResponseData<?> addComment(@Validated @RequestBody CommentDTO commentDTO) {
         try {
             commentService.create(commentDTO);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + commentDTO.getDescription());
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success",
+                    "Thêm thành công " + commentDTO.getDescription());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
@@ -42,7 +43,7 @@ public class CommentController {
     }
 
     @PostMapping("/active")
-    @PreAuthorize("hasAnyAuthority('CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public ResponseData<?> cancelComment(@RequestBody Map<String, String> body) {
         try {
             String result = commentService.updateStatus(Long.parseLong(body.get("id")));

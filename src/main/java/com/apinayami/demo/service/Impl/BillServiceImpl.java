@@ -259,6 +259,9 @@ public class BillServiceImpl implements IBillService {
                 throw new ResourceNotFoundException("Bill not found with id: " + billId);
 
             }
+            if(bill.getStatus() != EBillStatus.PENDING) {
+                throw new ResourceNotFoundException("Bill is not in pending status");
+            }
             if (bill.getStatus() == EBillStatus.CANCELLED) {
                 throw new ResourceNotFoundException("Bill is already cancelled");
             }
@@ -266,7 +269,7 @@ public class BillServiceImpl implements IBillService {
             billRepository.save(bill);
             return "Đơn hàng hủy thành công";
         } catch (Exception e) {
-            throw new CustomException("Lỗi hủy đơn hàng");
+            throw new CustomException(e.getMessage());
         }
     }
 
@@ -298,6 +301,7 @@ public class BillServiceImpl implements IBillService {
                 break;
             case CANCELLED:
                 subject = "Đơn hàng của bạn đã bị hủy";
+                bill.getPaymentModel().setPaymentStatus(EPaymentStatus.CANCELLED);
                 break;
             default:
                 throw new ResourceNotFoundException("Unknown bill status: " + billStatus);

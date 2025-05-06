@@ -17,7 +17,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/responses")
 @Validated
-@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
 public class ResponseCommentController {
     private final ResponseCommentService responseCommentService;
 
