@@ -97,6 +97,22 @@ public class  UserServiceImpl implements IUserService {
             throw new CustomException("Update user failed");
         }
     }
+
+
+    public String updateWithoutCheckExistEmailAndNumberphone(UserDTO userDTO) {
+        try {
+            UserModel existingUser = userRepository.findById(userDTO.getUserId())
+                    .orElseThrow(() -> new CustomException("User không tồn tại"));
+            existingUser.setActive(!existingUser.isActive());
+            userRepository.save(existingUser);
+            return "Cập nhật thành công " +userDTO.getUserName();
+        } catch (Exception e) {
+            log.error("Error: {}", e.getMessage());
+            if (e instanceof CustomException)
+                throw new CustomException(e.getMessage());
+            throw new CustomException("Update user failed");
+        }
+    }
     public String updateAdmin(AdminInformationUpdateDTO adminDTO) {
         try {
             String hashedPassword = passwordEncoder.encode(adminDTO.getPassword());

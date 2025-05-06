@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("api/users")
@@ -54,6 +57,7 @@ public class UserController implements Serializable {
         }
     }
 
+
     @GetMapping("/email/{email}")
     @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
@@ -65,6 +69,7 @@ public class UserController implements Serializable {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    
 
     @PostMapping()
     public ResponseEntity<UserDTO> getUserByEmail(@RequestBody Map<String, Object> requestBody) {
@@ -108,6 +113,21 @@ public class UserController implements Serializable {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update failed");
         }
     }
+    
+        @PutMapping("/update/status/{id}")
+        @PreAuthorize("hasAuthority('ADMIN')")
+        public ResponseData<String> updateStatusUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+            try {
+                log.info("Request update user: {}", userDTO.getUserName());
+                userService.updateWithoutCheckExistEmailAndNumberphone(userDTO);
+                return new ResponseData<>(HttpStatus.OK.value(), "Success", "update successfully");
+            } catch (Exception e) {
+                log.error("errorMessage={}", e.getMessage(), e.getCause());
+                if (e instanceof CustomException)
+                    return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+                return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update failed");
+            }
+        }
 
     @PutMapping("/update-password")
     @PreAuthorize("hasAuthority('CUSTOMER')")
