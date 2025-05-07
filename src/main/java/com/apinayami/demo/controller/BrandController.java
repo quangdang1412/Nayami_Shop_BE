@@ -47,7 +47,7 @@ public class BrandController {
 
     @Operation(summary = "Create new brand", description = "Creates a new brand with the provided information")
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<String> createBrand(@Valid @RequestBody BrandDTO brandDTO) {
         try {
             log.info("Request add brand: {}", brandDTO.getName());
@@ -63,7 +63,7 @@ public class BrandController {
 
     @Operation(summary = "Update brand", description = "Updates an existing brand with the provided information")
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<?> updateBrand(@PathVariable Long id, @Valid @RequestBody BrandDTO brandDTO) {
         try {
             log.info("Request update brand: {}", brandDTO.getName());
@@ -80,7 +80,7 @@ public class BrandController {
 
     @Operation(summary = "Change status brand", description = "Deletes a brand by its ID")
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<?> deleteBrand(@PathVariable Long id) {
         try {
             brandService.delete(id);

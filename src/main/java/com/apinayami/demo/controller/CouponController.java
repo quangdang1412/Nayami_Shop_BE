@@ -24,14 +24,14 @@ public class CouponController {
     private final JwtConfig jwtConfig;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<List<CouponDto>> getAllCoupons() {
         List<CouponDto> coupons = couponService.getAllCoupons();
         return new ResponseData<>(HttpStatus.OK.value(), "Coupons retrieved successfully", coupons);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<CouponDto> getCouponById(@PathVariable String id) {
         CouponDto coupon = couponService.getCouponById(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Coupon applied successfully", coupon);
@@ -45,14 +45,14 @@ public class CouponController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<CouponDto> createCoupon(@Valid @RequestBody CreateCouponRequest request) {
         CouponDto createdCoupon = couponService.createCoupon(request);
         return new ResponseData<>(HttpStatus.CREATED.value(), "Coupon created successfully", createdCoupon);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<CouponDto> updateCoupon(
             @PathVariable String id,
             @Valid @RequestBody CreateCouponRequest request) {
@@ -61,7 +61,7 @@ public class CouponController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<Void> deleteCoupon(@PathVariable String id) {
         couponService.deleteCoupon(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Coupon deleted successfully", null);
