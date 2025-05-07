@@ -58,7 +58,7 @@ public class CategoryController {
 
     @Operation(summary = "Update a category", description = "Updates an existing category by ID")
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<?> updateCategory(@PathVariable long id, @RequestBody @Valid CategoryDTO category) {
         try {
             System.out.println(category.isActive());
@@ -75,7 +75,7 @@ public class CategoryController {
 
     @Operation(summary = "Delete a category", description = "Deletes a category by ID")
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseData<?> deleteCategory(@PathVariable long id) {
         try {
             CategoryDTO updated_category = categoryService.findCategoryById(id);
