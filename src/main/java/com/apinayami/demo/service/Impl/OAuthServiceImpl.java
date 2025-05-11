@@ -7,6 +7,7 @@ import com.apinayami.demo.mapper.UserMapper;
 import com.apinayami.demo.model.UserModel;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.util.Enum.Role;
+import com.apinayami.demo.util.RandomPasswordService;
 import com.apinayami.demo.util.SecurityUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,7 @@ public class OAuthServiceImpl {
     private final UserServiceImpl userService;
     private final SecurityUtil securityUtil;
     private final IUserRepository userRepository;
+    private final EmailService emailService;
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String clientId;
 
@@ -62,9 +64,15 @@ public class OAuthServiceImpl {
 
             UserDTO currentUser = userService.getUserByEmail(userInfo.getEmail());
             if (currentUser == null) { // Neu user khong ton tai
-                String hashedPasswrod = passwordEncoder.encode(userInfo.getPassword());
-                userInfo.setPassword(hashedPasswrod);
-                userRepository.save(userInfo);
+
+                //send email to user with random password
+                if(emailService.sendEmail(userInfo.getEmail(),"New password",userInfo.getPassword())){
+                    String hashedPasswrod = passwordEncoder.encode(userInfo.getPassword());
+                    userInfo.setPassword(hashedPasswrod);
+                    userRepository.save(userInfo);
+                }else{
+                    throw new CustomException("Lỗi khi tạo tài khoản mới, vui lòng thử lại sau");
+                }
             }else{ // Neu user ton tai
                 if(currentUser.isActive() == false) //user da bi vo hieu hoa
                 {
@@ -107,8 +115,9 @@ public class OAuthServiceImpl {
         }
     }
 
+    private final RandomPasswordService randomPasswordService;
     public UserModel getUserInfo(String accessToken) {
-        final String defaultPassword = "123456";
+        final String defaultPassword = randomPasswordService.randomPassword();
 
 
         String userInfoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";

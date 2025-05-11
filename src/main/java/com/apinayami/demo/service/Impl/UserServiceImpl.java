@@ -192,9 +192,9 @@ public class  UserServiceImpl implements IUserService {
         if(email != "") {
             try{
                 UserModel userModel = userRepository.findByEmail(email);
-                userModel.setPassword(resetPasswordDTO.getNewPassword());
-                UserDTO userDTO = userMapper.toDetailDto(userModel);
-                update(userDTO);
+                String hashedPassword = passwordEncoder.encode(resetPasswordDTO.getNewPassword());
+                userModel.setPassword(hashedPassword);
+                userRepository.save(userModel);
                 return true;
             }catch(Exception e){
                 log.error("Error: {}", e.getMessage());
@@ -203,8 +203,19 @@ public class  UserServiceImpl implements IUserService {
         }
         return false;
     }
-
-
+    public boolean updateUserPasswordByAdmin(ResetPasswordDTO resetPasswordDTO, Long id) {
+        try {
+            UserModel userModel = userRepository.findById(id).orElseThrow(() -> new CustomException("User không tồn tại"));
+            ;
+            String hashedPassword = passwordEncoder.encode(resetPasswordDTO.getNewPassword());
+            userModel.setPassword(hashedPassword);
+            userRepository.save(userModel);
+            return true;
+        } catch (Exception e) {
+            log.error("Error: {}", e.getMessage());
+            return false;
+        }
+    }
     /*
     * Is used for refresh
     * */

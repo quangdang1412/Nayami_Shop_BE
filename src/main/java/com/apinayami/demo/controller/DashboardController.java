@@ -23,7 +23,7 @@ import java.time.LocalDate;
 @Validated
 @Slf4j
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+@PreAuthorize("hasAnyAuthority('ADMIN')")
 public class DashboardController {
     private final IProductService productService;
     private final IBillService billService;

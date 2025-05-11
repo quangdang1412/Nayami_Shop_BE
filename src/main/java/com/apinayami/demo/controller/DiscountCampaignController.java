@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/discounts")
 @Validated
 @Slf4j
-@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+@PreAuthorize("hasAnyAuthority('ADMIN')")
 public class DiscountCampaignController {
     private final IDiscountCampaignService discountCampaignService;
 
