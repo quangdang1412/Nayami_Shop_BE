@@ -35,8 +35,9 @@ public class CommentController {
     @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseData<?> addComment(@Validated @RequestBody CommentDTO commentDTO) {
         try {
-            commentService.create(commentDTO);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + commentDTO.getDescription());
+            System.out.println(commentDTO.toString());
+            String result = commentService.create(commentDTO);
+            return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + result);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
