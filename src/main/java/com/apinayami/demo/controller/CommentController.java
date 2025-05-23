@@ -35,7 +35,6 @@ public class CommentController {
     @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseData<?> addComment(@Validated @RequestBody CommentDTO commentDTO) {
         try {
-            System.out.println(commentDTO.toString());
             String result = commentService.create(commentDTO);
             return new ResponseData<>(HttpStatus.CREATED.value(), "Success", "Thêm thành công " + result);
         } catch (Exception e) {
