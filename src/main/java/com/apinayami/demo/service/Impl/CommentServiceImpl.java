@@ -10,6 +10,7 @@ import com.apinayami.demo.repository.ICommentRepository;
 import com.apinayami.demo.repository.IProductRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.ICommentService;
+import com.apinayami.demo.util.chainofresponsibility.ChainManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,12 @@ public class CommentServiceImpl implements ICommentService {
     private final IProductRepository productRepository;
     private final IUserRepository userRepository;
     private final CommentMapper commentMapper;
+    private final ChainManager chainManager;
 
     @Override
     public List<CommentDTO> getAllComments() {
-        List<CommentModel> commentModel = commentRepository.findAll();
-        return commentModel.stream().map(commentMapper::ToCommentDTO).collect(Collectors.toList());
+        List<CommentModel> commentModels = commentRepository.findAll();
+        return commentModels.stream().map(commentMapper::ToCommentDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -45,6 +47,9 @@ public class CommentServiceImpl implements ICommentService {
     @Override
     public String create(CommentDTO commentDTO) {
         try {
+
+            chainManager.validate(commentDTO);
+
             UserModel userModel = userRepository.findByEmail(commentDTO.getUserEmail());
             ProductModel productModel = productRepository.findById(commentDTO.getProductId()).get();
             CommentModel commentModel = commentMapper.ToCommentModel(commentDTO);

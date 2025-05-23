@@ -65,8 +65,8 @@ public class CategoryController {
             CategoryDTO updated_category = categoryService.findCategoryById(id);
             updated_category.setCategoryName(category.getCategoryName());
             updated_category.setActive(category.isActive());
-            categoryService.update(updated_category);
-            return new ResponseData<>(HttpStatus.OK.value(), "Success", "Cập nhật thành công " + category.getCategoryName());
+            String result = categoryService.update(updated_category);
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", result);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Save failed");
