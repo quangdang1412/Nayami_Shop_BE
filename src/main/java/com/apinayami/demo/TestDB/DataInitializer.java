@@ -66,6 +66,7 @@ public class DataInitializer {
 //            userModel.setPassword(hashedPassword);
 //            userModel.setActive(true);
 //            userRepository.save(userModel);
+
 //            UserModel userModel = UserModel.builder()
 //                    .userName("demoTB")
 //                    .email("demotranbao123@gmail.com")

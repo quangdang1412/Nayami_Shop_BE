@@ -31,13 +31,15 @@ public class DashboardController {
     @GetMapping("/chartCard")
     public ResponseData<?> getChartCardData() {
         try {
-            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully",
-                    ChartCardDTO.builder()
-                            .quantityProduct(productService.getQuantityOfProduct())
-                            .quantityBillNeedToProcess(billService.countBillsByStatus(EBillStatus.PENDING) + billService.countBillsByStatus(EBillStatus.CONFIRMED))
-                            .totalProfit(billService.totalProfit(EBillStatus.COMPLETED))
-                            .totalRevenue(billService.totalRevenue(EBillStatus.COMPLETED))
-                            .build());
+
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully",ChartCardDTO.builder()
+                    .quantityProduct(productService.getQuantityOfProduct())
+                    .quantityBillNeedToProcess(
+                            billService.countBillsByStatus(EBillStatus.PENDING)
+                                    + billService.countBillsByStatus(EBillStatus.CONFIRMED))
+                    .totalProfit(billService.totalProfit(EBillStatus.COMPLETED))
+                    .totalRevenue(billService.totalRevenue(EBillStatus.COMPLETED))
+                    .build());
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());

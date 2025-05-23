@@ -10,6 +10,7 @@ import com.apinayami.demo.repository.ICouponRepository;
 import com.apinayami.demo.repository.IUserRepository;
 import com.apinayami.demo.service.ICouponService;
 import com.apinayami.demo.util.Enum.ETypeCoupon;
+import com.apinayami.demo.util.Singleton.IdGenerator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -71,8 +72,9 @@ public class CouponServiceImpl implements ICouponService {
 
     @Transactional
     public CouponDto createCoupon(CreateCouponRequest request) {
+        String generatedId = IdGenerator.getInstance().generateId();
         CouponModel coupon = CouponModel.builder()
-                .id(UUID.randomUUID().toString().replace("-", "").substring(0, 6))
+                .id(generatedId)
                 .content(request.getContent())
                 .value(request.getValue())
                 .type(request.getType())
