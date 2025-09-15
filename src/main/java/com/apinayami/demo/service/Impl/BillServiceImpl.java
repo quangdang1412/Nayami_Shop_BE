@@ -448,6 +448,7 @@ public class BillServiceImpl implements IBillService {
             if (productInfo != null && productInfo.length > 0) {
                 ProductModel productModel = (ProductModel) productInfo[0];
                 data.add(ProductBestSellingDTO.builder()
+                        .id(productModel.getId())
                         .url(productModel.getListImage().get(0).getUrl())
                         .name(productModel.getProductName())
                         .unitPrice(productModel.getUnitPrice())
