@@ -5,6 +5,7 @@ import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.CustomException;
 import com.apinayami.demo.exception.ResourceNotFoundException;
+import com.apinayami.demo.service.IBarcodeService;
 import com.apinayami.demo.service.IProductService;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +14,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
     private final IProductService productService;
+    private final IBarcodeService barcodeService;
 
     @PostMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -176,6 +181,19 @@ public class ProductController {
         } catch (ResourceNotFoundException e) {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+    }
+
+    @GetMapping("/barcode/pdf/{id}")
+    public ResponseEntity<byte[]> generateBarcodePdf(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s.pdf", "BarcodeProduct" + id))
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(barcodeService.generateQR(id));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 }
