@@ -1,0 +1,314 @@
+{
+  "name": "Nayamibot",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "4bcc5ebd-c1df-4218-9c24-1e043cf9adb5",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        32
+      ],
+      "webhookId": "f6ff964d-57d4-4148-8af8-eac34a954c20"
+    },
+    {
+      "parameters": {
+        "content": "## Start by saying 'hi'\n![Button](https://i.imgur.com/PrIBJI6.png)",
+        "height": 149,
+        "width": 150
+      },
+      "id": "7037a1b8-afb2-4b0b-a034-98e80801e6ab",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}{{ $json.body.msg }}",
+        "options": {
+          "systemMessage": "=Bạn là trợ lý ảo Nayami Shop, nhiệm vụ duy nhất là chuyển câu hỏi của khách hàng thành câu lệnh SQL đúng cú pháp cho cơ sở dữ liệu MySQL `nayami_shop`.\nthông tin database [ { \"sql\": \"SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULTFROM INFORMATION_SCHEMA.COLUMNSWHERE TABLE_SCHEMA = 'nayami_shop'ORDER BY TABLE_NAME, ORDINAL_POSITION\", \"data\": [ { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"active\", \"DATA_TYPE\": \"tinyint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"detail\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"district\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"province\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"recipient_name\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"shipping_contact_number\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"ward\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"address_model\", \"COLUMN_NAME\": \"customer_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"discount\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"order_number\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"payment_method\", \"DATA_TYPE\": \"enum\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"status\", \"DATA_TYPE\": \"enum\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"total_price\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"coupon_id\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"customer_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"payment_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"UNI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"bill_model\", \"COLUMN_NAME\": \"shipping_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"UNI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"brand_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"brand_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"brand_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"brand_model\", \"COLUMN_NAME\": \"active\", \"DATA_TYPE\": \"tinyint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"brand_model\", \"COLUMN_NAME\": \"brand_name\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_item_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_item_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_item_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_item_model\", \"COLUMN_NAME\": \"quantity\", \"DATA_TYPE\": \"int\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_item_model\", \"COLUMN_NAME\": \"cart_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_item_model\", \"COLUMN_NAME\": \"product_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"cart_model\", \"COLUMN_NAME\": \"customer_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"category_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"category_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"category_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"category_model\", \"COLUMN_NAME\": \"active\", \"DATA_TYPE\": \"tinyint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": \"1\" }, { \"TABLE_NAME\": \"category_model\", \"COLUMN_NAME\": \"category_name\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"comment_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"comment_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"comment_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"comment_model\", \"COLUMN_NAME\": \"active\", \"DATA_TYPE\": \"tinyint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": \"1\" }, { \"TABLE_NAME\": \"comment_model\", \"COLUMN_NAME\": \"description\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"comment_model\", \"COLUMN_NAME\": \"rating\", \"DATA_TYPE\": \"int\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"comment_model\", \"COLUMN_NAME\": \"customer_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"comment_model\", \"COLUMN_NAME\": \"product_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"configuration_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"configuration_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"configuration_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"configuration_model\", \"COLUMN_NAME\": \"category_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"active\", \"DATA_TYPE\": \"tinyint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"constraint_money\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"content\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"end_date\", \"DATA_TYPE\": \"date\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"start_date\", \"DATA_TYPE\": \"date\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"type\", \"DATA_TYPE\": \"enum\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"value\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"coupon_model\", \"COLUMN_NAME\": \"customer_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_campaign_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_campaign_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_campaign_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_campaign_model\", \"COLUMN_NAME\": \"active\", \"DATA_TYPE\": \"bit\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_campaign_model\", \"COLUMN_NAME\": \"description\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_campaign_model\", \"COLUMN_NAME\": \"end_date\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_campaign_model\", \"COLUMN_NAME\": \"name\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_campaign_model\", \"COLUMN_NAME\": \"start_date\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_detail_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_detail_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_detail_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_detail_model\", \"COLUMN_NAME\": \"percentage\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"discount_detail_model\", \"COLUMN_NAME\": \"discount_campaign_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"image_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"image_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"image_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"image_model\", \"COLUMN_NAME\": \"url\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"image_model\", \"COLUMN_NAME\": \"product_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"image_model\", \"COLUMN_NAME\": \"promotion_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"line_item_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"line_item_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"line_item_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"line_item_model\", \"COLUMN_NAME\": \"quantity\", \"DATA_TYPE\": \"int\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"line_item_model\", \"COLUMN_NAME\": \"unit_price\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"line_item_model\", \"COLUMN_NAME\": \"bill_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"line_item_model\", \"COLUMN_NAME\": \"product_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"other_configuration_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"other_configuration_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"other_configuration_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"other_configuration_model\", \"COLUMN_NAME\": \"name\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"other_configuration_model\", \"COLUMN_NAME\": \"value\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"other_configuration_model\", \"COLUMN_NAME\": \"configuration_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"payment_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"payment_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"payment_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"payment_model\", \"COLUMN_NAME\": \"currency\", \"DATA_TYPE\": \"enum\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"payment_model\", \"COLUMN_NAME\": \"payment_method\", \"DATA_TYPE\": \"enum\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"payment_model\", \"COLUMN_NAME\": \"payment_status\", \"DATA_TYPE\": \"enum\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"description\", \"DATA_TYPE\": \"longtext\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"display_status\", \"DATA_TYPE\": \"bit\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"original_price\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"product_name\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"product_status\", \"DATA_TYPE\": \"tinyint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"rating_avg\", \"DATA_TYPE\": \"int\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"unit_price\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"brand_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"category_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"configuration_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"product_model\", \"COLUMN_NAME\": \"discount_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_detail_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_detail_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_detail_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_detail_model\", \"COLUMN_NAME\": \"position\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_detail_model\", \"COLUMN_NAME\": \"image_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"UNI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_detail_model\", \"COLUMN_NAME\": \"promotion_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_model\", \"COLUMN_NAME\": \"description\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_model\", \"COLUMN_NAME\": \"display_status\", \"DATA_TYPE\": \"bit\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_model\", \"COLUMN_NAME\": \"end_date\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_model\", \"COLUMN_NAME\": \"start_date\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"promotion_model\", \"COLUMN_NAME\": \"title\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"response_comment_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"response_comment_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"response_comment_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"response_comment_model\", \"COLUMN_NAME\": \"description\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"response_comment_model\", \"COLUMN_NAME\": \"comment_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"UNI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"response_comment_model\", \"COLUMN_NAME\": \"staff_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"serial_product_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"serial_product_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"serial_product_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"serial_product_model\", \"COLUMN_NAME\": \"active\", \"DATA_TYPE\": \"tinyint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": \"1\" }, { \"TABLE_NAME\": \"serial_product_model\", \"COLUMN_NAME\": \"serial\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"serial_product_model\", \"COLUMN_NAME\": \"lineitem_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"serial_product_model\", \"COLUMN_NAME\": \"product_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"shipping_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"shipping_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"shipping_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"shipping_model\", \"COLUMN_NAME\": \"shipping_fee\", \"DATA_TYPE\": \"double\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"shipping_model\", \"COLUMN_NAME\": \"address_id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"MUL\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"id\", \"DATA_TYPE\": \"bigint\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"PRI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"created_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"updated_at\", \"DATA_TYPE\": \"datetime\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"active\", \"DATA_TYPE\": \"bit\", \"IS_NULLABLE\": \"NO\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"email\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"UNI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"password\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"phone_number\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"UNI\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"type\", \"DATA_TYPE\": \"enum\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null }, { \"TABLE_NAME\": \"user_model\", \"COLUMN_NAME\": \"user_name\", \"DATA_TYPE\": \"varchar\", \"IS_NULLABLE\": \"YES\", \"COLUMN_KEY\": \"\", \"COLUMN_DEFAULT\": null } ] } ]\nQuy tắc:\n1. Chỉ trả về câu lệnh SQL, không thêm chữ, không giải thích, không format Markdown.\n2. Dùng SELECT *.\n3. Nếu khách không nêu rõ số lượng kết quả → mặc định giới hạn {top_k} với LIMIT.\n4. Có thể thêm ORDER BY để mang lại kết quả hữu ích nhất.\n5. Tuyệt đối không dùng các lệnh thay đổi dữ liệu (INSERT, UPDATE, DELETE, DROP...).\n6. Nếu câu hỏi không liên quan hoặc không thể chuyển thành SQL hợp lệ → trả về NULL.\n\nVí dụ:\nHỏi: Hãy cho biết tên của tất cả category.\nTrả lời: SELECT * FROM category_model;\n"
+        }
+      },
+      "id": "d86ff563-8944-4cfa-88a4-70b92780a31e",
+      "name": "Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        608,
+        32
+      ],
+      "alwaysOutputData": false,
+      "retryOnFail": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}{{ $('Webhook').item.json.body.userId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        976,
+        272
+      ],
+      "id": "1f51a7ab-0f57-4f0f-9aed-1283f222f6aa",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        560,
+        288
+      ],
+      "id": "d11d3e4b-2c85-4773-93c5-9c9428a35afe",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sBVmXbJPcIP68ta9",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -128
+      ],
+      "id": "355fb924-a1e8-4ce6-a08b-bde71a030c0c",
+      "name": "Webhook",
+      "webhookId": "cd3bba6c-fcd5-4317-8dcf-b6b49e92fd86"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.output }}",
+        "options": {
+          "detailedOutput": true
+        }
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1104,
+        -112
+      ],
+      "id": "413f86c4-b4c7-4f58-80c1-b5f0af8dc793",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "mySql": {
+          "id": "VuTx58TpbqETXo0a",
+          "name": "MySQL account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}{{ $('Webhook').item.json.body.msg }}",
+        "options": {
+          "systemMessage": "=Bạn là trợ lý ảo Nayami Shop. \nCâu hỏi của khách: \"{{ $('Webhook').item.json.body.msg }}\"  \nDữ liệu từ SQL (nếu có): {{ JSON.stringify($json.data) }}\n\nQuy tắc:\n1. Nếu có dữ liệu SQL:\n   - Nếu dữ liệu rỗng hoặc NULL → trả lời: \"Xin lỗi, tôi không tìm thấy sản phẩm phù hợp.\"\n   - Nếu dữ liệu có:\n     + Nếu có nhiều sản phẩm → liệt kê tối đa 3 sản phẩm, kèm giá.\n     + Nếu có 1 sản phẩm → nêu rõ tên và giá.\n   - Luôn trả lời ngắn gọn, tiếng Việt, thân thiện.\n   - Không hiển thị SQL, không giải thích kỹ thuật.\n\n2. Nếu không có dữ liệu SQL (nghĩa là không cần truy vấn DB) → trả lời trực tiếp bằng tiếng Việt, thân thiện, như một nhân viên tư vấn thông thường.\n3. bạn có thể đưa đường dẫn tới trang sản phẩm nữa nhé http://localhost:5173/product-detail/1, 1 ở đây là id sản phẩm"
+        }
+      },
+      "id": "1f94b966-fcc4-46b0-a02d-4ac30de8dee6",
+      "name": "Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1328,
+        16
+      ],
+      "alwaysOutputData": false,
+      "retryOnFail": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7217e024-19f7-4549-8fae-53301e6a7c62",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "SELECT",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        32
+      ],
+      "id": "5cca07e1-3b0d-4544-a7e4-b6e9b40593b7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.userId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        208
+      ],
+      "id": "8c69f13f-77d0-4ff4-bdb7-1fbf2ec17848",
+      "name": "Simple Memory1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "7f0abbd3-749a-4d56-bd6f-2229f78758d6",
+  "meta": {
+    "templateId": "self-building-ai-agent",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a245840d2a066988b4aa5e66eb48c42abb9fab979305932ff40b18361670be9a"
+  },
+  "id": "cFZNN1vXuKlF70L2",
+  "tags": []
+}
