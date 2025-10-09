@@ -1,5 +1,6 @@
 package com.apinayami.demo.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,7 @@ public class ShippingController {
     private final IShippingSerivce shippingSerivce;
 
     @PostMapping("/fee")
-    public Mono<String> getShippingFee(@RequestBody GHTKRequestDTO request) {
+    public Mono<String> getShippingFee(@Valid @RequestBody GHTKRequestDTO request) {
         return shippingSerivce.getShippingFee(request);
     }
 }

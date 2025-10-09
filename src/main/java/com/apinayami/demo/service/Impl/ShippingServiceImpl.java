@@ -45,7 +45,7 @@ public class ShippingServiceImpl implements IShippingSerivce {
         requestBody.put("district", request.getDistrict());
         requestBody.put("address", request.getAddress());
 
-        requestBody.put("customer_tel", "0915416485");
+        requestBody.put("customer_tel", request.getPhone());
         requestBody.put("weight", 500);
         requestBody.put("transport", "road");
         requestBody.put("deliver_option", null);
