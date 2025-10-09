@@ -46,6 +46,7 @@ public class WebSecurityConfig {
             "/api/promotions/**",
             "/api/auth/social-login/google",
             "/api/login/oauth2/code/google",
+            "/api/chatbot/**",
 //            Test purposes
 
             //Swagger
