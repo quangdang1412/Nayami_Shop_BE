@@ -6,7 +6,6 @@ import com.apinayami.demo.dto.request.UserDTO;
 import com.apinayami.demo.dto.response.ResponseData;
 import com.apinayami.demo.service.IAddressService;
 import com.apinayami.demo.service.IUserService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/addresses")
 @RequiredArgsConstructor
 public class AddressController {
-    
+
     private final IAddressService addressService;
     private final IUserService userService;
     private final JwtConfig jwtConfig;
@@ -28,9 +27,9 @@ public class AddressController {
         }
         String token = authHeader.substring(7);
         Jwt decodedToken = jwtConfig.decodeToken(token);
-        return decodedToken.getSubject(); 
+        return decodedToken.getSubject();
     }
-    
+
     @GetMapping
     public ResponseData<?> getAllAddresses(@RequestHeader("Authorization") String authHeader) {
         String email = extractUserEmail(authHeader);
@@ -52,11 +51,11 @@ public class AddressController {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập");
         }
 
-        var address = addressService.getAddressById(id);
+        var address = addressService.getAddressById(id, email);
+
         if (address == null) {
             return new ResponseData<>(HttpStatus.NOT_FOUND.value(), "Không tìm thấy địa chỉ");
         }
-
         return new ResponseData<>(HttpStatus.OK.value(), "Lấy địa chỉ thành công", address);
     }
 
@@ -64,7 +63,7 @@ public class AddressController {
     public ResponseData<?> createAddress(
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody AddressRequestDTO addressDto) {
-        
+
         String email = extractUserEmail(authHeader);
         if (email == null) {
             return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Vui lòng đăng nhập");

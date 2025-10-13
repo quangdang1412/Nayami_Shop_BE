@@ -1,6 +1,11 @@
 server:
   port: 8081
-
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: phong$ecret1
+    key-store-type: PKCS12
+    key-alias: phong
 spring:
   config:
     activate:
@@ -8,10 +13,9 @@ spring:
   application:
     name: nayami_shop
   datasource:
-    url:
-      ${DB_URL:yourDBURL}
-    username: ${DB_USERNAME:yourUserName}
-    password: ${DB_PASSWORD:yourUserName}
+    url: jdbc:mysql://localhost:3306/nayami_shop?createDatabaseIfNotExist=true
+    username: root
+    password: 09032004
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

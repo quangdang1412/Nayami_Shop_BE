@@ -17,7 +17,7 @@ public class ShippingServiceImpl implements IShippingSerivce {
     private final WebClient webClient;
     private final String apiKey;
 
-    public ShippingServiceImpl(@Value("${GHTK_KEY}") String apiKey) {
+    public ShippingServiceImpl(@Value("B576ccd0afeA56B75632203c4494CB7c8F1658d7") String apiKey) {
         this.apiKey = apiKey;
         this.webClient = WebClient.builder()
                 .baseUrl("https://services.giaohangtietkiem.vn/services/shipment")

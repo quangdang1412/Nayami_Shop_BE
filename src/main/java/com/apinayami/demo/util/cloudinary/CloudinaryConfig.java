@@ -5,24 +5,25 @@ import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 @Configuration
 public class CloudinaryConfig {
 
-    @Value("${CLOUD_NAME}")
+    @Value("dwijkd4xi")
     private String name;
-    @Value("${CLOUD_SECRET}")
+    @Value("862117432415768")
     private String secret;
-    @Value("${CLOUD_KEY}")
+    @Value("G5q1TlioVtStYHATJnPFokJkvIg")
     private String key;
 
     @Bean
-    public Cloudinary cloudinary(){
+    public Cloudinary cloudinary() {
         return new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", name,
                 "api_key", key,
                 "api_secret", secret
         ));
-    };
+    }
+
+    ;
 }
