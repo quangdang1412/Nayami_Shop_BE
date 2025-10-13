@@ -41,8 +41,7 @@ public class JwtConfig {
                 build();
         return token -> {
             try {
-                Jwt jwt = jwtDecoder.decode(token);
-                return jwt;
+                return jwtDecoder.decode(token);
             } catch (Exception e) {
                 log.error(e.getMessage());
                 return null;

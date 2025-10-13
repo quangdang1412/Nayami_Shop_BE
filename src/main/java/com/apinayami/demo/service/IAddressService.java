@@ -1,9 +1,9 @@
 package com.apinayami.demo.service;
 
-import java.util.List;
-
 import com.apinayami.demo.dto.request.AddressRequestDTO;
 import com.apinayami.demo.dto.response.AddressResponseDTO;
+
+import java.util.List;
 
 public interface IAddressService {
 
@@ -11,12 +11,11 @@ public interface IAddressService {
 
     AddressResponseDTO updateAddress(Long id, AddressRequestDTO address);
 
-    void deleteAddress(Long id);
+    void deleteAddress(Long id, String email);
 
-    AddressResponseDTO getAddressById(Long id);
+    AddressResponseDTO getAddressById(Long id, String email);
 
     List<AddressResponseDTO> getAddressByCustomerId(Long id);
 
 
-    
 }

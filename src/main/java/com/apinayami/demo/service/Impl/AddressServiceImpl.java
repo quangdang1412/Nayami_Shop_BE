@@ -1,9 +1,5 @@
 package com.apinayami.demo.service.Impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.apinayami.demo.dto.request.AddressRequestDTO;
 import com.apinayami.demo.dto.response.AddressResponseDTO;
 import com.apinayami.demo.exception.ResourceNotFoundException;
@@ -11,15 +7,16 @@ import com.apinayami.demo.mapper.AddressMapper;
 import com.apinayami.demo.model.AddressModel;
 import com.apinayami.demo.repository.IAddressRepository;
 import com.apinayami.demo.service.IAddressService;
-import com.google.cloud.storage.Acl.User;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AddressServiceImpl implements IAddressService  {
+public class AddressServiceImpl implements IAddressService {
     private final IAddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
@@ -38,29 +35,35 @@ public class AddressServiceImpl implements IAddressService  {
     public AddressResponseDTO updateAddress(Long id, AddressRequestDTO requestDTO) {
         log.info("Updating address with ID: {}", id);
         AddressModel address = addressRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + id));
-            addressMapper.updateAddressFromDto(requestDTO, address);
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + id));
+        addressMapper.updateAddressFromDto(requestDTO, address);
         AddressModel updatedAddress = addressRepository.save(address);
 
         return addressMapper.toResponseDTO(updatedAddress);
     }
 
     @Override
-    public void deleteAddress(Long id) {
+    public void deleteAddress(Long id, String email) {
         log.info("Deleting address with ID: {}", id);
-        AddressModel address = addressRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + id));
-        address.setActive(false);
-        addressRepository.save(address);
+        AddressModel addressModel = addressRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + id));
+        addressModel.setActive(false);
+        if (!addressModel.getCustomerModel().getEmail().equals(email))
+            throw new ResourceNotFoundException("Dont allow to delete Address: " + id);
+        addressRepository.save(addressModel);
     }
 
     @Override
-    public AddressResponseDTO getAddressById(Long id) {
+    public AddressResponseDTO getAddressById(Long id, String email) {
         log.info("Fetching address with ID: {}", id);
         AddressModel addressModel = addressRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + id));
+
+        if (!addressModel.getCustomerModel().getEmail().equals(email))
+            throw new ResourceNotFoundException("Dont allow to get Address: " + id);
         return addressMapper.toResponseDTO(addressModel);
     }
+
     @Override
     public List<AddressResponseDTO> getAddressByCustomerId(Long CustomerId) {
         log.info("Fetching address with ID: {}", CustomerId);
