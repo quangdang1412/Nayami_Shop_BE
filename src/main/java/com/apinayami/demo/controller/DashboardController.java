@@ -8,14 +8,19 @@ import com.apinayami.demo.dto.response.ResponseError;
 import com.apinayami.demo.exception.ResourceNotFoundException;
 import com.apinayami.demo.service.IBillService;
 import com.apinayami.demo.service.IProductService;
+import com.apinayami.demo.service.IReportService;
 import com.apinayami.demo.util.Enum.EBillStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 @RestController
@@ -27,12 +32,13 @@ import java.time.LocalDate;
 public class DashboardController {
     private final IProductService productService;
     private final IBillService billService;
+    private final IReportService reportService;
 
     @GetMapping("/chartCard")
     public ResponseData<?> getChartCardData() {
         try {
 
-            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully",ChartCardDTO.builder()
+            return new ResponseData<>(HttpStatus.OK.value(), "Get all product successfully", ChartCardDTO.builder()
                     .quantityProduct(productService.getQuantityOfProduct())
                     .quantityBillNeedToProcess(
                             billService.countBillsByStatus(EBillStatus.PENDING)
@@ -92,5 +98,13 @@ public class DashboardController {
             log.info("errorMessage={}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
+    }
+
+    @GetMapping("/report/excel")
+    public ResponseEntity<byte[]> exportExcel() throws IOException {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=BaoCaoKinhDoanh.xlsx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(reportService.exportDashBoardOfMonth());
     }
 }

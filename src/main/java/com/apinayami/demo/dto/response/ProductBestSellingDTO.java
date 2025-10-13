@@ -12,6 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductBestSellingDTO implements Serializable {
+    private Long id;
     private String url;
     private String name;
     private Double unitPrice;
